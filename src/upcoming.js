@@ -1,8 +1,9 @@
 const { notifyUser, warnUser, calculateProximity } = require('./notify.js')
-const { EVENTS_TO_EXCLUDE } = require('../config.js')
-const getEvents = require('./applescript/calendar.js')
+const { getEvents } = require('./applescript/calendar.js')
 
-let upcomingEvents = []
+let upcomingEvents = [],
+    expired = [],
+    looming = [];
 
 function setUpcoming(evts) {
     upcomingEvents = evts
@@ -12,33 +13,25 @@ function addEvent(evt) {
     upcomingEvents = [...upcomingEvents, evt]
 }
 
-function removeEvent(evt) {
-    console.log('removeEvent()')
-    upcomingEvents = upcomingEvents.filter(({ id }) => evt.id !== id)
-    console.log(`Removed ${evt.summary} from upcomingEvents`)
+async function removeEvent(evt) {
+    expired.push(evt)
+    looming = looming.filter(id => evt?.id !== id)
+    upcomingEvents = upcomingEvents.filter(({ id }) => evt?.id !== id)
 }
 
-function syncCalendarsToUpcoming() {
-    getEvents().then((events) => {
-        console.log(`Found ${events.length} upcoming events`)
-        upcomingEvents = events
-    })
+async function syncCalendarsToUpcoming() {
+    const events = await getEvents()
+    upcomingEvents = events.filter(
+        (e) => !expired.map(({ id }) => id).includes(e?.id)
+    )
+
+    console.log(`Found ${upcomingEvents.length} upcoming events`)
 }
 
-function shouldIgnoreEvent(eventToCheck) {
-    return EVENTS_TO_EXCLUDE.some((eventPhraseToExclude) => {
-        return eventToCheck?.summary
-            ?.toLowerCase()
-            ?.includes(eventPhraseToExclude)
-    })
-}
-
-function checkUpcomingForMeetings() {
+async function checkUpcomingForMeetings() {
     if (!upcomingEvents?.length) {
         return
     }
-
-    let expired = []
 
     const { length: count } = upcomingEvents,
         now = new Date()
@@ -52,15 +45,9 @@ function checkUpcomingForMeetings() {
         const evt = upcomingEvents[i],
             { delta, imminent, soon } = calculateProximity(evt, now)
 
-        if (shouldIgnoreEvent(evt)) {
-            console.log(
-                'Ignoring event because it matches the excluded event list',
-                evt,
-                EVENTS_TO_EXCLUDE
-            )
-        }
 
-        if (soon) {
+        if (soon && !looming.includes(evt?.id)) {
+            looming.push(evt?.id)
             warnUser(evt)
         }
 
@@ -71,7 +58,7 @@ function checkUpcomingForMeetings() {
 
         // Super late now - stop hassling them
         if (delta <= -10) {
-            console.log('Delta', delta, evt);
+            console.log('Delta', delta, evt)
             expired.push(evt.uid)
         }
     }

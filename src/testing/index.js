@@ -2,11 +2,11 @@ const { setUpcoming, upcomingEvents } = require("../upcoming.js");
 
 const { LOOK_AHEAD_MINUTES } = require("../../config.js");
 
-function addDummyEvent(summary, uid, offset, location, url) {
+function addDummyEvent(summary, uid, offset, location, url, description) {
   const startDate = new Date();
   startDate.setMinutes(startDate.getMinutes() + offset);
 
-  const evt = { summary, startDate, uid, location, url };
+  const evt = { summary, startDate, uid, location, url, description };
   setUpcoming([...upcomingEvents, evt]);
   console.log("Adding entry to upcomingEvents..");
 }

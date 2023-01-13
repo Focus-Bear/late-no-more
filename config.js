@@ -3,8 +3,6 @@ const LOOK_AHEAD_MINUTES = 2, // how long before a meeting should I notify?
     QUICK_NAP_DURATION_SECONDS = 30, // how often should I check the in-memory list of upcomingEvents
     PAUSE_BETWEEN_BARKS_SECONDS = 5, // how many seconds does each line of dialog have to itself
     // It can be a partial match and it's case insensitive. e.g. Holiday will match "UK holidays"
-    CALENDARS_TO_EXCLUDE = ['Birthday', 'Holiday', 'Contacts'],
-    EVENTS_TO_EXCLUDE = ['Birthday', 'Holiday', 'Contacts'],
     IS_TESTING = process.env.NODE_ENV == 'test'
 
 const DIALOG_STAGES = [
@@ -37,8 +35,6 @@ module.exports = {
     DIALOG_STAGES,
     LOOK_AHEAD_MINUTES,
     PAUSE_BETWEEN_BARKS_SECONDS,
-    CALENDARS_TO_EXCLUDE,
-    EVENTS_TO_EXCLUDE,
     MEETING_QUESTIONS,
     VERBAL_ALERTS,
     IS_TESTING,

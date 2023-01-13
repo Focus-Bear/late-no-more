@@ -25,11 +25,11 @@ function tidyDate(date) {
 function matchServices(evt) {
     const { description } = evt
 
-    const isGoogleMeet = description.includes('google.com'),
-        isMsftTeams = description.includes('microsoft.com')
+    const isGoogleMeet = description?.includes('google.com'),
+        isMsftTeams = description?.includes('microsoft.com')
 
     if (isMsftTeams || isGoogleMeet) {
-        const regex = /https\S*\s/,
+        const regex = /https\S*[\s\>]/,
             [url] = description.match(regex)
         return { ...evt, url: url.trim() }
     }
@@ -68,15 +68,24 @@ async function getEvents() {
         tidied = withOutBlanks.map(tidyEvent)
 
     return tidied.filter(({ calendarName, summary }) => {
-        if (CALENDARS_TO_EXCLUDE.includes(calendarName)) {
+        const shouldIgnoreCalendar = CALENDARS_TO_EXCLUDE.some((calendarToExclude) => {
+            return calendarName?.toLowerCase()?.includes(calendarToExclude?.toLowerCase())
+        });
+
+        if (shouldIgnoreCalendar) {
             console.log(`Ignoring Calendar '${calendarName}'`)
             return false
         }
-        if (EVENTS_TO_EXCLUDE.includes(summary)) {
+
+        const shouldIgnoreEvent = EVENTS_TO_EXCLUDE.some((eventToExclude) => {
+            return summary?.toLowerCase()?.includes(eventToExclude?.toLowerCase())
+        });
+
+        if (shouldIgnoreEvent) {
             console.log(`Ignoring Event '${summary}'`)
             return false
         }
         return true
     })
 }
-module.exports = { getEvents, setCalsToExclude, setEventsToExclude }
+module.exports = { getEvents, setCalsToExclude, setEventsToExclude, matchServices }

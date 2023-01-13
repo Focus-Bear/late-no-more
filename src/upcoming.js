@@ -15,14 +15,14 @@ function addEvent(evt) {
 
 async function removeEvent(evt) {
     expired.push(evt)
-    looming = looming.filter(id => evt.id !== id)
-    upcomingEvents = upcomingEvents.filter(({ id }) => evt.id !== id)
+    looming = looming.filter(id => evt?.id !== id)
+    upcomingEvents = upcomingEvents.filter(({ id }) => evt?.id !== id)
 }
 
 async function syncCalendarsToUpcoming() {
     const events = await getEvents()
     upcomingEvents = events.filter(
-        (e) => !expired.map(({ id }) => id).includes(e.id)
+        (e) => !expired.map(({ id }) => id).includes(e?.id)
     )
 
     console.log(`Found ${upcomingEvents.length} upcoming events`)
@@ -46,8 +46,8 @@ async function checkUpcomingForMeetings() {
             { delta, imminent, soon } = calculateProximity(evt, now)
 
 
-        if (soon && !looming.includes(evt.id)) {
-            looming.push(evt.id)
+        if (soon && !looming.includes(evt?.id)) {
+            looming.push(evt?.id)
             warnUser(evt)
         }
 

@@ -7,6 +7,8 @@ const LOOK_AHEAD_MINUTES = 2, // how long before a meeting should I notify?
     EVENTS_TO_EXCLUDE = ['Birthday', 'Holiday', 'Contacts'],
     IS_TESTING = process.env.NODE_ENV == 'test'
 
+const ONE_DAY_IN_MILLI_SECONDS = 1000 * 60 * 60 * 24
+
 const DIALOG_STAGES = [
         '😊 heads up, meeting starting soon!',
         '😅 fyi your meeting will begin in a moment',
@@ -44,4 +46,5 @@ module.exports = {
     IS_TESTING,
     QUICK_NAP_DURATION_SECONDS,
     SLOW_NAP_DURATION_MINUTES,
+    ONE_DAY_IN_MILLI_SECONDS
 }

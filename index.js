@@ -1,14 +1,16 @@
 //require("./src/keyboard.js");
 
-const addTestEvents = require('./src/testing/index.js'),
-    {
-        syncCalendarsToUpcoming,
-        checkUpcomingForMeetings,
-    } = require('./src/upcoming.js')
+const addTestEvents = require('./src/testing/index.js')
+
+const {
+    syncCalendarsToUpcoming,
+    checkUpcomingForMeetings,
+} = require('./src/upcoming.js')
 
 const {
     SLOW_NAP_DURATION_MINUTES,
     QUICK_NAP_DURATION_SECONDS,
+    ONE_DAY_IN_MILLI_SECONDS,
     IS_TESTING,
 } = require('./config.js')
 

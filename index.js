@@ -1,10 +1,6 @@
-
 const addTestEvents = require('./src/testing/index.js')
-
-const {
-    syncCalendarsToUpcoming,
-    checkUpcomingForMeetings,
-} = require('./src/upcoming.js')
+const checkUpcomingForMeetings = require('./src/events/upcoming.js')
+const syncCalendarsToUpcoming = require('./src/events/update.js')
 
 const {
     SLOW_NAP_DURATION_MINUTES,
@@ -21,10 +17,7 @@ const {
     checkForFocusBearInstall,
 } = require('./src/applescript/fs.js')
 
-const {
-    setCalsToExclude,
-    setEventsToExclude,
-} = require('./src/applescript/calendar.js')
+const { setCalsToExclude, setEventsToExclude } = require('./src/calendar')
 
 const { setNagState } = require('./src/intention.js')
 

@@ -1,7 +1,5 @@
-const exec = require('./exec.js'),
-    { GET_ALL_EVENTS } = require('./scripts.js')
-
-const { SCRIPT_HEADER } = require('./scripts.js')
+const exec = require('./applescript/exec.js'),
+    { GET_ALL_EVENTS, SCRIPT_HEADER } = require('./applescript/scripts.js')
 
 let EVENTS_TO_EXCLUDE, CALENDARS_TO_EXCLUDE
 
@@ -35,9 +33,8 @@ function matchServices(evt) {
     }
     return evt
 }
-         
 
-function tidyEvent(evt) {
+function tidyEvent(evt, type = 'default') {
     const tidy = evt.map((field) => {
         if (field == 'missing value') return null
         return field
@@ -53,6 +50,7 @@ function tidyEvent(evt) {
         location: loc,
         description: desc,
         url,
+        type,
         id,
     }
     return matchServices(obj)
@@ -62,30 +60,47 @@ function filterArray(sourceList, filterBy, key) {
     return sourceList.filter((entry) => filterBy.includes(entry[key]))
 }
 
+function ignoreByCalendar(calendarName) {
+    const shouldIgnoreCalendar = CALENDARS_TO_EXCLUDE.some(
+        (calendarToExclude) =>
+            calendarName
+                ?.toLowerCase()
+                ?.includes(calendarToExclude?.toLowerCase())
+    )
+
+    if (shouldIgnoreCalendar)
+        throw { message: `Ignoring calendar '${calendarName}'` }
+}
+function ignoreByEvent(summary) {
+    const shouldIgnoreEvent = EVENTS_TO_EXCLUDE.some((eventToExclude) =>
+        summary?.toLowerCase()?.includes(eventToExclude?.toLowerCase())
+    )
+
+    if (shouldIgnoreEvent) throw { message: `Ignoring Event '${summary}'` }
+}
+
+function filterEvent({ calendarName, summary }) {
+    try {
+        ignoreByCalendar(calendarName)
+        ignoreByEvent(summary)
+
+        return true
+    } catch (e) {
+        console.log(e.message)
+        return false
+    }
+}
+
 async function getEvents() {
     const rawEvents = await exec(SCRIPT_HEADER + GET_ALL_EVENTS),
         withOutBlanks = rawEvents.filter((e) => e.length),
         tidied = withOutBlanks.map(tidyEvent)
 
-    return tidied.filter(({ calendarName, summary }) => {
-        const shouldIgnoreCalendar = CALENDARS_TO_EXCLUDE.some((calendarToExclude) => {
-            return calendarName?.toLowerCase()?.includes(calendarToExclude?.toLowerCase())
-        });
-
-        if (shouldIgnoreCalendar) {
-            console.log(`Ignoring Calendar '${calendarName}'`)
-            return false
-        }
-
-        const shouldIgnoreEvent = EVENTS_TO_EXCLUDE.some((eventToExclude) => {
-            return summary?.toLowerCase()?.includes(eventToExclude?.toLowerCase())
-        });
-
-        if (shouldIgnoreEvent) {
-            console.log(`Ignoring Event '${summary}'`)
-            return false
-        }
-        return true
-    })
+    return tidied.filter(filterEvent)
 }
-module.exports = { getEvents, setCalsToExclude, setEventsToExclude, matchServices }
+module.exports = {
+    getEvents,
+    setCalsToExclude,
+    setEventsToExclude,
+    matchServices,
+}

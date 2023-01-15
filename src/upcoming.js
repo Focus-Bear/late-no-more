@@ -1,5 +1,5 @@
 const { notifyUser, warnUser, calculateProximity } = require('./notify.js')
-const { getEvents } = require('./applescript/calendar.js')
+const { getEvents } = require('./calendar.js')
 
 let upcomingEvents = [],
     expired = [],

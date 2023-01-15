@@ -22,12 +22,12 @@ return buttonReturned`
     return await exec(SCRIPT)
 }
 
-async function askQuestion(questionText) {
+async function askQuestion(questionText, dialogTitle='Set your intention', defaultText='') {
     const SCRIPT = `
 try    
 set dialogText to "${questionText}"
-set defaultText to "default text"
-set dialogTitle to "Set Your Intention"
+set defaultText to "${defaultText}"
+set dialogTitle to "${dialogTitle}"
 set result to display dialog dialogText default answer defaultText with title dialogTitle
 set userInput to result's text returned
 return userInput

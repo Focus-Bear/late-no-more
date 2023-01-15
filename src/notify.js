@@ -74,7 +74,7 @@ async function notifyUser(evt) {
         if (lastRow && barking) stopBarking() // catch edge case where barking misbehaves
         if (lastRow) startBarking(evt)
 
-        const answer = await showMeetingAlert(evt, line, givingUpAfter, true),
+        const answer = await showMeetingAlert(evt, line, givingUpAfter),
             [present] = MEETING_ACTION_BUTTONS
 
         if (!answer?.length) {

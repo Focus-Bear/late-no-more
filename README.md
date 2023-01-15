@@ -1,6 +1,6 @@
 # Late No More
 
-Checks local iCal via AppleScript & notifies about upcomingEvents meetings. This repo is for a piece of subfunctionality for the Late No More desktop app. To learn more, visit the [Focus Bear website] (https://focusbear.io).
+Checks local iCal via AppleScript & notifies about upcomingEvents meetings. This repo is for a piece of subfunctionality for the Late No More desktop app. To learn more, visit the [Focus Bear website](https://focusbear.io).
 
 ## Setup
 

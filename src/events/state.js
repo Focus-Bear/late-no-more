@@ -1,10 +1,9 @@
 const events = require('./index.js')
+const { getEvents } = require('../calendar')
 const scriptIndex = require('./scripts/')
 
-module.exports = async function checkUpcoming() {
-    console.log('checkUpcoming()')
+async function checkUpcoming() {
     const { upcoming, expired } = events.get()
-    console.log({ upcoming })
     if (!upcoming?.length) {
         return
     }
@@ -25,6 +24,18 @@ module.exports = async function checkUpcoming() {
     if (expired.length) {
         console.log('Removing expired event(s) from upcoming list')
         const update = upcoming.filter((evt) => !expired.includes(evt.uid))
-        set('upcoming', update)
+        events.set('upcoming', update)
     }
 }
+
+async function checkCalendars() {
+    const { expired } = events.get(),
+        newEvents = await getEvents(),
+        update = newEvents.filter(
+            (e) => !expired.map(({ id }) => id).includes(e?.id)
+        )
+
+    events.set('upcoming', update)
+    console.log(`Found ${update.length} upcoming events`)
+}
+module.exports = { checkUpcoming, checkCalendars }

@@ -62,7 +62,8 @@ async function notifyUser(evt) {
     for (let i = 0; i < DIALOG_STAGES.length; i++) {
         const line = DIALOG_STAGES[i],
             lastRow = i + 1 == DIALOG_STAGES.length,
-            givingUpAfter = !lastRow ? perStage : 0
+            givingUpAfter = !lastRow ? perStage : 0,
+            barking = bark.getState()
 
         if (lastRow && barking) bark.stop() // catch edge case where barking misbehaves
         if (lastRow) bark.start(evt)

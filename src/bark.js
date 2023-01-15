@@ -32,8 +32,13 @@ function stopBarking() {
     barking = false
 }
 
+function getState(){
+    return barking
+}
+
 module.exports = {
     start: startBarking,
     stop: stopBarking,
+    getState
 
 }

@@ -1,6 +1,11 @@
 const addTestEvents = require('./src/testing/index.js')
-const checkUpcomingForMeetings = require('./src/events/upcoming.js')
-const syncCalendarsToUpcoming = require('./src/events/update.js')
+const { checkUpcoming, checkCalendars } = require('./src/events/state.js')
+const { setCalsToExclude, setEventsToExclude } = require('./src/calendar')
+const {
+    readSettings,
+    checkForFocusBearInstall,
+} = require('./src/applescript/fs.js')
+const { setNagState } = require('./src/intention.js')
 
 const {
     SLOW_NAP_DURATION_MINUTES,
@@ -10,16 +15,9 @@ const {
 } = require('./config.js')
 
 const quickInterval = QUICK_NAP_DURATION_SECONDS * 1000,
-    slowInterval = SLOW_NAP_DURATION_MINUTES * 60_000
+    slowInterval = SLOW_NAP_DURATION_MINUTES * 60_000,
+    oneFullDay = ONE_DAY_IN_MILLI_SECONDS
 
-const {
-    readSettings,
-    checkForFocusBearInstall,
-} = require('./src/applescript/fs.js')
-
-const { setCalsToExclude, setEventsToExclude } = require('./src/calendar')
-
-const { setNagState } = require('./src/intention.js')
 
 async function setSettings() {
     const { excluded_calendars, excluded_events } = await readSettings()
@@ -33,12 +31,12 @@ async function main() {
     await setSettings()
 
     if (IS_TESTING) await addTestEvents()
-    else syncCalendarsToUpcoming()
-    checkUpcomingForMeetings()
+    else checkCalendars()
+    checkUpcoming()
 
-    setInterval(checkUpcomingForMeetings, quickInterval)
-    setInterval(syncCalendarsToUpcoming, slowInterval)
-    setInterval(setNagState, ONE_DAY_IN_MILLI_SECONDS)
+    setInterval(checkUpcoming, quickInterval)
+    setInterval(checkCalendars, slowInterval)
+    setInterval(setNagState, oneFullDay)
 }
 
 main()

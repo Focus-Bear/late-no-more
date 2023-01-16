@@ -32,11 +32,15 @@ async function warnUser(evt) {
 }
 
 async function takeNotes(evt) {
+    console.log({ evt })
     const notesTitle = `${evt.summary}: Meeting Notes`,
-        notesText = `Your intention for this meeting is "${evt.intention}".\n\nNotes:`
+        notesText = `Your intention for this meeting is '${evt.intention}'.\n\nNotes:`,
+        save = 'Save notes',
+        skip = 'No notes required',
+        disregard = 'Disregard intention',
+        buttons = [skip, disregard, save]
 
-    const buttons = ['Save notes', 'No notes required', 'Disregard intention']
-    const meetingNotes = await askQuestion(notesText, notesTitle)
+    const meetingNotes = await askQuestion(notesText, notesTitle, buttons, save)
 
     events.add('upcoming', followUp)
 }
@@ -45,8 +49,19 @@ async function setMeetingIntention(evt) {
     const events = require('../index.js')
 
     const question = MEETING_QUESTIONS.join('\n'),
-        buttons = ['Cancel', 'Set intention'],
-        intention = await askQuestion(question, "Set meeting intention", "", buttons)
+        title = 'Set meeting intention',
+        cancel = 'Cancel',
+        intent = 'Set intention',
+        buttons = [cancel, intent]
+
+    const { userInput: intention } = await askQuestion(
+        question,
+        title,
+        buttons,
+        intent
+    )
+
+    if (!intention) return
 
     const followUp = {
         ...evt,

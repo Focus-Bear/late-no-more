@@ -18,7 +18,9 @@ function add(listName, evt) {
 
 function remove(listName, evt) {
     const theList = events[listName]
-    events[listName] = theList.filter(({ id }) => evt.id !== id)
+    events[listName] = theList.filter(
+        ({ id, type }) => evt.id !== id && evt.type !== type
+    )
 }
 
 function get(listName) {

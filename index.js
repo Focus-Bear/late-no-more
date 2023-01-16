@@ -1,5 +1,5 @@
 const addTestEvents = require('./src/testing/index.js')
-const { checkUpcoming, checkCalendars } = require('./src/events/state.js')
+const { checkUpcoming, checkCalendars } = require('./src/core.js')
 const { setCalsToExclude, setEventsToExclude } = require('./src/calendar')
 const {
     readSettings,

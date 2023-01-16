@@ -14,7 +14,19 @@ function addDummyEvent(
     const startDate = new Date()
     startDate.setMinutes(startDate.getMinutes() + offset)
 
-    const evt = { summary, startDate, uid, location, url, description, type }
+//    type = 'meetingEnd'
+    const intention = 'stay awake'
+
+    const evt = {
+        summary,
+        startDate,
+        uid,
+        location,
+        url,
+        description,
+        intention,
+        type,
+    }
 
     console.log('Adding entry to upcomingEvents..')
     add('upcoming', evt)

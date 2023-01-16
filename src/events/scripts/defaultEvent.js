@@ -2,9 +2,9 @@ const { calculateProximity } = require('../../events/event.js')
 const bark = require('../../bark.js'),
     {
         DIALOG_STAGES,
-        MEETING_ACTION_BUTTON,
         LOOK_AHEAD_MINUTES,
         MEETING_ACTION_BUTTONS,
+        MEETING_QUESTIONS,
     } = require('../../../config.js')
 
 const {
@@ -31,25 +31,57 @@ async function warnUser(evt) {
     await showDialog(title, text, buttons, 15)
 }
 
-async function handleAnswer(evt, answer) {
-    if (!answer?.length) {
-        console.log('no answer, continuing')
-        throw { type: 'continue' }
-    }
-    const [present] = MEETING_ACTION_BUTTONS
-    if (answer !== present) return
+async function takeNotes(evt) {
+    const notesTitle = `${evt.summary}: Meeting Notes`,
+        notesText = `Your intention for this meeting is "${evt.intention}".\n\nNotes:`
 
+    const buttons = ['Save notes', 'No notes required', 'Disregard intention']
+    const meetingNotes = await askQuestion(notesText, notesTitle)
+
+    events.add('upcoming', followUp)
+}
+
+async function setMeetingIntention(evt) {
+    const events = require('../index.js')
+
+    const question = MEETING_QUESTIONS.join('\n'),
+        buttons = ['Cancel', 'Set intention'],
+        intention = await askQuestion(question, "Set meeting intention", "", buttons)
+
+    const followUp = {
+        ...evt,
+        start: evt.end,
+        type: 'meetingEnd',
+        intention,
+    }
+    await takeNotes(followUp)
+}
+
+async function attendMeeting(evt) {
+    console.log('Opening meeting url, if present')
     if (evt?.url) {
         await openMeetingURL(evt.url)
     } else if (evt?.location?.startsWith('http')) {
         await openMeetingURL(evt.location)
     }
+}
 
-    const question = MEETING_QUESTIONS.join('\n'),
-        intention = await askQuestion(question)
+async function handleAnswer(evt, answer) {
+    if (!answer?.length) {
+        console.log('no answer, continuing')
+        throw { type: 'continue' }
+    }
+    const [truant, present, intent] = MEETING_ACTION_BUTTONS
 
-    await showIntention(intention)
-    throw { type: 'break' }
+    if (answer === present) {
+        await attendMeeting(evt)
+        throw { type: 'break' }
+    }
+
+    if (answer === intent) {
+        await setMeetingIntention(evt)
+        throw { type: 'break' }
+    }
 }
 
 async function notifyUser(evt) {
@@ -86,7 +118,10 @@ module.exports = function (evt, now) {
     const events = require('../../events/index.js'),
         { delta, imminent, soon } = calculateProximity(evt, now)
 
+    const { looming } = events.get()
+
     if (soon && !looming.includes(evt?.id)) {
+        // fix
         events.add('looming', evt)
         warnUser(evt)
     }
@@ -99,7 +134,6 @@ module.exports = function (evt, now) {
     }
     // Super late now - stop hassling them
     if (delta <= -10) {
-        console.log('Delta', delta, evt)
         events.add('expired', evt)
     }
 }

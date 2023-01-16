@@ -1,6 +1,21 @@
 function tidyDate(date) {
     return new Date(date.split(',').slice(1).join(',').replace(' at', ''))
 }
+
+function matchService(evt) {
+    const { description } = evt
+
+    const isGoogleMeet = description?.includes('google.com'),
+        isMsftTeams = description?.includes('microsoft.com')
+
+    if (isMsftTeams || isGoogleMeet) {
+        const regex = /https\S*[\s\>]/,
+            [url] = description.match(regex)
+        return { ...evt, url: url.trim() }
+    }
+    return evt
+}
+
 function tidyEvent(evt, type = 'default') {
     const tidy = evt.map((field) => {
         if (field == 'missing value') return null
@@ -20,21 +35,7 @@ function tidyEvent(evt, type = 'default') {
         type,
         id,
     }
-    return matchServices(obj)
-}
-
-function matchService(evt) {
-    const { description } = evt
-
-    const isGoogleMeet = description?.includes('google.com'),
-        isMsftTeams = description?.includes('microsoft.com')
-
-    if (isMsftTeams || isGoogleMeet) {
-        const regex = /https\S*[\s\>]/,
-            [url] = description.match(regex)
-        return { ...evt, url: url.trim() }
-    }
-    return evt
+    return matchService(obj)
 }
 
 module.exports = { tidyEvent, matchService }

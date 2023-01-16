@@ -13,7 +13,7 @@ const {
     openMeetingURL,
 } = require('../../applescript/dialog.js')
 
-const { showIntention, noIntention } = require('../../intention.js')
+const setMeetingIntention = require('./intention.js')
 
 async function showMeetingAlert(evt, line, givingUpAfter, showImage = false) {
     const title = `Late No More: ${evt.summary} ${evt.startDate}`,
@@ -29,47 +29,6 @@ async function warnUser(evt) {
         buttons = ['Got it', 'Close']
 
     await showDialog(title, text, buttons, 15)
-}
-
-async function takeNotes(evt) {
-    console.log({ evt })
-    const notesTitle = `${evt.summary}: Meeting Notes`,
-        notesText = `Your intention for this meeting is '${evt.intention}'.\n\nNotes:`,
-        save = 'Save notes',
-        skip = 'No notes required',
-        disregard = 'Disregard intention',
-        buttons = [skip, disregard, save]
-
-    const meetingNotes = await askQuestion(notesText, notesTitle, buttons, save)
-
-    events.add('upcoming', followUp)
-}
-
-async function setMeetingIntention(evt) {
-    const events = require('../index.js')
-
-    const question = MEETING_QUESTIONS.join('\n'),
-        title = 'Set meeting intention',
-        cancel = 'Cancel',
-        intent = 'Set intention',
-        buttons = [cancel, intent]
-
-    const { userInput: intention } = await askQuestion(
-        question,
-        title,
-        buttons,
-        intent
-    )
-
-    if (!intention) return
-
-    const followUp = {
-        ...evt,
-        start: evt.end,
-        type: 'meetingEnd',
-        intention,
-    }
-    await takeNotes(followUp)
 }
 
 async function attendMeeting(evt) {
@@ -112,7 +71,7 @@ async function notifyUser(evt) {
             givingUpAfter = !lastRow ? perStage : 0,
             barking = bark.getState()
 
-        if (lastRow && barking) bark.stop() // catch edge case where barking misbehaves
+        //   if (lastRow && barking) bark.stop() // catch edge case where barking misbehaves
         if (lastRow) bark.start(evt)
 
         try {
@@ -122,9 +81,8 @@ async function notifyUser(evt) {
             if (type == 'continue') continue
             if (type == 'break') break
         }
-        bark.stop()
 
-        await noIntention()
+        bark.stop()
         break
     }
 }
@@ -135,8 +93,7 @@ module.exports = function (evt, now) {
 
     const { looming } = events.get()
 
-    if (soon && !looming.includes(evt?.id)) {
-        // fix
+    if (soon && !events.has('looming', evt)) {
         events.add('looming', evt)
         warnUser(evt)
     }

@@ -40,6 +40,15 @@ async function save(data) {
         console.log(e)
     }
 }
+async function remove(evt) {
+    try {
+        const records = await ensure(),
+            trimmed = records.filter(({ id }) => id !== evt.id)
+        await save(trimmed)
+    } catch (e) {
+        console.log(e)
+    }
+}
 
 async function update(row) {
     const records = await ensure(csvPath)
@@ -48,7 +57,7 @@ async function update(row) {
         return
     }
 
-    let edited = false;
+    let edited = false
 
     const final = records.map((r) => {
         if (row.id !== r.id) return r
@@ -61,7 +70,7 @@ async function update(row) {
         return updated
     })
     if (!edited) {
-        console.log("Adding row to csv..")
+        console.log('Adding row to csv..')
         await save([...final, row])
         return
     }
@@ -69,5 +78,4 @@ async function update(row) {
     await save(final)
 }
 
-
-module.exports = { save, ensure, parse, update }
+module.exports = { save, ensure, parse, update, remove }

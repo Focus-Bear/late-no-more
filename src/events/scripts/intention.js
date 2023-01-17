@@ -1,10 +1,12 @@
-const { update } = require('../../fs.js')
+const csv  = require('../../fs.js')
 const { askQuestion } = require('../../applescript/dialog.js')
 const { MEETING_QUESTIONS } = require('../../../config.js')
 
 async function takeNotes(evt) {
+    const events = require('../index.js')
+
     const notesTitle = `${evt.summary}: Meeting Notes`,
-        notesText = `Your intention for this meeting is '${evt.intention}'.\n\nNotes:`,
+        notesText = `Your intention for this meeting is \n\n${evt.intention}\n\nNotes:`,
         save = 'Save notes',
         skip = 'No notes required',
         disregard = 'Disregard intention',
@@ -21,7 +23,12 @@ async function takeNotes(evt) {
         const { startDate: date, summary } = evt,
             row = { id: evt.id, notes: userInput.trim() }
 
-        await update(row)
+        await csv.update(row)
+    }
+    if (buttonReturned === disregard) {
+        console.log({disregard:evt})
+        await events.remove("upcoming", evt)
+        await csv.remove(evt)
     }
 }
 
@@ -45,7 +52,7 @@ module.exports = async function setMeetingIntention(evt) {
     const { startDate: date, summary } = evt,
         row = { date, summary, id: evt.id, intention: intention.trim() }
 
-    await update(row)
+    await csv.update(row)
 
     const followUp = {
         ...evt,

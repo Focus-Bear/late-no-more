@@ -22,6 +22,7 @@ function remove(listName, evt) {
         ({ id, type }) => evt.id !== id && evt.type !== type
     )
 }
+
 function has(listName, evt){
     return listName.filter(({id, type})=> id == evt.id && type == evt.type)
 }

@@ -10,9 +10,8 @@ const bark = require('../../bark.js'),
 const {
     showDialog,
     askQuestion,
-    openMeetingURL,
 } = require('../../applescript/dialog.js')
-
+const openMeetingURL = require('../../applescript/event.js')
 const setMeetingIntention = require('./intention.js')
 
 async function showMeetingAlert(evt, line, givingUpAfter, showImage = false) {

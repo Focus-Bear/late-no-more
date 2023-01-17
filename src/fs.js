@@ -47,23 +47,27 @@ async function update(row) {
         await save([row])
         return
     }
-    try {
-        const final = records.map((r) => {
-            if (row.id !== r.id) return r
-            const updated = { ...r }
-            for (const key in row) {
-                const value = row[key]
-                updated[key] = value
-            }
-            return updated
-        })
 
-        await save(final)
-    } catch (e) {
-        console.log(e)
+    let edited = false;
+
+    const final = records.map((r) => {
+        if (row.id !== r.id) return r
+        const updated = { ...r }
+        for (const key in row) {
+            const value = row[key]
+            updated[key] = value
+        }
+        edited = true
+        return updated
+    })
+    if (!edited) {
+        console.log("Adding row to csv..")
+        await save([...final, row])
+        return
     }
+
+    await save(final)
 }
 
-const row = { summary: 'Event', date: new Date(), intention: 'hi' }
 
 module.exports = { save, ensure, parse, update }

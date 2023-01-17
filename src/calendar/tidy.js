@@ -16,7 +16,7 @@ function matchService(evt) {
     return evt
 }
 
-function tidyEvent(evt, type = 'default') {
+function tidyEvent(evt) {
     const tidy = evt.map((field) => {
         if (field == 'missing value') return null
         return field
@@ -32,9 +32,10 @@ function tidyEvent(evt, type = 'default') {
         location: loc,
         description: desc,
         url,
-        type,
+        type: 'default',
         id,
     }
+    console.log({ obj })
     return matchService(obj)
 }
 

@@ -7,15 +7,12 @@ const bark = require('../../bark.js'),
         MEETING_QUESTIONS,
     } = require('../../../config.js')
 
-const {
-    showDialog,
-    askQuestion,
-} = require('../../applescript/dialog.js')
+const { showDialog, askQuestion } = require('../../applescript/dialog.js')
 const openMeetingURL = require('../../applescript/event.js')
 const setMeetingIntention = require('./intention.js')
 
 async function showMeetingAlert(evt, line, givingUpAfter, showImage = false) {
-    console.log("showMeetingAlert()")
+    console.log('showMeetingAlert()')
     const title = `Late No More: ${evt.summary} ${evt.startDate}`,
         text = [line, '\n', evt.location, evt.url].join('\n'),
         buttons = MEETING_ACTION_BUTTONS
@@ -45,6 +42,9 @@ async function handleAnswer(evt, answer) {
         console.log('no answer, continuing')
         throw { type: 'continue' }
     }
+
+    bark.stop()
+
     const [truant, present, intent] = MEETING_ACTION_BUTTONS
 
     if (answer === present) {
@@ -53,6 +53,7 @@ async function handleAnswer(evt, answer) {
     }
 
     if (answer === intent) {
+        await attendMeeting(evt)
         await setMeetingIntention(evt)
         throw { type: 'break' }
     }
@@ -82,7 +83,6 @@ async function notifyUser(evt) {
             if (type == 'break') break
         }
 
-        bark.stop()
         break
     }
 }

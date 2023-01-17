@@ -1,10 +1,29 @@
 const exec = require('../applescript/exec.js'),
     { GET_ALL_EVENTS, SCRIPT_HEADER } = require('../applescript/scripts.js')
 
-const { tidyEvent } = require('./tidy.js'),
-    { ignoreByEvent, ignoreByCalendar } = require('./filters.js')
+const { tidyEvent } = require('./tidy.js')
 
 let EVENTS_TO_EXCLUDE, CALENDARS_TO_EXCLUDE
+
+function ignoreByCalendar(calendarName) {
+    const shouldIgnoreCalendar = CALENDARS_TO_EXCLUDE.some(
+        (calendarToExclude) =>
+            calendarName
+                ?.toLowerCase()
+                ?.includes(calendarToExclude?.toLowerCase())
+    )
+
+    if (shouldIgnoreCalendar)
+        throw { message: `Ignoring calendar '${calendarName}'` }
+}
+
+function ignoreByEvent(summary) {
+    const shouldIgnoreEvent = EVENTS_TO_EXCLUDE.some((eventToExclude) =>
+        summary?.toLowerCase()?.includes(eventToExclude?.toLowerCase())
+    )
+
+    if (shouldIgnoreEvent) throw { message: `Ignoring Event '${summary}'` }
+}
 
 async function setCalsToExclude(calList) {
     console.log('setting CALENDARS_TO_EXCLUDE', calList)

@@ -13,7 +13,8 @@
   "license": "ISC",
   "dependencies": {
     "@jxa/run": "^1.3.6",
-    "applescript": "^1.0.0"
+    "applescript": "^1.0.0",
+    "csv-parser": "^3.0.0"
   },
   "devDependencies": {
     "pkg": "^5.8.0",

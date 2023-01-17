@@ -1,3 +1,5 @@
+
+const { update } = require('../../fs.js')
 const { askQuestion } = require('../../applescript/dialog.js')
 
 const { MEETING_QUESTIONS } = require('../../../config.js')
@@ -12,7 +14,13 @@ async function takeNotes(evt) {
 
     const meetingNotes = await askQuestion(notesText, notesTitle, buttons, save)
 
-    events.add('upcoming', followUp)
+    console.log({meetingNotes}) 
+
+     const { date, summary } = evt,
+        row = { date, summary, notes}
+
+    await update(row)
+     
 
     console.log({ meetingNotes })
 }
@@ -35,11 +43,17 @@ module.exports = async function setMeetingIntention(evt) {
 
     if (!intention) return
 
+    const { date, summary } = evt,
+        row = { date, summary, intention }
+
+    await update(row)
+
     const followUp = {
         ...evt,
         start: evt.end,
         type: 'meetingEnd',
         intention,
     }
+    events.add('upcoming', followUp)
     await takeNotes(followUp)
 }

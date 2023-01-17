@@ -13,7 +13,6 @@ async function checkForFocusBearInstall() {
 
 async function readSettings() {
     const SCRIPT = `
-
     set filePath to alias ((path to application support from user domain as text ) & "com.focusbear.latenomore:events.json")
     set jsonString to (read file filePath) as text
     return jsonString 

@@ -1,4 +1,4 @@
-const csv  = require('../../fs.js')
+const csv  = require('../../csv.js')
 const { askQuestion } = require('../../applescript/dialog.js')
 const { MEETING_QUESTIONS } = require('../../../config.js')
 
@@ -26,7 +26,6 @@ async function takeNotes(evt) {
         await csv.update(row)
     }
     if (buttonReturned === disregard) {
-        console.log({disregard:evt})
         await events.remove("upcoming", evt)
         await csv.remove(evt)
     }

@@ -7,7 +7,7 @@ async function checkUpcoming() {
     if (!upcoming?.length) {
         return
     }
-         console.log(upcoming)
+    console.log({upcoming})
     const { length: count } = upcoming,
         now = new Date()
 
@@ -23,7 +23,9 @@ async function checkUpcoming() {
 
     if (expired.length) {
         console.log('removing expired event(s) from upcoming list')
-        const update = upcoming.filter((evt) => !expired.map(({id})=>id).includes(evt.id))
+        const update = upcoming.filter(
+            (evt) => !expired.map(({ id }) => id).includes(evt.id)
+        )
         events.set('upcoming', update)
     }
 }

@@ -1,5 +1,5 @@
 const { showDialog } = require('../../applescript/dialog.js')
-const { update } = require('../../fs.js')
+const { update } = require('../../csv.js')
 
 module.exports = async function (evt) {
     const { remove } = require('../../events/index')

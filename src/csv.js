@@ -1,7 +1,6 @@
 const fs = require('fs')
 const path = require('path')
-const { stringify } = require('csv-stringify/sync')
-const { parse } = require('csv-parse/sync')
+const { stringify, parse } = require('csv/sync')
 const home = require('os').homedir()
 
 const csvPath = home + '/Documents/LateNoMore-Meetings.csv'
@@ -19,10 +18,11 @@ async function ensure() {
                     'success',
                 ],
             })
+        if (!data.length) throw "fix"
         return data.slice(1)
     } catch (e) {
-        console.log(e)
-        fs.writeFileSync(csvPath, '[]', { flag: 'w' })
+        fs.writeFileSync(csvPath, '', { flag: 'w' })
+        await save([])
         return []
     }
 }

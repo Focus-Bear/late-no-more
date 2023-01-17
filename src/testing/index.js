@@ -4,7 +4,7 @@ const { LOOK_AHEAD_MINUTES } = require('../../config.js')
 
 function addDummyEvent(
     summary,
-    uid,
+    id,
     offset,
     location,
     url,
@@ -20,7 +20,7 @@ function addDummyEvent(
     const evt = {
         summary,
         startDate,
-        uid,
+        id,
         location,
         url,
         description,
@@ -36,6 +36,6 @@ module.exports = async function addTestEvents() {
     console.log('In testing mode...')
 
     const waitFor = LOOK_AHEAD_MINUTES - 0.5
-    addDummyEvent('Event', '1', waitFor, 'meeting room', 'https://google.com')
+    addDummyEvent('Event', '1xasd72', waitFor, 'meeting room', 'https://google.com')
     // addDummyEvent("Event", "1", 15.25, "meeting room", "https://google.com");
 }

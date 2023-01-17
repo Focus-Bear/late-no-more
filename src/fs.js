@@ -1,59 +1,69 @@
 const fs = require('fs')
 const path = require('path')
-const csv = require('csv-parser')
+const { stringify } = require('csv-stringify/sync')
+const { parse } = require('csv-parse/sync')
+const home = require('os').homedir()
 
-const csvPath = '~/Documents/LateNoMore-Meetings.csv'
+const csvPath = home + '/Documents/LateNoMore-Meetings.csv'
 
-async function save(filePath, data) {
+async function ensure() {
     try {
-        await fs.writeFileSync(filePath, data, {flag: "w"})
-    } catch (err) {
-        console.error(`Error: Unable to save ${filePath}`)
+        const raw = fs.readFileSync(csvPath),
+            data = parse(raw, {
+                columns: [
+                    'date',
+                    'id',
+                    'summary',
+                    'intention',
+                    'notes',
+                    'success',
+                ],
+            })
+        return data.slice(1)
+    } catch (e) {
+        console.log(e)
+        fs.writeFileSync(csvPath, '[]', { flag: 'w' })
+        return []
     }
 }
 
-async function ensure(filePath) {
+async function save(data) {
     try {
-        const file = fs.readFileSync(filePath, {flag:'r'})
-        console.log(`${filePath} opened successfully`)
-        return file
-    } catch (err) {
-        console.error(`Error: ${filePath} does not exist`)
-        await save(filePath, '')
-        return ensure(filePath)
-    }
-}
-
-async function parse(file) {
-    const asString = file.toString(),
-        rows = await csv.parse(asString, (err, rows) => {
-            if (err) {
-                console.log(err)
-            } else {
-                data.push(...rows)
-                console.log(`${filePath} parsed successfully`)
-                return data
-            }
+        const asString = stringify(data, {
+            header: true,
+            columns: ['date', 'id', 'summary', 'intention', 'notes', 'success'],
+            cast: { date: (d) => d.toISOString() },
         })
+        fs.writeFileSync(csvPath, asString, { flag: 'w' })
+        console.log('Saved', csvPath)
+    } catch (e) {
+        console.log(e)
+    }
 }
 
 async function update(row) {
     const records = await ensure(csvPath)
-
-    if (!records.length)
-        for (let record of records) {
-            const { date, summary } = record
-
-            if (date !== row.date) continue
-            if (summary !== row.summary) continue
-
+    if (!records?.length) {
+        await save([row])
+        return
+    }
+    try {
+        const final = records.map((r) => {
+            if (row.id !== r.id) return r
+            const updated = { ...r }
             for (const key in row) {
                 const value = row[key]
-                record = { ...record, [key]: value }
+                updated[key] = value
             }
-        }
+            return updated
+        })
 
-    await save(csvPath, records)
+        await save(final)
+    } catch (e) {
+        console.log(e)
+    }
 }
+
+const row = { summary: 'Event', date: new Date(), intention: 'hi' }
 
 module.exports = { save, ensure, parse, update }

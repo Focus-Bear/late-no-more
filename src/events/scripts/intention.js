@@ -1,4 +1,3 @@
-
 const { update } = require('../../fs.js')
 const { askQuestion } = require('../../applescript/dialog.js')
 
@@ -12,17 +11,19 @@ async function takeNotes(evt) {
         disregard = 'Disregard intention',
         buttons = [skip, disregard, save]
 
-    const meetingNotes = await askQuestion(notesText, notesTitle, buttons, save)
+    const { buttonReturned, userInput } = await askQuestion(
+        notesText,
+        notesTitle,
+        buttons,
+        save
+    )
 
-    console.log({meetingNotes}) 
+    if (buttonReturned === save) {
+        const { startDate: date, summary } = evt,
+            row = { id: evt.id, notes: userInput.trim() }
 
-     const { date, summary } = evt,
-        row = { date, summary, notes}
-
-    await update(row)
-     
-
-    console.log({ meetingNotes })
+        await update(row)
+    }
 }
 
 module.exports = async function setMeetingIntention(evt) {
@@ -43,8 +44,8 @@ module.exports = async function setMeetingIntention(evt) {
 
     if (!intention) return
 
-    const { date, summary } = evt,
-        row = { date, summary, intention }
+    const { startDate: date, summary } = evt,
+        row = { date, summary, id: evt.id, intention: intention.trim() }
 
     await update(row)
 

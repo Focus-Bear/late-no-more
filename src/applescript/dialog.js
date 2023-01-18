@@ -12,10 +12,12 @@ async function showDialog(title, text, buttons, givingUpAfter = 30) {
             (display dialog "${text}" ¬ 
             with title "${title}" ¬
             buttons { ${stringify(buttons)} } ¬
-            default button "${defaultButton}"¬ 
+            default button "${defaultButton}" ¬ 
             giving up after ${givingUpAfter} ¬
-            with icon alias ¬
-                ((path to application support from user domain as text) & "com.focusbear.latenomore:icon.png"))
+            with icon alias (¬
+                (path to application support from user domain as text) & ¬
+                "com.focusbear.latenomore:icon.png") ¬
+                )
         set buttonReturned to result's button returned
         return buttonReturned
  --    end try`
@@ -27,12 +29,13 @@ async function askQuestion(question, title, buttons, defaultButton) {
 
     const SCRIPT = `
     try    
-        set result to ¬
-            (display dialog "${question}" ¬
+        set result to (¬
+            display dialog "${question}" ¬
             default answer "\n\n\n\n" ¬
             with title "${title}" ¬
-            buttons { ${stringify(buttons)} }  ¬
-            default button "${defaultButton}")
+            buttons { ${stringify(buttons)} } ¬
+            default button "${defaultButton}" ¬
+            )
         set hold to result
         set buttonReturned to button returned of result
         set userInput to text returned of hold

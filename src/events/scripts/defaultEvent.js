@@ -38,6 +38,7 @@ async function attendMeeting(evt) {
 }
 
 async function handleAnswer(evt, answer) {
+    const [intent, present, truant] = MEETING_ACTION_BUTTONS
     if (!answer?.length) {
         console.log('no answer, continuing')
         throw { type: 'continue' }
@@ -45,7 +46,9 @@ async function handleAnswer(evt, answer) {
 
     bark.stop()
 
-    const [truant, present, intent] = MEETING_ACTION_BUTTONS
+    if (answer == truant) {
+        throw { type: 'break' }
+    }
 
     if (answer === present) {
         await attendMeeting(evt)

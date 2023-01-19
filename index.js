@@ -31,7 +31,7 @@ async function main() {
     await setSettings()
 
     if (IS_TESTING) await addTestEvents()
-    else checkCalendars()
+    else await checkCalendars()
     checkUpcoming()
 
     setInterval(checkUpcoming, quickInterval)

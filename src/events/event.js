@@ -1,4 +1,4 @@
-const { LOOK_AHEAD_MINUTES } = require('../../config.js')
+const { LOOK_AHEAD_MINUTES } = require('@root/config.js')
 
 function calculateProximity(evt, now) {
     const delta = (new Date(evt.startDate) - now) / 1000,

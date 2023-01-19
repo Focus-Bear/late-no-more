@@ -1,15 +1,15 @@
-const { calculateProximity } = require('../../events/event.js')
-const bark = require('../../bark.js'),
+const { calculateProximity } = require('@events/event.js')
+const bark = require('@lib/bark.js'),
     {
         DIALOG_STAGES,
         LOOK_AHEAD_MINUTES,
         MEETING_ACTION_BUTTONS,
         MEETING_QUESTIONS,
-    } = require('../../../config.js')
+    } = require('@root/config.js')
 
-const { showDialog, askQuestion } = require('../../applescript/dialog.js')
-const openMeetingURL = require('../../applescript/event.js')
-const setMeetingIntention = require('./intention.js')
+const { showDialog, askQuestion } = require('@applescript/dialog.js')
+const openMeetingURL = require('@applescript/event.js')
+const setMeetingIntention = require('@lib/intention.js')
 
 async function showMeetingAlert(evt, line, givingUpAfter, showImage = false) {
     console.log('showMeetingAlert()')
@@ -32,7 +32,10 @@ async function attendMeeting(evt) {
     console.log('Opening meeting url, if present')
     if (evt?.url) {
         await openMeetingURL(evt.url)
-    } else if (evt?.location?.startsWith('http')) {
+        return
+    } 
+
+    if (evt?.location?.startsWith('http')) {
         await openMeetingURL(evt.location)
     }
 }
@@ -49,6 +52,7 @@ async function handleAnswer(evt, answer) {
     if (answer == truant) {
         throw { type: 'break' }
     }
+
 
     if (answer === present) {
         await attendMeeting(evt)
@@ -91,7 +95,7 @@ async function notifyUser(evt) {
 }
 
 module.exports = function (evt, now) {
-    const events = require('../../events/index.js'),
+    const events = require('@events'),
         { delta, imminent, soon } = calculateProximity(evt, now)
 
     const { looming } = events.get()

@@ -1,25 +1,34 @@
 {
-  "name": "late-no-more",
-  "version": "2.0.0",
-  "description": "",
-  "main": "index.mjs",
-  "scripts": {
-    "start": "node index.js",
-    "test": "NODE_ENV=test node index.js",
-    "dist": "pkg index.js --targets node14-macos-x64 --no-byte-code --output dist/LateNoMore"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@jxa/run": "^1.3.6",
-    "applescript": "^1.0.0",
-    "csv": "^6.2.5",
-    "csv-parse": "^5.3.3",
-    "csv-stringify": "^6.2.3"
-  },
-  "devDependencies": {
-    "pkg": "^5.8.0",
-    "prettier": "^2.8.1"
-  }
+    "name": "late-no-more",
+    "version": "2.0.0",
+    "description": "",
+    "main": "index.mjs",
+    "scripts": {
+        "start": "node index.js",
+        "test": "NODE_ENV=test node index.js",
+        "dist": "pkg index.js --targets node14-macos-x64 --no-byte-code --output dist/LateNoMore"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@jxa/run": "^1.3.6",
+        "applescript": "^1.0.0",
+        "csv": "^6.2.5",
+        "csv-parse": "^5.3.3",
+        "csv-stringify": "^6.2.3",
+        "module-alias": "^2.2.2"
+    },
+    "devDependencies": {
+        "pkg": "^5.8.0",
+        "prettier": "^2.8.1"
+    },
+    "_moduleAliases": {
+        "@lib": "./src/",
+        "@scripts": "./src/scripts/",
+        "@applescript": "./src/applescript/",
+        "@root": "./",
+        "@events": "./src/events/" ,
+        "@calendar": "./src/calendar/"
+    }
 }

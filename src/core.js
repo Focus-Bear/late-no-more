@@ -1,6 +1,6 @@
-const events = require('./events/index.js')
-const { getEvents } = require('./calendar')
-const scriptIndex = require('./events/scripts/')
+const events = require('@events')
+const { getEvents } = require('@calendar')
+const scriptIndex = require('@scripts')
 
 async function checkUpcoming() {
     const { upcoming, expired } = events.get()

@@ -1,4 +1,4 @@
-const exec = require('./exec.js')
+const exec = require('@applescript/exec.js')
 
 function stringify(buttons) {
     return buttons.map((b) => `"${b}"`).join(', ')

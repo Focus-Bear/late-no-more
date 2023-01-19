@@ -1,5 +1,5 @@
-const scriptIndex = require('./scripts/')
-const { LOOK_AHEAD_MINUTES } = require('../../config.js')
+const scriptIndex = require('@scripts')
+const { LOOK_AHEAD_MINUTES } = require('@root/config.js')
 
 const events = {
     upcoming: [],

@@ -1,7 +1,7 @@
-const exec = require('../applescript/exec.js'),
-    { GET_ALL_EVENTS, SCRIPT_HEADER } = require('../applescript/scripts.js')
+const exec = require('@applescript/exec.js'),
+    { GET_ALL_EVENTS, SCRIPT_HEADER } = require('@applescript/scripts.js')
 
-const { tidyEvent } = require('./tidy.js')
+const { tidyEvent } = require('@calendar/tidy.js')
 
 let EVENTS_TO_EXCLUDE, CALENDARS_TO_EXCLUDE
 

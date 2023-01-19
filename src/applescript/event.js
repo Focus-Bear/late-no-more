@@ -1,4 +1,4 @@
-const exec = require('./exec.js')
+const exec = require('@applescript/exec.js')
 
 module.exports = async function openURL(url) {
     const SCRIPT = `

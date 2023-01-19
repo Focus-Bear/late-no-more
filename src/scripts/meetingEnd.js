@@ -1,8 +1,8 @@
-const { showDialog } = require('../../applescript/dialog.js')
-const { update } = require('../../csv.js')
+const { showDialog } = require('@applescript/dialog.js')
+const { update } = require('@lib/csv.js')
 
 module.exports = async function (evt) {
-    const { remove } = require('../../events/index')
+    const { remove } = require('@events')
     const { intention, summary } = evt
 
     const dialogTitle = 'Follow-Up: ' + summary,

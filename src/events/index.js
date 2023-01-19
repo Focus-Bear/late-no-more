@@ -18,13 +18,14 @@ function add(listName, evt) {
 
 function remove(listName, evt) {
     const theList = events[listName]
+    
     events[listName] = theList.filter(
         ({ id, type }) => evt.id !== id && evt.type !== type
     )
 }
 
 function has(listName, evt){
-    return listName.filter(({id, type})=> id == evt.id && type == evt.type)
+    return !!events[listName].filter(({id, type})=> id == evt.id && type == evt.type)?.length
 }
 
 function get(listName) {

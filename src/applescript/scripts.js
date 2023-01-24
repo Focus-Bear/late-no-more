@@ -5,8 +5,22 @@ const SCRIPT_HEADER = `
 	   	use script "CalendarLib EC" version "1.1.4"
 
 		set theStore to fetch store
-	 `,
-  GET_ALL_EVENTS = `
+	 `   
+const properties = [
+        'event_summary',
+        'event_start_date',
+        'event_end_date',
+        'event_url',
+        'event_location',
+        'event_description',
+        'event_external_ID',
+        'calendar_name',
+    ]   
+function createParseStatements(props) {
+	return props.map(prop => `copy ${prop} of (event info for event anEvent) as text to end of current`).join("\n")
+}
+
+const GET_ALL_EVENTS = `
         set theCals to fetch calendars {} event store theStore
 		set d1 to (current date)
 		set d2 to d1 + 1 * hours
@@ -19,31 +33,21 @@ const SCRIPT_HEADER = `
 			set current to {}
 			if (startTime ≥ d1) and (startTime ≤ d2) then
 				try
-					
-					copy event_summary of (event info for event anEvent) as text to end of current
-					copy event_start_date of (event info for event anEvent) as text to end of current
-					copy event_end_date of (event info for event anEvent) as text to end of current
-					copy event_url of (event info for event anEvent) as text to end of current
-					copy event_location of (event info for event anEvent) as text to end of current
-					copy event_description of (event info for event anEvent) as text to end of current
-					copy event_external_ID of (event info for event anEvent) as text to end of current
-					copy calendar_name of (event info for event anEvent) as text to end of current
-					
+					${createParseStatements(properties)}	
 					copy current to end of output
 				end try
 			end if
 		end repeat
 		return output
 `,
-  GET_ALL_CALENDARS = `
-	    set theCals to fetch calendars {} event store theStore -- change to suit
+    GET_ALL_CALENDARS = `
+	    set theCals to fetch calendars {} event store theStore 
 		set theTitles to {}
 		repeat with aCal in theCals
 	      set calTitle to aCal's title() as text
-		  log calTitle
 		  set theTitles to theTitles & calTitle   
 		end repeat
 
-		return theTitles`;
+		return theTitles`
 
-module.exports = { SCRIPT_HEADER, GET_ALL_EVENTS, GET_ALL_CALENDARS };
+module.exports = { SCRIPT_HEADER, GET_ALL_EVENTS, GET_ALL_CALENDARS }

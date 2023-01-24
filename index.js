@@ -1,32 +1,24 @@
-//require("./src/keyboard.js");
 
-const addTestEvents = require('./src/testing/index.js'),
-    {
-        syncCalendarsToUpcoming,
-        checkUpcomingForMeetings,
-    } = require('./src/upcoming.js')
-
-const {
-        SLOW_NAP_DURATION_MINUTES,
-        QUICK_NAP_DURATION_SECONDS,
-        IS_TESTING,
-    } = require('./config.js'),
-    ONE_DAY_IN_MILLI_SECONDS = 1000 * 60 * 60 * 24
-
-const quickInterval = QUICK_NAP_DURATION_SECONDS * 1000,
-    slowInterval = SLOW_NAP_DURATION_MINUTES * 60_000
-
+const addTestEvents = require('./src/testing/index.js')
+const { checkUpcoming, checkCalendars } = require('./src/core.js')
+const { setCalsToExclude, setEventsToExclude } = require('./src/calendar')
 const {
     readSettings,
     checkForFocusBearInstall,
 } = require('./src/applescript/fs.js')
+const { setNagState } = require('./src/scripts/nag.js')
 
 const {
-    setCalsToExclude,
-    setEventsToExclude,
-} = require('./src/applescript/calendar.js')
+    SLOW_NAP_DURATION_MINUTES,
+    QUICK_NAP_DURATION_SECONDS,
+    ONE_DAY_IN_MILLI_SECONDS,
+    IS_TESTING,
+} = require('./config.js')
 
-const { setNagState } = require('./src/intention.js')
+const quickInterval = QUICK_NAP_DURATION_SECONDS * 1000,
+    slowInterval = SLOW_NAP_DURATION_MINUTES * 60_000,
+    oneFullDay = ONE_DAY_IN_MILLI_SECONDS
+
 
 async function setSettings() {
     const { excluded_calendars, excluded_events } = await readSettings()
@@ -40,12 +32,12 @@ async function main() {
     await setSettings()
 
     if (IS_TESTING) await addTestEvents()
-    else syncCalendarsToUpcoming()
-    checkUpcomingForMeetings()
+    else await checkCalendars()
+    checkUpcoming()
 
-    setInterval(checkUpcomingForMeetings, quickInterval)
-    setInterval(syncCalendarsToUpcoming, slowInterval)
-    setInterval(setNagState, ONE_DAY_IN_MILLI_SECONDS)
+    setInterval(checkUpcoming, quickInterval)
+    setInterval(checkCalendars, slowInterval)
+    setInterval(setNagState, oneFullDay)
 }
 
 main()

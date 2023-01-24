@@ -5,6 +5,8 @@ const LOOK_AHEAD_MINUTES = 2, // how long before a meeting should I notify?
     // It can be a partial match and it's case insensitive. e.g. Holiday will match "UK holidays"
     IS_TESTING = process.env.NODE_ENV == 'test'
 
+const ONE_DAY_IN_MILLI_SECONDS = 1000 * 60 * 60 * 24
+
 const DIALOG_STAGES = [
         '😊 heads up, meeting starting soon!',
         '😅 fyi your meeting will begin in a moment',
@@ -28,7 +30,7 @@ const DIALOG_STAGES = [
 
 const present = 'Attend meeting',
     truant = "I don't need to attend",
-    MEETING_ACTION_BUTTONS = [present, truant]
+    MEETING_ACTION_BUTTONS = [truant, present]
 
 module.exports = {
     MEETING_ACTION_BUTTONS,
@@ -40,4 +42,5 @@ module.exports = {
     IS_TESTING,
     QUICK_NAP_DURATION_SECONDS,
     SLOW_NAP_DURATION_MINUTES,
+    ONE_DAY_IN_MILLI_SECONDS
 }

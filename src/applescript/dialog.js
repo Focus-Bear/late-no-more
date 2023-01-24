@@ -1,33 +1,51 @@
 const exec = require('./exec.js')
 
-async function showDialog(
-    title,
-    text,
-    buttons,
-    givingUpAfter = 30,
-) {
+function stringify(buttons) {
+    return buttons.map((b) => `"${b}"`).join(', ')
+}
+async function showDialog(title, text, buttons, givingUpAfter = 30) {
+    const [defaultButton] = buttons.reverse() // grab the right most button
+
     const SCRIPT = ` 
-
-set dialogText to "${text}"                                                                                
-set button1Label to "${buttons[0]}"
-set button2Label to "${buttons[1]}"
-set timeoutValue to ${givingUpAfter} 
-set result to (display dialog dialogText with title "${title}" buttons {button1Label, button2Label} default button button1Label giving up after ${givingUpAfter} with icon alias ((path to application support from user domain as text) & "com.focusbear.latenomore:icon.jpeg"))
-set buttonReturned to result's button returned
-return buttonReturned`
+    try
+        set result to ( ¬ 
+            display dialog "${text}" ¬ 
+            with title "${title}" ¬
+            buttons { ${stringify(buttons)} } ¬
+            default button "${defaultButton}" ¬ 
+            giving up after ${givingUpAfter} ¬
+            with icon alias ( ¬
+                ( path to application support from user domain as text ) & ¬
+                "com.focusbear.latenomore:icon.png" ¬
+            ) ¬
+        )
+        set buttonReturned to result's button returned
+        return buttonReturned
+    end try`
     return await exec(SCRIPT)
 }
 
-async function askQuestion(questionText) {
+async function askQuestion(question, title, buttons, defaultButton) {
+    if (!defaultButton) [defaultButton] = buttons.reverse()
+
     const SCRIPT = `
-try    
-set dialogText to "${questionText}"
-set defaultText to "default text"
-set dialogTitle to "Set Your Intention"
-set result to display dialog dialogText default answer defaultText with title dialogTitle
-set userInput to result's text returned
-return userInput
-end try`
-    return await exec(SCRIPT)
+    try    
+        set result to ( ¬
+            display dialog "${question}" ¬
+            default answer "\n\n\n\n" ¬
+            with title "${title}" ¬
+            buttons { ${stringify(buttons)} } ¬
+            default button "${defaultButton}" ¬
+        )
+        set hold to result
+        set buttonReturned to button returned of result
+        set userInput to text returned of hold
+        return { buttonReturned, userInput } 
+   end try`
+
+    const [buttonReturned, userInput] = await exec(SCRIPT)
+
+    return { buttonReturned, userInput }
 }
+
 module.exports = { showDialog, askQuestion }

@@ -1,6 +1,6 @@
 const { showDialog } = require('../applescript/dialog.js')
 const { update } = require('../csv.js')
-
+const { nag } = require('./nag.js')
 
 module.exports = async function (evt) {
     const { remove } = require('../events')
@@ -18,4 +18,5 @@ module.exports = async function (evt) {
     const row = { id: evt.id, success }
     await update(row)
     remove('upcoming', evt)
+    await nag()
 }

@@ -7,7 +7,6 @@ const bark = require('../bark.js'),
         MEETING_QUESTIONS,
     } = require('../../config.js')
 
-
 const { showDialog, askQuestion } = require('../applescript/dialog.js')
 const openMeetingURL = require('../applescript/event.js')
 const setMeetingIntention = require('./intention.js')
@@ -34,7 +33,7 @@ async function attendMeeting(evt) {
     if (evt?.url) {
         await openMeetingURL(evt.url)
         return
-    } 
+    }
 
     if (evt?.location?.startsWith('http')) {
         await openMeetingURL(evt.location)
@@ -50,22 +49,14 @@ async function handleAnswer(evt, answer) {
 
     bark.stop()
 
-    console.log({answer})
+    console.log({ answer })
     if (answer == truant) {
         throw { type: 'break' }
     }
 
-
-    if (answer === present) {
-        await attendMeeting(evt)
-        throw { type: 'break' }
-    }
-
-    if (answer === intent) {
-        await attendMeeting(evt)
-        await setMeetingIntention(evt)
-        throw { type: 'break' }
-    }
+    await attendMeeting(evt)
+    await setMeetingIntention(evt)
+    throw { type: 'break' }
 }
 
 async function notifyUser(evt) {

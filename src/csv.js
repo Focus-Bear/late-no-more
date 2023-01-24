@@ -1,6 +1,6 @@
 const fs = require('fs')
 const path = require('path')
-const { stringify, parse } = require('csv/sync')
+const { stringify, parse } = require('../lib/csv/dist/cjs/sync.cjs')
 const home = require('os').homedir()
 
 const csvPath = home + '/Documents/LateNoMore-Meetings.csv'
@@ -34,6 +34,7 @@ async function save(data) {
             columns: ['date', 'id', 'summary', 'intention', 'notes', 'success'],
             cast: { date: (d) => d.toISOString() },
         })
+
         fs.writeFileSync(csvPath, asString, { flag: 'w' })
         console.log('Saved', csvPath)
     } catch (e) {

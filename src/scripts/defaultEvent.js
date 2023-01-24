@@ -10,7 +10,7 @@ const bark = require('../bark.js'),
 
 const { showDialog, askQuestion } = require('../applescript/dialog.js')
 const openMeetingURL = require('../applescript/event.js')
-const setMeetingIntention = require('../intention.js')
+const setMeetingIntention = require('./intention.js')
 
 async function showMeetingAlert(evt, line, givingUpAfter, showImage = false) {
     console.log('showMeetingAlert()')
@@ -50,6 +50,7 @@ async function handleAnswer(evt, answer) {
 
     bark.stop()
 
+    console.log({answer})
     if (answer == truant) {
         throw { type: 'break' }
     }

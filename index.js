@@ -6,7 +6,7 @@ const {
     readSettings,
     checkForFocusBearInstall,
 } = require('./src/applescript/fs.js')
-const { setNagState } = require('./src/intention.js')
+const { setNagState } = require('./src/scripts/nag.js')
 
 const {
     SLOW_NAP_DURATION_MINUTES,

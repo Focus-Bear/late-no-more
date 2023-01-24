@@ -30,8 +30,7 @@ const DIALOG_STAGES = [
 
 const present = 'Attend meeting',
     truant = "I don't need to attend",
-    intent = 'Attend + set meeting intention'
-    MEETING_ACTION_BUTTONS = [truant, present, intent]
+    MEETING_ACTION_BUTTONS = [truant, present]
 
 module.exports = {
     MEETING_ACTION_BUTTONS,

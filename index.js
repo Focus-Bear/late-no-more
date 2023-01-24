@@ -1,4 +1,3 @@
-require('module-alias/register')
 
 const addTestEvents = require('./src/testing/index.js')
 const { checkUpcoming, checkCalendars } = require('./src/core.js')

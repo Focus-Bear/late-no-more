@@ -1,6 +1,6 @@
 const fs = require('fs')
 const path = require('path')
-const { stringify, parse } = require('../lib/csv/dist/cjs/sync.cjs')
+const { stringify, parse } = require('../lib/csv/sync.cjs')
 const home = require('os').homedir()
 
 const csvPath = home + '/Documents/LateNoMore-Meetings.csv'

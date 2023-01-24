@@ -1,4 +1,4 @@
-const defaultEvent = require('@scripts/defaultEvent.js'),
-    meetingEnd = require('@scripts/meetingEnd.js')
+const defaultEvent = require('./defaultEvent.js'),
+    meetingEnd = require('./meetingEnd.js')
 
 module.exports = { default: defaultEvent, meetingEnd }

@@ -1,4 +1,4 @@
-const exec = require('@applescript/exec.js')
+const exec = require('./exec.js')
 
 async function checkForFocusBearInstall() {
     const SCRIPT = `

@@ -1,15 +1,16 @@
-const { calculateProximity } = require('@events/event.js')
-const bark = require('@lib/bark.js'),
+const { calculateProximity } = require('../events/event.js')
+const bark = require('../bark.js'),
     {
         DIALOG_STAGES,
         LOOK_AHEAD_MINUTES,
         MEETING_ACTION_BUTTONS,
         MEETING_QUESTIONS,
-    } = require('@root/config.js')
+    } = require('../../config.js')
 
-const { showDialog, askQuestion } = require('@applescript/dialog.js')
-const openMeetingURL = require('@applescript/event.js')
-const setMeetingIntention = require('@lib/intention.js')
+
+const { showDialog, askQuestion } = require('../applescript/dialog.js')
+const openMeetingURL = require('../applescript/event.js')
+const setMeetingIntention = require('../intention.js')
 
 async function showMeetingAlert(evt, line, givingUpAfter, showImage = false) {
     console.log('showMeetingAlert()')
@@ -95,7 +96,7 @@ async function notifyUser(evt) {
 }
 
 module.exports = function (evt, now) {
-    const events = require('@events'),
+    const events = require('../events'),
         { delta, imminent, soon } = calculateProximity(evt, now)
 
     const { looming } = events.get()

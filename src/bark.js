@@ -1,4 +1,4 @@
-const say = require('@applescript/say.js')
+const say = require('./applescript/say.js')
 
 const {
     DIALOG_STAGES,
@@ -7,7 +7,7 @@ const {
     MEETING_ACTION_BUTTONS,
     PAUSE_BETWEEN_BARKS_SECONDS,
     LOOK_AHEAD_MINUTES,
-} = require('@root/config.js')
+} = require('../config.js')
 
 let barking = false
 

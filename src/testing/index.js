@@ -1,6 +1,6 @@
-const { add } = require('@events')
+const { add } = require('../events')
 
-const { LOOK_AHEAD_MINUTES } = require('@root/config.js')
+const { LOOK_AHEAD_MINUTES } = require('../..//config.js')
 
 function addDummyEvent(
     summary,

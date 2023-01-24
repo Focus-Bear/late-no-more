@@ -1,6 +1,6 @@
-const { showDialog } = require('@applescript/dialog.js'),
-    openURL = require('@applescript/event.js'),
-    { checkForFocusBearInstall } = require('@applescript/fs.js')
+const { showDialog } = require('./applescript/dialog.js'),
+    openURL = require('./applescript/event.js'),
+    { checkForFocusBearInstall } = require('./applescript/fs.js')
 
 const visitFocusBear = 'Check out Focus Bear',
     closeDialog = 'Close',

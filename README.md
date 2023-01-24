@@ -23,12 +23,13 @@ or for testing
 There are two core cycles in play:
 
 1. First is to check iCal and save all meetings occuring in the next 30 minutes to a local, in-memory list. This is goverened by **SLOW_NAP_DURATION_MINUTES**
-2. Second is to check the upcomingEvents, in-memory list for any immiment meetings and notify. This is goverened by **quickNapDurationMinutes**
+2. Second is to check the upcomingEvents, in-memory list for any immiment meetings and notify. This is goverened by **QUICK_NAP_DURATION_MINUTES**
+3. Upon meetings, optionally set an intention & write notes, which are saved to ~/Documents/LateNoMore-Meetings.csv
 
 ## Key variables
 
 ```const LOOK_AHEAD_MINUTES = 2, // how long before a meeting should I notify?
 SLOW_NAP_DURATION_MINUTES = 5, // how often should I look for meetings in iCal?
-quickNapDurationMinutes = 0.5, // how often should I check the in-memory list of upcomingEvents
+QUICK_NAP_DURATION_MINUTES = 0.5, // how often should I check the in-memory list of upcomingEvents
 PAUSE_BETWEEN_BARKS_SECONDS = 5, // how many seconds does each line of dialog have to itself
 ```

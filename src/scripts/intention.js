@@ -9,8 +9,7 @@ async function takeNotes(evt) {
         notesText = `Your intention for this meeting is \n\n${evt.intention}\n\nNotes:`,
         save = 'Save notes',
         skip = 'No notes required',
-        disregard = 'Disregard intention',
-        buttons = [skip, disregard, save]
+        buttons = [skip, save]
 
     const { buttonReturned, userInput } = await askQuestion(
         notesText,
@@ -25,10 +24,7 @@ async function takeNotes(evt) {
 
         await csv.update(row)
     }
-    if (buttonReturned === disregard) {
-        await events.remove("upcoming", evt)
-        await csv.remove(evt)
-    }
+  
 }
 
 module.exports = async function setMeetingIntention(evt) {

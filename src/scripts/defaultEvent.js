@@ -4,12 +4,14 @@ const bark = require('../bark.js'),
         DIALOG_STAGES,
         LOOK_AHEAD_MINUTES,
         MEETING_ACTION_BUTTONS,
-        MEETING_QUESTIONS,
+        MEETING_QUESTIONS, ALERT_WINDOW_GIVEUP_TIMEOUT_MINUTES
     } = require('../../config.js')
 
 const { showDialog, askQuestion } = require('../applescript/dialog.js')
 const openMeetingURL = require('../applescript/event.js')
 const setMeetingIntention = require('./intention.js')
+
+const giveUpAfter = ALERT_WINDOW_GIVEUP_TIMEOUT_MINUTES * 60_000
 
 async function showMeetingAlert(evt, line, givingUpAfter, showImage = false) {
     console.log('showMeetingAlert()')
@@ -72,7 +74,7 @@ async function notifyUser(evt) {
     for (let i = 0; i < DIALOG_STAGES.length; i++) {
         const line = DIALOG_STAGES[i],
             lastRow = i + 1 == DIALOG_STAGES.length,
-            givingUpAfter = !lastRow ? perStage : 0,
+            givingUpAfter = !lastRow ? perStage : giveUpAfter,
             barking = bark.getState()
 
         //   if (lastRow && barking) bark.stop() // catch edge case where barking misbehaves

@@ -13,8 +13,8 @@ const setMeetingIntention = require('./intention.js')
 
 async function showMeetingAlert(evt, line, givingUpAfter, showImage = false) {
     console.log('showMeetingAlert()')
-    const title = `Late No More: ${evt.summary} ${evt.startDate}`,
-        text = [line, '\n', evt.location, evt.url].join('\n'),
+    const title = `Late No More: ${evt.summary}`, br = '\n',
+        text = [evt.startDate, br, line, br, evt.location, evt.url].join(br),
         buttons = MEETING_ACTION_BUTTONS
 
     return await showDialog(title, text, buttons, givingUpAfter, showImage)

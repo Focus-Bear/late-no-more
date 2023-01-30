@@ -13,7 +13,8 @@ const setMeetingIntention = require('./intention.js')
 
 async function showMeetingAlert(evt, line, givingUpAfter, showImage = false) {
     console.log('showMeetingAlert()')
-    const title = `Late No More: ${evt.summary}`, br = '\n',
+    const title = `Late No More: ${evt.summary}`,
+        br = '\n',
         text = [evt.startDate, br, line, br, evt.location, evt.url].join(br),
         buttons = MEETING_ACTION_BUTTONS
 
@@ -54,9 +55,11 @@ async function handleAnswer(evt, answer) {
         throw { type: 'break' }
     }
 
-    await attendMeeting(evt)
-    await setMeetingIntention(evt)
-    throw { type: 'break' }
+    if (answer == present) {
+        await attendMeeting(evt)
+        await setMeetingIntention(evt)
+        throw { type: 'break' }
+    }
 }
 
 async function notifyUser(evt) {

@@ -31,7 +31,7 @@ const DIALOG_STAGES = [
 
 const present = 'Attend meeting',
     truant = "I don't need to attend",
-    MEETING_ACTION_BUTTONS = [truant, present]
+    MEETING_ACTION_BUTTONS = [present, truant]
 
 module.exports = {
     MEETING_ACTION_BUTTONS,
@@ -43,5 +43,5 @@ module.exports = {
     IS_TESTING,
     QUICK_NAP_DURATION_SECONDS,
     SLOW_NAP_DURATION_MINUTES,
-    ONE_DAY_IN_MILLI_SECONDS
+    ONE_DAY_IN_MILLI_SECONDS,
 }

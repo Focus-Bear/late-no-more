@@ -4,8 +4,10 @@ const bark = require('../bark.js'),
         DIALOG_STAGES,
         LOOK_AHEAD_MINUTES,
         MEETING_ACTION_BUTTONS,
-        MEETING_QUESTIONS, ALERT_WINDOW_GIVEUP_TIMEOUT_MINUTES
+        MEETING_QUESTIONS,
+        ALERT_WINDOW_GIVEUP_TIMEOUT_MINUTES,
     } = require('../../config.js')
+console.log({MEETING_ACTION_BUTTONS})
 
 const { showDialog, askQuestion } = require('../applescript/dialog.js')
 const openMeetingURL = require('../applescript/event.js')
@@ -44,7 +46,8 @@ async function attendMeeting(evt) {
 }
 
 async function handleAnswer(evt, answer) {
-    const [intent, present, truant] = MEETING_ACTION_BUTTONS
+    const [present, truant] = MEETING_ACTION_BUTTONS
+    console.log({present, truant})
     if (!answer?.length) {
         console.log('no answer, continuing')
         throw { type: 'continue' }
@@ -52,7 +55,7 @@ async function handleAnswer(evt, answer) {
 
     bark.stop()
 
-    console.log({ answer })
+    console.log({ answer, present, truant })
     if (answer == truant) {
         throw { type: 'break' }
     }

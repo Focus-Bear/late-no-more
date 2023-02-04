@@ -52,7 +52,7 @@ module.exports = async function setMeetingIntention(evt) {
             date: startDate,
             summary,
             id: evt.id,
-            intention: cannonical
+            intention: cannonical,
         }
 
     await csv.update(row)
@@ -62,7 +62,6 @@ module.exports = async function setMeetingIntention(evt) {
         startDate: endDate,
         type: 'meetingEnd',
         intention,
-    
     }
 
     events.add('upcoming', followUp)

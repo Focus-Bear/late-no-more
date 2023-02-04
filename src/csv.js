@@ -1,5 +1,9 @@
 const fs = require('fs')
 const path = require('path')
+<<<<<<< HEAD
+=======
+
+>>>>>>> 04b0491017f977c10bbcba1ffe5008dd66464567
 const { stringify, parse } = require('../lib/csv/sync.cjs')
 const home = require('os').homedir()
 

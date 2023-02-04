@@ -35,8 +35,6 @@ function tidyEvent(evt) {
         type: 'default',
         id,
     }
-
-    console.log({ obj })
     return matchService(obj)
 }
 

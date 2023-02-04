@@ -7,7 +7,7 @@ async function checkUpcoming() {
     if (!upcoming?.length) {
         return
     }
-    console.log({upcoming})
+    console.log({ upcoming })
     const { length: count } = upcoming,
         now = new Date()
 

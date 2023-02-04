@@ -7,7 +7,6 @@ const bark = require('../bark.js'),
         MEETING_QUESTIONS,
         ALERT_WINDOW_GIVEUP_TIMEOUT_MINUTES,
     } = require('../../config.js')
-console.log({MEETING_ACTION_BUTTONS})
 
 const { showDialog, askQuestion } = require('../applescript/dialog.js')
 const openMeetingURL = require('../applescript/event.js')
@@ -46,8 +45,7 @@ async function attendMeeting(evt) {
 }
 
 async function handleAnswer(evt, answer) {
-    const [present, truant] = MEETING_ACTION_BUTTONS
-    console.log({present, truant})
+    const [ truant, present] = MEETING_ACTION_BUTTONS
     if (!answer?.length) {
         console.log('no answer, continuing')
         throw { type: 'continue' }
@@ -55,7 +53,6 @@ async function handleAnswer(evt, answer) {
 
     bark.stop()
 
-    console.log({ answer, present, truant })
     if (answer == truant) {
         throw { type: 'break' }
     }
@@ -109,11 +106,6 @@ module.exports = function (evt, now) {
     if (delta && imminent) {
         events.remove('upcoming', evt)
         events.remove('looming', evt)
-        events.add('expired', evt)
         notifyUser(evt)
-    }
-    // Super late now - stop hassling them
-    if (delta <= -10) {
-        events.add('expired', evt)
     }
 }

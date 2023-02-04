@@ -1,4 +1,4 @@
-const csv  = require('../csv.js')
+const csv = require('../csv.js')
 const { askQuestion } = require('../applescript/dialog.js')
 const { MEETING_QUESTIONS } = require('../../config.js')
 
@@ -18,13 +18,13 @@ async function takeNotes(evt) {
         save
     )
 
+    if (buttonReturned === skip) return
     if (buttonReturned === save) {
         const { startDate: date, summary } = evt,
             row = { id: evt.id, notes: userInput.trim() }
 
         await csv.update(row)
     }
-  
 }
 
 module.exports = async function setMeetingIntention(evt) {
@@ -42,19 +42,29 @@ module.exports = async function setMeetingIntention(evt) {
         buttons,
         intent
     )
-    if (!intention) return
 
-    const { startDate: date, summary } = evt,
-        row = { date, summary, id: evt.id, intention: intention.trim() }
+    const cannonical = intention.trim()
+
+    if (!cannonical.length) return
+
+    const { startDate, endDate, summary } = evt,
+        row = {
+            date: startDate,
+            summary,
+            id: evt.id,
+            intention: cannonical
+        }
 
     await csv.update(row)
 
     const followUp = {
         ...evt,
-        startDate: evt.endDate,
+        startDate: endDate,
         type: 'meetingEnd',
         intention,
+    
     }
+
     events.add('upcoming', followUp)
     await takeNotes(followUp)
 }

@@ -12,11 +12,13 @@ function set(listName, evts) {
 }
 
 function add(listName, evt) {
+    console.log(`Adding ${evt.type} type event "${evt.summary}" to ${listName}`, evt)
     const theList = events[listName]
     events[listName] = [...theList, evt]
 }
 
 function remove(listName, evt) {
+    console.log(`Removing ${evt.type} type event "${evt.summary}" from ${listName}`, evt)
     const theList = events[listName]
     
     events[listName] = theList.filter(

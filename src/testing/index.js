@@ -14,15 +14,8 @@ function addDummyEvent(
     const startDate = new Date()
     startDate.setMinutes(startDate.getMinutes() + offset)
     const endDate = new Date()
-<<<<<<< HEAD
     endDate.setMinutes(startDate.getMinutes() + offset + 1)
 
-    console.log({ startDate, endDate })
-
-=======
-    endDate.setMinutes(endDate.getMinutes() + offset * 2)
-
->>>>>>> 04b0491017f977c10bbcba1ffe5008dd66464567
     const evt = {
         summary,
         startDate,
@@ -33,10 +26,6 @@ function addDummyEvent(
         description,
         type,
     }
-<<<<<<< HEAD
-    console.log({ evt })
-=======
->>>>>>> 04b0491017f977c10bbcba1ffe5008dd66464567
 
     console.log('Adding entry to upcomingEvents..')
     add('upcoming', evt)

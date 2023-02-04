@@ -17,7 +17,7 @@ async function setNagState() {
     const now = new Date(),
         day = now.getDate()
 
-    if (day % 7 === 0 && !fbInstalled) {
+    if (day % 1 === 0 && !fbInstalled) {
         skipNag = false
         return
     }

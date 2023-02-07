@@ -2,17 +2,27 @@ function tidyDate(date) {
     return new Date(date.split(',').slice(1).join(',').replace(' at', ''))
 }
 
+function parseMSFT(str) {
+    let start = str.indexOf('<https://')
+    if (start === -1) return null
+    start += 1
+    let end = str.indexOf('>', start)
+    if (end === -1) end = str.length
+    return str.substring(start, end)
+}
+function parseGOOG(str) {
+    const regex = /https\S*[\s\>]/,
+        [url] = str.match(regex)
+    return url
+}
 function matchService(evt) {
     const { description } = evt
 
     const isGoogleMeet = description?.includes('google.com'),
         isMsftTeams = description?.includes('microsoft.com')
 
-    if (isMsftTeams || isGoogleMeet) {
-        const regex = /https\S*[\s\>]/,
-            [url] = description.match(regex)
-        return { ...evt, url: url.trim() }
-    }
+    if (isMsftTeams) return { ...evt, url: parseMSFT(description) }
+    if (isGoogleMeet) return { ...evt, url: parseGOOG(description) }
     return evt
 }
 

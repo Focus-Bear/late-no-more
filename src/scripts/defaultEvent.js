@@ -12,14 +12,14 @@ const { showDialog, askQuestion } = require('../applescript/dialog.js')
 const openMeetingURL = require('../applescript/event.js')
 const setMeetingIntention = require('./intention.js')
 
-const giveUpAfter = ALERT_WINDOW_GIVEUP_TIMEOUT_MINUTES * 60_000
+const giveUpAfter = ALERT_WINDOW_GIVEUP_TIMEOUT_MINUTES * 60
 
 async function showMeetingAlert(evt, line, givingUpAfter, showImage = false) {
     console.log('showMeetingAlert()')
     const title = `Late No More: ${evt.summary}`,
         br = '\n',
         text = [evt.startDate, br, line, br, evt.location, evt.url].join(br),
-       buttons = MEETING_ACTION_BUTTONS
+        buttons = MEETING_ACTION_BUTTONS
 
     return await showDialog(title, text, buttons, givingUpAfter, showImage)
 }
@@ -45,8 +45,8 @@ async function attendMeeting(evt) {
 }
 
 async function handleAnswer(evt, answer) {
-    const [ truant, present] = MEETING_ACTION_BUTTONS
-   if (!answer?.length) {
+    const [truant, present] = MEETING_ACTION_BUTTONS
+    if (!answer?.length) {
         console.log('no answer, continuing')
         throw { type: 'continue' }
     }
@@ -58,7 +58,6 @@ async function handleAnswer(evt, answer) {
         await setMeetingIntention(evt)
         throw { type: 'break' }
     }
-
 }
 
 async function notifyUser(evt) {
@@ -72,9 +71,8 @@ async function notifyUser(evt) {
         const line = DIALOG_STAGES[i],
             lastRow = i + 1 == DIALOG_STAGES.length,
             givingUpAfter = !lastRow ? perStage : giveUpAfter,
-           barking = bark.getState()
+            barking = bark.getState()
 
-        //   if (lastRow && barking) bark.stop() // catch edge case where barking misbehaves
         if (lastRow) bark.start(evt)
 
         try {
@@ -105,5 +103,4 @@ module.exports = function (evt, now) {
         events.remove('looming', evt)
         notifyUser(evt)
     }
-
 }

@@ -1,6 +1,5 @@
 const fs = require('fs')
 const path = require('path')
-
 const { stringify, parse } = require('../lib/csv/sync.cjs')
 const home = require('os').homedir()
 
@@ -19,9 +18,10 @@ async function ensure() {
                     'success',
                 ],
             })
-        if (!data.length) throw "fix"
+        if (!data.length) throw 'Error: no data found'
         return data.slice(1)
     } catch (e) {
+        console.log('Creating empty file..')
         fs.writeFileSync(csvPath, '', { flag: 'w' })
         await save([])
         return []

@@ -5,16 +5,20 @@ const bark = require('../bark.js'),
         LOOK_AHEAD_MINUTES,
         MEETING_ACTION_BUTTONS,
         MEETING_QUESTIONS,
+        ALERT_WINDOW_GIVEUP_TIMEOUT_MINUTES,
     } = require('../../config.js')
 
 const { showDialog, askQuestion } = require('../applescript/dialog.js')
 const openMeetingURL = require('../applescript/event.js')
 const setMeetingIntention = require('./intention.js')
 
+const giveUpAfter = ALERT_WINDOW_GIVEUP_TIMEOUT_MINUTES * 60
+
 async function showMeetingAlert(evt, line, givingUpAfter, showImage = false) {
     console.log('showMeetingAlert()')
-    const title = `Late No More: ${evt.summary} ${evt.startDate}`,
-        text = [line, '\n', evt.location, evt.url].join('\n'),
+    const title = `Late No More: ${evt.summary}`,
+        br = '\n',
+        text = [evt.startDate, br, line, br, evt.location, evt.url].join(br),
         buttons = MEETING_ACTION_BUTTONS
 
     return await showDialog(title, text, buttons, givingUpAfter, showImage)
@@ -41,7 +45,7 @@ async function attendMeeting(evt) {
 }
 
 async function handleAnswer(evt, answer) {
-    const [intent, present, truant] = MEETING_ACTION_BUTTONS
+    const [truant, present] = MEETING_ACTION_BUTTONS
     if (!answer?.length) {
         console.log('no answer, continuing')
         throw { type: 'continue' }
@@ -49,14 +53,11 @@ async function handleAnswer(evt, answer) {
 
     bark.stop()
 
-    console.log({ answer })
-    if (answer == truant) {
+    if (answer == present) {
+        await attendMeeting(evt)
+        await setMeetingIntention(evt)
         throw { type: 'break' }
     }
-
-    await attendMeeting(evt)
-    await setMeetingIntention(evt)
-    throw { type: 'break' }
 }
 
 async function notifyUser(evt) {
@@ -69,10 +70,9 @@ async function notifyUser(evt) {
     for (let i = 0; i < DIALOG_STAGES.length; i++) {
         const line = DIALOG_STAGES[i],
             lastRow = i + 1 == DIALOG_STAGES.length,
-            givingUpAfter = !lastRow ? perStage : 0,
+            givingUpAfter = !lastRow ? perStage : giveUpAfter,
             barking = bark.getState()
 
-        //   if (lastRow && barking) bark.stop() // catch edge case where barking misbehaves
         if (lastRow) bark.start(evt)
 
         try {
@@ -101,11 +101,6 @@ module.exports = function (evt, now) {
     if (delta && imminent) {
         events.remove('upcoming', evt)
         events.remove('looming', evt)
-        events.add('expired', evt)
         notifyUser(evt)
-    }
-    // Super late now - stop hassling them
-    if (delta <= -10) {
-        events.add('expired', evt)
     }
 }

@@ -4,7 +4,7 @@ function stringify(buttons) {
     return buttons.map((b) => `"${b}"`).join(', ')
 }
 async function showDialog(title, text, buttons, givingUpAfter = 30) {
-    const [defaultButton] = buttons.reverse() // grab the right most button
+    const [defaultButton] = [...buttons].reverse() // grab the right most button
 
     const SCRIPT = ` 
     try
@@ -26,7 +26,7 @@ async function showDialog(title, text, buttons, givingUpAfter = 30) {
 }
 
 async function askQuestion(question, title, buttons, defaultButton) {
-    if (!defaultButton) [defaultButton] = buttons.reverse()
+    if (!defaultButton) [defaultButton] = [...buttons].reverse()
 
     const SCRIPT = `
     try    

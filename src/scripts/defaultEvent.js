@@ -73,6 +73,7 @@ async function notifyUser(evt) {
             givingUpAfter = !lastRow ? perStage : giveUpAfter,
             barking = bark.getState()
 
+        if (barking && !lastRow) bark.stop()
         if (lastRow) bark.start(evt)
 
         try {
@@ -83,7 +84,7 @@ async function notifyUser(evt) {
             if (type == 'break') break
         }
 
-        break
+       // break
     }
 }
 

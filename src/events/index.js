@@ -27,7 +27,7 @@ function remove(listName, evt) {
 }
 
 function has(listName, evt){
-    return !!events[listName].filter(({id, type})=> id == evt.id && type == evt.type)?.length
+    return !!events[listName].filter(({id, name, type})=> (id == evt.id || name === evt.name) && type == evt.type)?.length
 }
 
 function get(listName) {

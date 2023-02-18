@@ -53,6 +53,8 @@ async function handleAnswer(evt, answer) {
 
     bark.stop()
 
+    if (answer == truant) throw { type: 'break' }
+
     if (answer == present) {
         await attendMeeting(evt)
         await setMeetingIntention(evt)
@@ -84,7 +86,7 @@ async function notifyUser(evt) {
             if (type == 'break') break
         }
 
-       // break
+        // break
     }
 }
 

@@ -15,6 +15,11 @@ function startBarking(evt) {
     console.log('Starting barks...')
     const pauseFor = PAUSE_BETWEEN_BARKS_SECONDS * 1000
 
+    if (barking) {
+        // avoid multiple barks
+        clearInterval(barking);
+    }
+
     barking = setInterval(async () => {
         console.log('In barking interval...')
         const randomIndex = Math.floor(Math.random() * VERBAL_ALERTS.length),

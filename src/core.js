@@ -18,8 +18,7 @@ async function checkUpcoming() {
         const evt = upcoming[i],
             { type } = evt,
             eventHandler = scriptIndex[evt.type]
-
-			console.log({type})
+        //   console.log({ type, eventHandler })
         await eventHandler(evt, now)
     }
 }
@@ -27,11 +26,7 @@ async function checkUpcoming() {
 async function checkCalendars() {
     const newEvents = await getEvents()
 
-	const {upcoming} = events.get()
-
-    for (const evt of newEvents) {
-        events.add('upcoming', evt)
-    }
-    console.log(`Found ${newEvents.length} upcoming events in calendars..`)
+    events.set('upcoming', newEvents)
+    console.log(`Found ${newEvents.length} upcoming events`)
 }
 module.exports = { checkUpcoming, checkCalendars }

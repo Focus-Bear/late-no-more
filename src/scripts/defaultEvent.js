@@ -85,8 +85,6 @@ async function notifyUser(evt) {
             if (type == 'continue') continue
             if (type == 'break') break
         }
-
-        // break
     }
 }
 

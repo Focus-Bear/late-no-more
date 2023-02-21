@@ -12,22 +12,32 @@ function set(listName, evts) {
 }
 
 function add(listName, evt) {
-    console.log(`Adding ${evt.type} type event "${evt.summary}" to ${listName}`, evt)
+    console.log(
+        `Adding ${evt.type} type event "${evt.summary}" to ${listName}`,
+        evt
+    )
     const theList = events[listName]
+    remove(listName, evt)
     events[listName] = [...theList, evt]
 }
 
 function remove(listName, evt) {
-    console.log(`Removing ${evt.type} type event "${evt.summary}" from ${listName}`, evt)
+    console.log(
+        `Removing ${evt.type} type event "${evt.summary}" from ${listName}`,
+        evt
+    )
     const theList = events[listName]
-    
+
     events[listName] = theList.filter(
         ({ id, type }) => evt.id !== id && evt.type !== type
     )
 }
 
-function has(listName, evt){
-    return !!events[listName].filter(({id, name, type})=> (id == evt.id || name === evt.name) && type == evt.type)?.length
+function has(listName, evt) {
+    return !!events[listName].filter(
+        ({ id, name, type }) =>
+            (id == evt.id || name === evt.name) && type == evt.type
+    )?.length
 }
 
 function get(listName) {
@@ -40,5 +50,5 @@ module.exports = {
     add,
     remove,
     get,
-    has
+    has,
 }

@@ -21,9 +21,9 @@ const quickInterval = QUICK_NAP_DURATION_SECONDS * 1000,
 
 
 async function setSettings() {
-    const { excluded_calendars, excluded_events } = await readSettings()
-    await setCalsToExclude(excluded_calendars)
-    await setEventsToExclude(excluded_events)
+    const { calendarsToExclude, eventKeywordsToIgnore } = await readSettings()
+    await setCalsToExclude(calendarsToExclude)
+    await setEventsToExclude(eventKeywordsToIgnore)
     await setNagState()
 }
 

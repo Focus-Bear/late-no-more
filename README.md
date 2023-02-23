@@ -32,4 +32,5 @@ There are two core cycles in play:
 SLOW_NAP_DURATION_MINUTES = 5, // how often should I look for meetings in iCal?
 QUICK_NAP_DURATION_MINUTES = 0.5, // how often should I check the in-memory list of upcomingEvents
 PAUSE_BETWEEN_BARKS_SECONDS = 5, // how many seconds does each line of dialog have to itself
+ALERT_WINDOW_GIVEUP_TIMEOUT_MINUTES = 15 // how long should the barking last?
 ```

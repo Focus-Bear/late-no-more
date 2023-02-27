@@ -7,10 +7,11 @@ let EVENTS_TO_EXCLUDE, CALENDARS_TO_EXCLUDE
 
 function ignoreByCalendar(calendarName) {
     const shouldIgnoreCalendar = CALENDARS_TO_EXCLUDE.some(
-        (calendarToExclude) =>
-            calendarName
+        (calendarToExclude) => {
+            return calendarName
                 ?.toLowerCase()
                 ?.includes(calendarToExclude?.toLowerCase())
+        }
     )
 
     if (shouldIgnoreCalendar)
@@ -27,7 +28,7 @@ function ignoreByEvent(summary) {
 
 async function setCalsToExclude(calList) {
     console.log('setting CALENDARS_TO_EXCLUDE', calList)
-    CALENDARS_TO_EXCLUDE = calList
+    CALENDARS_TO_EXCLUDE = calList.map((calendar) => calendar.name);
 }
 
 async function setEventsToExclude(eventList) {
@@ -42,7 +43,7 @@ function filterEvent({ calendarName, summary }) {
 
         return true
     } catch (e) {
-        console.log(e.message)
+        console.log('Error in filterEvent', e.message)
         return false
     }
 }

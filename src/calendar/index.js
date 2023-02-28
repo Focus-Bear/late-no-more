@@ -28,7 +28,7 @@ function ignoreByEvent(summary) {
 
 async function setCalsToExclude(calList) {
     console.log('setting CALENDARS_TO_EXCLUDE', calList)
-    CALENDARS_TO_EXCLUDE = calList.map((calendar) => calendar.name);
+    CALENDARS_TO_EXCLUDE = calList?.map((calendar) => calendar.name) || []
 }
 
 async function setEventsToExclude(eventList) {

@@ -63,7 +63,12 @@ async function handleAnswer(evt, answer) {
 }
 
 async function notifyUser(evt) {
+    const events = require('../events')
+
     console.log('Notifying user about', evt.summary, evt.startDate)
+
+    events.remove('upcoming', evt)
+    events.remove('looming', evt)
 
     const rightNow = new Date(),
         toGo = Math.floor((new Date(evt.startDate) - rightNow) / 1000),
@@ -100,8 +105,6 @@ module.exports = function (evt, now) {
     }
 
     if (delta && imminent) {
-        events.remove('upcoming', evt)
-        events.remove('looming', evt)
         notifyUser(evt)
     }
 }

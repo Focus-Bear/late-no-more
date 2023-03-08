@@ -21,7 +21,7 @@ async function setBarkTime() {
 }
 setBarkTime()
 
-function checkIfBarkTime() {
+function isBarkTime() {
     const [startHr, startMin] = barkTime.startTime.split(':')
     const [endHr, endMin] = barkTime.endTime.split(':')
 
@@ -43,17 +43,19 @@ function startBarking(evt) {
     const pauseFor = PAUSE_BETWEEN_BARKS_SECONDS * 1000
 
     if (barking) {
-        // avoid multiple barks
+        // prevents bark overlap
         clearInterval(barking)
     }
 
     barking = setInterval(async () => {
-        console.log('In barking interval...')
-        const shouldBark = checkIfBarkTime()
+        console.log('🐶 Preparing to bark...')
+
+        const shouldBark = isBarkTime()
         if (!shouldBark) {
             stopBarking()
             return
         }
+
         const randomIndex = Math.floor(Math.random() * VERBAL_ALERTS.length),
             dialog = VERBAL_ALERTS[randomIndex],
             preamble = "Meeting, '" + evt.summary + "'.",
@@ -64,9 +66,10 @@ function startBarking(evt) {
 }
 
 function stopBarking() {
-    console.log('Silencing barks')
     clearInterval(barking)
     barking = false
+
+    console.log('🤫 Barking cancelled')
 }
 
 function getState() {

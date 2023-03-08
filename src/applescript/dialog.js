@@ -9,17 +9,17 @@ async function showDialog(title, text, buttons, givingUpAfter = 30) {
     const SCRIPT = ` 
     try
         set result to ( ¬ 
-            display dialog "${text}" ¬ 
-            with title "${title}" ¬
+            display dialog \"${text}\" ¬ 
+            with title \"${title}\" ¬
             buttons { ${stringify(buttons)} } ¬
-            default button "${defaultButton}" ¬ 
+            default button \"${defaultButton}\" ¬ 
             giving up after ${givingUpAfter} ¬
             with icon alias ( ¬
                 ( path to application support from user domain as text ) & ¬
-                "com.focusbear.latenomore:icon.png" ¬
+                \"com.focusbear.latenomore:icon.png\" ¬
             ) ¬
         )
-        set buttonReturned to result's button returned
+        set buttonReturned to result\'s button returned
         return buttonReturned
     end try`
     return await exec(SCRIPT)
@@ -31,11 +31,11 @@ async function askQuestion(question, title, buttons, defaultButton) {
     const SCRIPT = `
     try    
         set result to ( ¬
-            display dialog "${question}" ¬
-            default answer "\n\n\n\n" ¬
-            with title "${title}" ¬
+            display dialog \"${question}\" ¬
+            default answer \"\n\n\n\n\" ¬
+            with title \"${title}\" ¬
             buttons { ${stringify(buttons)} } ¬
-            default button "${defaultButton}" ¬
+            default button \"${defaultButton}\" ¬
         )
         set hold to result
         set buttonReturned to button returned of result

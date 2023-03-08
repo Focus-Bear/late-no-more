@@ -1,8 +1,8 @@
 const SCRIPT_HEADER = `
-		use AppleScript version "2.4" -- Yosemite (10.10) or later
-	   	use framework "Foundation"
+		use AppleScript version \"2.4\" -- Yosemite (10.10) or later
+	   	use framework \"Foundation\"
 	   	use scripting additions
-	   	use script "CalendarLib EC" version "1.1.4"
+	   	use script \"CalendarLib EC\" version \"1.1.4\"
 
 		set theStore to fetch store
 	 `   

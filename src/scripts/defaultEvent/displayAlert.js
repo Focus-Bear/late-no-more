@@ -13,7 +13,7 @@ async function warnUser(evt) {
 }
 
 async function showMeetingAlert(evt, line, givingUpAfter, showImage = false) {
-    console.log('showMeetingAlert()')
+    console.log('🔔 notifying user via alert..')
     const title = `Late No More: ${evt.summary}`,
         br = '\n',
         text = [evt.startDate, br, line, br, evt.location, evt.url].join(br),

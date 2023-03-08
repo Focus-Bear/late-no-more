@@ -16,8 +16,7 @@ let barking = false,
 async function setBarkTime() {
     const { barkStartTime, barkEndTime } = await readSettings()
     barkTime = { startTime: barkStartTime, endTime: barkEndTime }
-
-    console.log({ barkTime })
+    console.log(`📙 Allowed to bark ${barkStartTime}-${barkEndTime}`)
 }
 setBarkTime()
 
@@ -39,7 +38,7 @@ function isBarkTime() {
 }
 
 function startBarking(evt) {
-    console.log('Starting barks...')
+    console.log('🐕 Barking requested!')
     const pauseFor = PAUSE_BETWEEN_BARKS_SECONDS * 1000
 
     if (barking) {
@@ -61,12 +60,15 @@ function startBarking(evt) {
             preamble = "Meeting, '" + evt.summary + "'.",
             toSay = preamble + dialog
 
+        console.log(`📢 Barking "${toSay}"`)
         await say(toSay)
     }, pauseFor)
 }
 
 function stopBarking() {
+    if (!barking) return
     clearInterval(barking)
+
     barking = false
 
     console.log('🤫 Barking cancelled')

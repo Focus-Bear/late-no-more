@@ -1,12 +1,12 @@
 const setMeetingIntention = require('../intention.js')
 const bark = require('../../bark.js')
 const open = require('../../applescript/open.js')
-const openMeetingURL =  require("../../applescript/event.js")
+const openMeetingURL = require('../../applescript/event.js')
 const { MEETING_ACTION_BUTTONS } = require('../../../config.js')
 
 async function attendMeeting(evt) {
-    console.log('Opening meeting url, if present')
     if (evt?.url) {
+        console.log(`📄 Opening ${evt.url}`)
         await openMeetingURL(evt.url)
         return
     }
@@ -35,7 +35,6 @@ function checkForTrigger(evt) {
             continue
         }
         const trigger = extractLine(str)
-        console.log({ trigger })
         return trigger
     }
     return false
@@ -48,6 +47,7 @@ function getEventDuration(event) {
 }
 
 function handleTrigger(evt, trigger) {
+    console.log(`📍 Found trigger "${trigger}", opening...`)
     const duration = getEventDuration(evt)
     const url = `focusbear://start-activity?activity_id=${trigger}&duration_seconds=${duration}`
     open(url)
@@ -56,7 +56,7 @@ function handleTrigger(evt, trigger) {
 module.exports = async function handleAnswer(evt, answer) {
     const [truant, present] = MEETING_ACTION_BUTTONS
     if (!answer?.length) {
-        console.log('no answer, continuing')
+        console.log(`📭 no answer, let's escalate..`)
         throw { type: 'continue' }
     }
 

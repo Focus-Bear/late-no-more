@@ -11,7 +11,7 @@ const giveUpAfter = ALERT_WINDOW_GIVEUP_TIMEOUT_MINUTES * 60
 async function notifyUser(evt) {
     const events = require('../../events')
 
-    console.log('Notifying user about', evt.summary, evt.startDate)
+    console.log(`🚨 Notifying user about '${evt.summary}' @ ${evt.startDate}`)
 
     events.remove('upcoming', evt)
     events.remove('looming', evt)

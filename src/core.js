@@ -12,13 +12,11 @@ async function checkUpcoming() {
         now = new Date()
 
     const s = count > 1 ? 's' : ''
-    console.log(`Waiting on ${count} upcoming event${s}`)
+    console.log(`⏳ Waiting on ${count} upcoming event${s}`)
 
     for (let i = 0; i < upcoming.length; i++) {
         const evt = upcoming[i],
-            { type } = evt,
             eventHandler = scriptIndex[evt.type]
-        //   console.log({ type, eventHandler })
         await eventHandler(evt, now)
     }
 }
@@ -27,6 +25,6 @@ async function checkCalendars() {
     const newEvents = await getEvents()
 
     events.set('upcoming', newEvents)
-    console.log(`Found ${newEvents.length} upcoming events`)
+    console.log(`🗓️ Found ${newEvents.length} upcoming events`)
 }
 module.exports = { checkUpcoming, checkCalendars }

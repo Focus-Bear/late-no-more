@@ -11,10 +11,12 @@ const giveUpAfter = ALERT_WINDOW_GIVEUP_TIMEOUT_MINUTES * 60
 async function notifyUser(evt) {
     const events = require('../../events')
 
-    console.log(`🚨 Notifying user about '${evt.summary}' @ ${evt.startDate}`)
+    const alreadyActive = events.has('active', evt)
+    if (alreadyActive) return
 
-    events.remove('upcoming', evt)
-    events.remove('looming', evt)
+    events.add('active', evt)
+
+    console.log(`🚨 Notifying user about '${evt.summary}' @ ${evt.startDate}`)
 
     const rightNow = new Date(),
         toGo = Math.floor((new Date(evt.startDate) - rightNow) / 1000),
@@ -37,7 +39,7 @@ async function notifyUser(evt) {
             if (type == 'continue') continue
             if (type == 'break') break
         }
-			break
+        break
     }
 }
 

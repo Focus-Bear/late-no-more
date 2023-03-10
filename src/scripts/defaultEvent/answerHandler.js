@@ -60,6 +60,7 @@ module.exports = async function handleAnswer(evt, answer) {
         throw { type: 'continue' }
     }
 
+    console.log(`🗯️ The user answers "${answer}"`)
     bark.stop()
 
     if (answer == truant) {

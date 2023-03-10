@@ -5,6 +5,7 @@ const events = {
     upcoming: [],
     expired: [],
     looming: [],
+		active: []
 }
 
 function set(listName, evts) {
@@ -44,5 +45,4 @@ module.exports = {
     add,
     remove,
     get,
-    has,
-}
+    has,}

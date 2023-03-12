@@ -16,10 +16,19 @@ async function attendMeeting(evt) {
     }
 }
 
+let barkingTimeout = false
+
 module.exports = async function handleAnswer(evt, answer) {
     const [truant, present] = MEETING_ACTION_BUTTONS
     if (!answer?.length) {
         console.log(`📭 no answer, let's escalate..`)
+        if (barkingTimeout) clearTimeout(barkingTimeout)
+
+        console.log('setting bark timeout..')
+        barkingTimeout = setTimeout(() => {
+            console.log('timeout ending the barking')
+            bark.stop()
+        }, 15 * 60 * 1000)
         throw { type: 'continue' }
     }
 

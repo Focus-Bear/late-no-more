@@ -6,7 +6,7 @@ const {
     ALERT_WINDOW_GIVEUP_TIMEOUT_MINUTES,
 } = require('../../../config.js')
 
-const giveUpAfter = ALERT_WINDOW_GIVEUP_TIMEOUT_MINUTES * 60
+const giveUpAfter = ALERT_WINDOW_GIVEUP_TIMEOUT_MINUTES
 
 async function notifyUser(evt) {
     console.log(`🚨 Notifying user about '${evt.summary}' @ ${evt.startDate}`)
@@ -33,6 +33,7 @@ async function notifyUser(evt) {
             if (type == 'break') break
             console.log('Unhandled error:', e)
         }
+        bark.stop()
         break
     }
 }

@@ -23,7 +23,7 @@ module.exports = async function handleAnswer(evt, answer) {
         throw { type: 'continue' }
     }
 
-    console.log(`🗯️ The user answers "${answer}"`)
+    console.log(`🗯️  The user answers "${answer}"`)
     bark.stop()
 
     if (answer == truant) {
@@ -31,7 +31,8 @@ module.exports = async function handleAnswer(evt, answer) {
     }
 
     if (answer == present) {
-        handleTrigger(evt, trigger)
+        console.log('present')
+        handleTrigger(evt)
         await attendMeeting(evt)
         await setMeetingIntention(evt)
         throw { type: 'break' }

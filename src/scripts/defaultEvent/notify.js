@@ -9,13 +9,6 @@ const {
 const giveUpAfter = ALERT_WINDOW_GIVEUP_TIMEOUT_MINUTES * 60
 
 async function notifyUser(evt) {
-    const events = require('../../events')
-
-    const alreadyActive = events.has('active', evt)
-    if (alreadyActive) return
-
-    events.add('active', evt)
-
     console.log(`🚨 Notifying user about '${evt.summary}' @ ${evt.startDate}`)
 
     const rightNow = new Date(),
@@ -38,6 +31,7 @@ async function notifyUser(evt) {
             const { type } = e
             if (type == 'continue') continue
             if (type == 'break') break
+            console.log('Unhandled error:', e)
         }
         break
     }

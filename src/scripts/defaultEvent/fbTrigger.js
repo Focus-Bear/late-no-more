@@ -23,7 +23,7 @@ function checkForTrigger(evt) {
     const toLookAt = [summary, description]
 
     for (const str of toLookAt) {
-        if (!str.includes('fbtrigger:')) {
+        if (!str?.includes('fbtrigger:')) {
             continue
         }
         const trigger = extractLine(str)

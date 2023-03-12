@@ -1,5 +1,5 @@
 const addTestEvents = require('./src/testing/index.js')
-const { checkUpcoming, checkCalendars } = require('./src/core.js')
+const updateState = require('./src/index.js')
 const { setCalsToExclude, setEventsToExclude } = require('./src/calendar')
 const { readSettings } = require('./src/applescript/fs.js')
 const { setNagState } = require('./src/scripts/nag.js')
@@ -27,11 +27,10 @@ async function main() {
     await setSettings()
 
     if (IS_TESTING) await addTestEvents()
-    else await checkCalendars()
-    checkUpcoming()
 
-    setInterval(checkUpcoming, quickInterval)
-    setInterval(checkCalendars, slowInterval)
+    await updateState()
+
+    setInterval(updateState, quickInterval)
     setInterval(setNagState, oneFullDay)
 }
 

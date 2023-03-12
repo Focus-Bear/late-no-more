@@ -27,10 +27,7 @@ module.exports = async function update() {
     const { looming, upcoming } = events.get()
     const calendarEvents = await getEvents()
 
-    const filtered = events.filter(
-        ['active', 'looming'],
-        [...calendarEvents, ...upcoming, ...looming]
-    )
+    const filtered = events.filter(['active'], [...calendarEvents, ...upcoming])
     const { length: count } = filtered
 
     if (!filtered.length) return

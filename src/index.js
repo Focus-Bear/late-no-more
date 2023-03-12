@@ -1,25 +1,8 @@
-// what's the state of everything?
-
-// am I barking?
-// am I displaying any popups? (do i need this?)
-
-// lets check the calendar
-
-// ok, got everything, now lets filter it:
-// filter out based on presets (or is that done at the point of consumption?)
-// all events => filter by existing
-// if it's active or looming, delete it (well, replace with new one)
-// otherwise, clear the upcoming list and replace it with what's late
-
-// what's active RIGHT if anything?
-// what's looming?
-// what's upcoming?
 const scriptIndex = require('./scripts')
 const events = require('./events')
 const { getEvents } = require('./calendar')
 
 function prune() {
-    console.log('Pruning lists..')
     const { active, upcoming, looming } = events.get()
     const all = { active, looming, upcoming }
 
@@ -30,7 +13,6 @@ function prune() {
 
         for (const evt of current) {
             if (expiry < evt.endDate) continue
-            console.log('Pruning old event', listName, evt)
             events.remove(listName, evt, 'Expired')
         }
     }
@@ -42,18 +24,14 @@ function pluralize(word, count) {
 }
 
 module.exports = async function update() {
-    prune()
-
-    const { upcoming } = events.get('upcoming')
+    const { looming, upcoming } = events.get()
     const calendarEvents = await getEvents()
 
-    const toInspect = []
-
-    if (upcoming?.length) toInspect.push(...upcoming)
-    if (calendarEvents?.length) toInspect.push(...calendarEvents)
-
-    const filtered = events.filter(['active', 'looming'], toInspect),
-        { length: count } = filtered
+    const filtered = events.filter(
+        ['active', 'looming'],
+        [...calendarEvents, ...upcoming, ...looming]
+    )
+    const { length: count } = filtered
 
     if (!filtered.length) return
 
@@ -64,4 +42,6 @@ module.exports = async function update() {
         const eventHandler = scriptIndex[evt.type]
         await eventHandler(evt, now)
     }
+
+    prune()
 }

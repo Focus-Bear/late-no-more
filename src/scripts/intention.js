@@ -1,6 +1,9 @@
 const csv = require('../csv.js')
 const { askQuestion } = require('../applescript/dialog.js')
-const { MEETING_QUESTIONS } = require('../../config.js')
+const {
+    MEETING_QUESTIONS,
+    QUICK_NAP_DURATION_SECONDS,
+} = require('../../config.js')
 
 async function takeNotes(evt) {
     const notesTitle = `${evt.summary}: Meeting Notes`,
@@ -54,9 +57,14 @@ module.exports = async function setMeetingIntention(evt) {
 
     await csv.update(row)
 
+    const newEndDate = new Date(startDate)
+    const napLength = QUICK_NAP_DURATION_SECONDS / 60
+    newEndDate.setMinutes(endDate.getMinutes() + napLength + 1)
+
     const followUp = {
         ...evt,
         startDate: endDate,
+        endDate: newEndDate,
         type: 'meetingEnd',
         intention,
     }

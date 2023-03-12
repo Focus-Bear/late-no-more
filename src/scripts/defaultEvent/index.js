@@ -13,7 +13,7 @@ module.exports = function (evt, now) {
         notifyUser(evt)
         return
     }
-    if (soon && !events.has('looming', evt)) {
+    if (soon) {
         events.add('looming', evt)
         warnUser(evt)
     }

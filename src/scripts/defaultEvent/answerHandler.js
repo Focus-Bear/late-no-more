@@ -31,7 +31,6 @@ module.exports = async function handleAnswer(evt, answer) {
     }
 
     if (answer == present) {
-        console.log('present')
         handleTrigger(evt)
         await attendMeeting(evt)
         await setMeetingIntention(evt)

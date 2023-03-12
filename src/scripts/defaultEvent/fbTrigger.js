@@ -32,7 +32,7 @@ function checkForTrigger(evt) {
     return false
 }
 
-export default function handleTrigger(evt) {
+module.exports = function handleTrigger(evt) {
     const trigger = checkForTrigger(evt)
     if (!trigger) return
 

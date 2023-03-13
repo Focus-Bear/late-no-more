@@ -52,7 +52,6 @@ async function getEvents() {
     const rawEvents = await exec(SCRIPT_HEADER + GET_ALL_EVENTS),
         withOutBlanks = rawEvents.filter((e) => e.length),
         tidied = withOutBlanks.map(tidyEvent)
-
     return tidied.filter(filterEvent)
 }
 module.exports = {

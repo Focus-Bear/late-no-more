@@ -6,15 +6,10 @@ const {
     ALERT_WINDOW_GIVEUP_TIMEOUT_MINUTES,
 } = require('../../../config.js')
 
-const giveUpAfter = ALERT_WINDOW_GIVEUP_TIMEOUT_MINUTES * 60
+const giveUpAfter = ALERT_WINDOW_GIVEUP_TIMEOUT_MINUTES
 
 async function notifyUser(evt) {
-    const events = require('../../events')
-
     console.log(`🚨 Notifying user about '${evt.summary}' @ ${evt.startDate}`)
-
-    events.remove('upcoming', evt)
-    events.remove('looming', evt)
 
     const rightNow = new Date(),
         toGo = Math.floor((new Date(evt.startDate) - rightNow) / 1000),
@@ -36,8 +31,10 @@ async function notifyUser(evt) {
             const { type } = e
             if (type == 'continue') continue
             if (type == 'break') break
+            console.log('Unhandled error:', e)
         }
-			break
+        bark.stop() // this might not be necessary
+        break
     }
 }
 

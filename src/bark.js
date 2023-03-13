@@ -57,7 +57,7 @@ function startBarking(evt) {
 
         const randomIndex = Math.floor(Math.random() * VERBAL_ALERTS.length),
             dialog = VERBAL_ALERTS[randomIndex],
-            preamble = "Meeting, '" + evt.summary + "'.",
+            preamble = "Meeting, '" + evt.summary + "': ",
             toSay = preamble + dialog
 
         console.log(`📢 Barking "${toSay}"`)

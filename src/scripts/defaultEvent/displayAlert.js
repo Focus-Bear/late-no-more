@@ -7,7 +7,7 @@ const {
 async function warnUser(evt) {
     const title = `Late No More: ${evt.summary} (${evt.calendarName}) is starting in 15 minutes.`,
         text = `I'll remind you again ${LOOK_AHEAD_MINUTES} minutes before.`,
-        buttons = ['Got it', 'Close']
+        buttons = ['Got it']
 
     await showDialog(title, text, buttons, 15)
 }

@@ -4,9 +4,9 @@ const { calculateProximity } = require('../events/event.js')
 const { nag } = require('./nag.js')
 
 module.exports = async function (evt, now) {
-    const { remove } = require('../events')
+    const events = require('../events/index.js')
     const { intention, summary } = evt
-    const { delta, imminent, soon } = calculateProximity(evt, now)
+    const { imminent } = calculateProximity(evt, now)
 
     if (!imminent) return
 
@@ -17,7 +17,6 @@ module.exports = async function (evt, now) {
             }` + 'Do you feel you accomplished it?',
         INTENTION_BUTTONS = ['Yes', 'Sort of', 'No']
 
-    remove('upcoming', evt)
     const success = await showDialog(
         dialogTitle,
         dialogText,
@@ -25,6 +24,7 @@ module.exports = async function (evt, now) {
         0
     )
 
+    events.remove('upcoming', evt, 'Meeting feedback captured')
     const row = { id: evt.id, success }
     await update(row)
     await nag()

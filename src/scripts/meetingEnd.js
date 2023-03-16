@@ -10,6 +10,8 @@ module.exports = async function (evt, now) {
 
     if (!imminent) return
 
+    events.remove('upcoming', evt, 'Meeting feedback captured')
+
     const dialogTitle = 'Follow-Up: ' + summary,
         dialogText =
             `Your intention for this meeting was: ${
@@ -24,7 +26,6 @@ module.exports = async function (evt, now) {
         0
     )
 
-    events.remove('upcoming', evt, 'Meeting feedback captured')
     const row = { id: evt.id, success }
     await update(row)
     await nag()

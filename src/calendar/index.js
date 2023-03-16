@@ -43,7 +43,9 @@ function filterEvent({ calendarName, summary }) {
 
         return true
     } catch (e) {
-        console.log('Error in filterEvent', e.message)
+        if (!e.message.includes('Ignoring')) {
+            console.error('Error in filterEvent', e.message)
+        }
         return false
     }
 }

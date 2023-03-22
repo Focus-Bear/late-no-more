@@ -21,6 +21,8 @@ async function showDialog(title, text, buttons, givingUpAfter = 30) {
         )
         set buttonReturned to result\'s button returned
         return buttonReturned
+    on error errMsg
+        display dialog "ERROR: " & errMsg
     end try`
     return await exec(SCRIPT)
 }
@@ -41,7 +43,9 @@ async function askQuestion(question, title, buttons, defaultButton) {
         set buttonReturned to button returned of result
         set userInput to text returned of hold
         return { buttonReturned, userInput } 
-   end try`
+    on error errMsg
+        display dialog "ERROR: " & errMsg
+    end try`
 
     const [buttonReturned, userInput] = await exec(SCRIPT)
 

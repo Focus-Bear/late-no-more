@@ -27,7 +27,7 @@ async function showDialog(title, text, buttons, givingUpAfter = 30) {
     return await exec(SCRIPT)
 }
 
-async function askQuestion(question, title, buttons, defaultButton) {
+async function askQuestion(question, title, buttons = [], defaultButton) {
     if (!defaultButton) [defaultButton] = [...buttons].reverse()
 
     const SCRIPT = `

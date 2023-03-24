@@ -38,7 +38,7 @@ module.exports = function handleTrigger(evt) {
 
     console.log(`📍 Found trigger "${trigger}", opening...`)
     const duration = getEventDuration(evt)
-    const url = `focusbear://start-activity?activity_id=${trigger}&duration_seconds=${duration}`
+    const url = `open \"focusbear://start-activity?activity_id=${trigger}&duration_seconds=${duration}\"`
 
     open(url)
 }

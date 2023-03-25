@@ -12,12 +12,15 @@ const focusBearHomePageURL =
 let skipNag = true
 
 async function setNagState() {
+    console.log('🧸 Checking nag state')
     let fbInstalled = await checkForFocusBearInstall()
 
     const now = new Date(),
         day = now.getDate()
 
     if (day % 7 === 0 && !fbInstalled) {
+        console.log('🧸 Nagging!')
+
         skipNag = false
         return
     }

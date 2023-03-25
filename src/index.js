@@ -39,6 +39,7 @@ module.exports = async function update() {
 
     const { length: count } = filtered
 
+    console.log(`🔎 Events left after filtering: ${filtered.length}`)
     if (!filtered.length) return
 
     console.log(`🗓️  ${filtered.length} upcoming ${pluralize('event', count)}`)
@@ -46,7 +47,9 @@ module.exports = async function update() {
     const now = new Date()
     for (const evt of filtered) {
         const eventHandler = scriptIndex[evt.type]
+        console.log('🎬 Starting eventHandler')
         await eventHandler(evt, now)
+        console.log('✅ eventHandlerFinished')
     }
 
     prune()

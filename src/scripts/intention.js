@@ -45,7 +45,7 @@ module.exports = async function setMeetingIntention(evt) {
         title,
         buttons,
         intent
-    )
+    ) || ''
 
     const cannonical = intention.trim()
 

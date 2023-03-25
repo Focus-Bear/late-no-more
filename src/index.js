@@ -6,6 +6,8 @@ function prune() {
     const { active, upcoming, looming } = events.get()
     const all = { active, looming, upcoming }
 
+    console.log('🍃 Pruning...')
+
     const expiry = new Date(Date.now())
 
     for (const listName in all) {
@@ -13,7 +15,7 @@ function prune() {
 
         for (const evt of current) {
             if (expiry < evt.endDate) continue
-            events.remove(listName, evt, 'Expired')
+            events.remove(listName, evt, '🪦 Expired')
         }
     }
 }
@@ -24,10 +26,17 @@ function pluralize(word, count) {
 }
 
 module.exports = async function update() {
-    const { looming, upcoming } = events.get()
+    console.log('⏱️  Running core loop', new Date())
+    const { looming, upcoming, active } = events.get()
     const calendarEvents = await getEvents()
 
+    //    console.log({ active, looming, upcoming, calendarEvents })
+
     const filtered = events.filter(['active'], [...calendarEvents, ...upcoming])
+    // We take the events straight out of applescript,
+    // and combine them with our list of internally
+    // generated & tracked events (eg, intention follow up)
+
     const { length: count } = filtered
 
     if (!filtered.length) return
@@ -41,4 +50,5 @@ module.exports = async function update() {
     }
 
     prune()
+    console.log('\n')
 }

@@ -21,7 +21,15 @@ async function showDialog(title, text, buttons, givingUpAfter = 30) {
         )
         set buttonReturned to result\'s button returned
         return buttonReturned
+    on error errMsg
+        if errMsg contains "User canceled" then
+            set buttonReturned to ""
+            return buttonReturned
+        else
+            return "Error"
+        end if
     end try`
+
     return await exec(SCRIPT)
 }
 
@@ -41,7 +49,15 @@ async function askQuestion(question, title, buttons, defaultButton) {
         set buttonReturned to button returned of result
         set userInput to text returned of hold
         return { buttonReturned, userInput } 
-   end try`
+    on error errMsg
+        if errMsg contains "User canceled" then
+            set userInput to "" 
+            set buttonReturned to ""
+            return { buttonReturned, userInput }
+        else
+            return "Error"
+        end if
+    end try`
 
     const [buttonReturned, userInput] = await exec(SCRIPT)
 

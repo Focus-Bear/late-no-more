@@ -7,8 +7,12 @@ const {
 
 async function takeNotes(evt) {
     const notesTitle = `${evt.summary}: Meeting Notes`,
-        notesText = `Your intention for this meeting is \n\n${evt.intention}\n\nNotes:`,
-        save = 'Save notes',
+        notesText =
+            (evt?.intention
+                ? `Your intention for this meeting is \n\n${evt.intention}\n\n`
+                : '') + `Notes:`
+
+    const save = 'Save notes',
         skip = 'No notes required',
         buttons = [skip, save]
 
@@ -45,7 +49,14 @@ module.exports = async function setMeetingIntention(evt) {
 
     const cannonical = intention.trim()
 
-    if (!cannonical.length) return
+    if (!cannonical.length) {
+        // I forget:
+        // do we want to offer to save notes when
+        // an intention setting is declined
+
+        // takeNotes(evt)
+        return
+    }
 
     const { startDate, endDate, summary } = evt,
         row = {
@@ -70,5 +81,8 @@ module.exports = async function setMeetingIntention(evt) {
     }
 
     events.add('upcoming', followUp)
-    await takeNotes(followUp)
+    // we pass the later event becuase
+    // it resolves which csv line to update based on uid
+    // plus the intention itself is associated with this evt
+    takeNotes(followUp)
 }

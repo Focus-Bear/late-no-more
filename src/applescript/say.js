@@ -1,15 +1,9 @@
 const exec = require('./exec.js')
+const { readSettings } = require('./fs.js')
 
-module.exports = async function say(dialog, options = {}) {
-    const defaultOptions = {
-        using: 'Karen',
-        speakingRate: 150,
-        pitch: 50,
-        volume: 0.5,
-        modulation: 2,
-        waitForCompletion: true,
-    }
+const { voiceOptions: options } = readSettings()
 
+module.exports = async function say(dialog) {
     const optionStrings = {
         using: (value) => ` using "${value}"`,
         speakingRate: (value) => ` speaking rate ${value}`,
@@ -22,16 +16,14 @@ module.exports = async function say(dialog, options = {}) {
         saveTo: (value) => ` saving to "${value}"`,
     }
 
-    const combinedOptions = { ...defaultOptions, ...options }
-
     let SCRIPT = `say "${dialog}"`
 
-    for (const key in combinedOptions) {
-        const option = combinedOptions?.[key]
+    for (const key in options) {
+        const option = options?.[key]
         if (option === undefined) continue
 
         if (optionStrings.hasOwnProperty(key)) {
-            const optionValue = combinedOptions[key]
+            const optionValue = options[key]
             SCRIPT += optionStrings[key](optionValue)
         }
     }

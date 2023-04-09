@@ -1,0 +1,19 @@
+{
+  "barkStartTime": "07:00",
+  "barkEndTime": "21:00",
+  "calendarsToExclude": [
+    {
+      "name": "Holidays in Australia",
+      "id": "24516AA2-7D42-49FE-803F-76F3DE727A53"
+    }
+  ],
+  "eventKeywordsToIgnore": ["no-notify", "focus", "blocked"],
+  "voiceOptions": {
+    "using": "Karen",
+    "speakingRate": 150,
+    "pitch": 50,
+    "volume": 0.5,
+    "modulation": 2,
+    "waitForCompletion": true
+  }
+}

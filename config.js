@@ -16,12 +16,8 @@ const DIALOG_STAGES = [
         '😱 you are late.',
     ],
     VERBAL_ALERTS = [
-        'yellow alert, meeting imminent',
-        'red alert',
-        "heyyoo... it's time",
-        'beep beep!',
-        'meeting time!',
-        'hey!! check your calendar!',
+        'spotify:track:7jL5aGalMaZRfnJ9jasABT',
+        'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
     ],
     MEETING_QUESTIONS = [
         'what do you want to contribute to the meeting?',

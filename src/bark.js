@@ -1,5 +1,7 @@
 const say = require('./applescript/say.js')
 const { readSettings } = require('./applescript/fs.js')
+const exec = require('./applescript/exec.js')
+const openURL = require('./applescript/event.js')
 
 const {
     DIALOG_STAGES,
@@ -37,6 +39,27 @@ function isBarkTime() {
     return rn >= startAt && rn <= endAt
 }
 
+async function openSpotifyTrack(trackUri) {
+    const command = `
+      tell application "Spotify"
+        activate
+        open location "${trackUri}"
+      end tell
+    `
+    exec(command)
+}
+
+function checkForService(line) {
+    if (line.startsWith('spotify:')) {
+        openSpotifyTrack(line)
+        return true
+    }
+    if (line.includes('youtube.com')) {
+        openURL(line)
+        return true
+    }
+}
+
 function startBarking(evt) {
     console.log('🐕 Barking requested!')
     const pauseFor = PAUSE_BETWEEN_BARKS_SECONDS * 1000
@@ -59,6 +82,13 @@ function startBarking(evt) {
             dialog = VERBAL_ALERTS[randomIndex],
             preamble = "Meeting, '" + evt.summary + "': ",
             toSay = preamble + dialog
+
+        const handled = checkForService(dialog)
+
+        if (handled) {
+            stopBarking()
+            return
+        }
 
         console.log(`📢 Barking "${toSay}"`)
         await say(toSay)

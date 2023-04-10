@@ -1,4 +1,4 @@
-const bark = require('../../bark.js')
+const bark = require('../../bark/index.js')
 const handleAnswer = require('./answerHandler.js')
 const { showMeetingAlert } = require('./displayAlert.js')
 const {

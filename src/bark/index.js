@@ -2,10 +2,6 @@ const say = require('../applescript/say.js')
 const isBarkTime = require('./schedule.js')
 const checkForServices = require('./services.js')
 const {
-    DIALOG_STAGES,
-    MEETING_QUESTIONS,
-    LOOK_AHEAD_MINUTES,
-    MEETING_ACTION_BUTTONS,
     VERBAL_ALERTS,
     PAUSE_BETWEEN_BARKS_SECONDS,
 } = require('../../config.js')
@@ -35,7 +31,7 @@ function startBarking(evt) {
             preamble = "Meeting, '" + evt.summary + "': ",
             toSay = preamble + dialog
 
-        const handled = checkForServices(dialog)
+        const handled = await checkForServices(dialog)
 
         if (handled) {
             stopBarking()

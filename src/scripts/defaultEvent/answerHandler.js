@@ -1,5 +1,5 @@
 const setMeetingIntention = require('../intention.js')
-const bark = require('../../bark.js')
+const bark = require('../../bark/index.js')
 const handleTrigger = require('./fbTrigger.js')
 const openMeetingURL = require('../../applescript/event.js')
 const { MEETING_ACTION_BUTTONS } = require('../../../config.js')

@@ -26,7 +26,7 @@ function pluralize(word, count) {
 }
 
 module.exports = async function update() {
-    console.log('⏱️  Running core loop', new Date())
+    console.log('🔄️ Running core loop', new Date())
     const { looming, upcoming, active } = events.get()
     const calendarEvents = await getEvents()
 

@@ -1,41 +1,12 @@
-const say = require('./applescript/say.js')
-const { readSettings } = require('./applescript/fs.js')
-
+const say = require('../applescript/say.js')
+const isBarkTime = require('./schedule.js')
+const checkForServices = require('./services.js')
 const {
-    DIALOG_STAGES,
     VERBAL_ALERTS,
-    MEETING_QUESTIONS,
-    MEETING_ACTION_BUTTONS,
     PAUSE_BETWEEN_BARKS_SECONDS,
-    LOOK_AHEAD_MINUTES,
-} = require('../config.js')
+} = require('../../config.js')
 
-let barking = false,
-    barkTime = null
-
-async function setBarkTime() {
-    const { barkStartTime, barkEndTime } = await readSettings()
-    barkTime = { startTime: barkStartTime, endTime: barkEndTime }
-    console.log(`📙 Allowed to bark ${barkStartTime}-${barkEndTime}`)
-}
-setBarkTime()
-
-function isBarkTime() {
-    const [startHr, startMin] = barkTime.startTime.split(':')
-    const [endHr, endMin] = barkTime.endTime.split(':')
-
-    const startAt = new Date()
-    startAt.setHours(startHr)
-    startAt.setMinutes(startMin)
-
-    const endAt = new Date()
-    endAt.setHours(endHr)
-    endAt.setMinutes(endMin)
-
-    const rn = new Date(Date.now())
-
-    return rn >= startAt && rn <= endAt
-}
+let barking = false
 
 function startBarking(evt) {
     console.log('🐕 Barking requested!')
@@ -59,6 +30,13 @@ function startBarking(evt) {
             dialog = VERBAL_ALERTS[randomIndex],
             preamble = "Meeting, '" + evt.summary + "': ",
             toSay = preamble + dialog
+
+        const handled = await checkForServices(dialog)
+
+        if (handled) {
+            stopBarking()
+            return
+        }
 
         console.log(`📢 Barking "${toSay}"`)
         await say(toSay)

@@ -46,12 +46,12 @@ Please see the Configuration Options section below for details on each setting.
   ],
   "eventKeywordsToIgnore": ["no-notify", "focus", "blocked"],
   "voiceOptions": {
-    "using": "Karen",
-    "speakingRate": 150,
-    "pitch": 50,
-    "volume": 0.5,
-    "modulation": 2,
-    "waitForCompletion": true
+    "using": "Karen",            // Supported voice names by AppleScript
+    "speakingRate": 150,         // Integer value between 50 and 300 words per minute
+    "pitch": 50,                 // Integer value between 0 and 100 (0 = lowest pitch, 100 = highest pitch)
+    "volume": 0.5,               // Float value between 0.0 and 1.0 (0.0 = silent, 1.0 = maximum volume)
+    "modulation": 2,             // Integer value between 0 and 10 (0 = no modulation, 10 = highest modulation)
+    "waitForCompletion": true    // Boolean value (true or false)
   },
   "barkPool": [
     "spotify:track:7jL5aGalMaZRfnJ9jasABT",

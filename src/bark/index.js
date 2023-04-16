@@ -1,4 +1,5 @@
 const say = require('../applescript/say.js')
+
 const readSettings = require('../settings.js')
 const isBarkTime = require('./schedule.js')
 const checkForServices = require('./services.js')

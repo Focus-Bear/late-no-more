@@ -76,24 +76,22 @@ Please see the Configuration Options section below for details on each setting.
 ## Configuration Options
 
 The settings.json file contains various configuration options for Late No More. Refer to the Example Configuration section above for a full example.
-
--   checkUpcomingLookAheadMinutes: Integer. The number of minutes to look ahead in the calendar for upcoming meetings.
--   checkCalendarFrequencyMinutes: Integer. The frequency in minutes at which the application checks the calendar for new events.
--   checkUpcomingFrequencySeconds: Integer. The frequency in seconds at which the application checks for upcoming meetings to alert the user.
--   pauseAfterBarkSeconds: Integer. The duration in seconds to pause between verbal alerts.
--   dialogWindowTimeoutMinutes: Integer. The number of minutes after which the alert dialog window will automatically close.
--   barkStartTime: String (format: "HH:mm"). The start time of the day when the application should start sending alerts.
--   barkEndTime: String (format: "HH:mm"). The end time of the day when the application should stop sending alerts.
--   calendarsToExclude: Array of objects. A list of calendars to exclude from the meeting alerts. Each object has a name and an id property.
--   eventKeywordsToIgnore: Array of strings. A list of keywords that, if found in the event title, will cause the event to be ignored by the application.
--   barkPool: Array of strings. A list of URLs, identifiers, or text strings for media files or text to play/speak as verbal alerts. If a YouTube or Spotify track is provided, it will end any further barking.
--   dialogWindowTextStages: Array of strings. The list of text messages to display in the alert dialog window, based on the urgency of the event.
-    intentionPrompts: Array of strings. A list of prompts/questions that the user can answer to help them focus on their intentions for the upcoming meeting.
-
--   voiceOptions: Object. Configuration options for the text-to-speech voice alerts. Properties include:
--   -   using: String. The name of the voice to use (e.g., "Karen"). The available voices depend on your system and installed voices.
--   -   speakingRate: Integer (range: 90-450). The speaking rate of the voice, in words per minute.
--   -   pitch: Integer (range: 0-100). The pitch of the voice, where 0 is the lowest pitch, and 100 is the highest pitch.
-        volume: Float (range: 0.0-1.0). The volume of the voice, where 0.0 is mute, and 1.0 is the maximum volume.
--   -   modulation: Integer (range: 1-4). The degree of modulation, or expressiveness, of the voice.
--   -   waitForCompletion: Boolean. Set to true if the application should wait for the voice to finish speaking before continuing, or false to allow the application to continue running while the voice speaks.
+| Setting                        | Type                          | Description                                                                                                                |
+| ------------------------------ | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| checkUpcomingLookAheadMinutes  | Integer                       | The number of minutes to look ahead in the calendar for upcoming meetings.                                                 |
+| checkCalendarFrequencyMinutes  | Integer                       | The frequency in minutes at which the application checks the calendar for new events.                                      |
+| checkUpcomingFrequencySeconds  | Integer                       | The frequency in seconds at which the application checks for upcoming meetings to alert the user.                          |
+| pauseAfterBarkSeconds          | Integer                       | The duration in seconds to pause between verbal alerts.                                                                   |
+| dialogWindowTimeoutMinutes     | Integer                       | The number of minutes after which the alert dialog window will automatically close.                                       |
+| barkStartTime                  | String (format: "HH:mm")      | The start time of the day when the application should start sending alerts.                                               |
+| barkEndTime                    | String (format: "HH:mm")      | The end time of the day when the application should stop sending alerts.                                                  |
+| calendarsToExclude             | Array of objects              | A list of calendars to exclude from the meeting alerts. Each object has a `name` and an `id` property.                   |
+| voiceOptions                   | Object                        | Configuration options for the text-to-speech voice alerts. See the nested properties below.                               |
+| &emsp;using                    | String                        | The name of the voice to use (e.g., "Karen"). The available voices depend on your system and installed voices.            |
+| &emsp;speakingRate             | Integer (suggested range: 100-300) | The speaking rate of the voice, in words per minute.             |
+| &emsp;pitch                    | Float (suggested range: 0.5-2.0)   | The pitch multiplier of the voice.                               |
+| &emsp;volume                   | Float (range: 0.0-1.0)        | The volume of the voice, where 0.0 is mute, and 1.0 is the maximum volume.                                                |
+| &emsp;waitForCompletion        | Boolean                       | Set to `true` if the application should wait for the voice to finish speaking before continuing, or `false` to allow the application to continue running while the voice speaks. |
+| barkPool                       | Array of strings              | A list of URLs, identifiers, or text strings for media files or text to play/speak as verbal alerts. If a YouTube or Spotify track is provided, it will end any further barking. |
+| dialogWindowTextStages         | Array of strings              | The list of text messages to display in the alert dialog window, based on the urgency of the event.                       |
+| intentionPrompts               | Array of strings              | A list of prompts/questions that the user can answer to help them focus on their intentions for the upcoming meeting.     |

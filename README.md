@@ -47,12 +47,12 @@ Please see the Configuration Options section below for details on each setting.
   ],
   "eventKeywordsToIgnore": ["no-notify", "focus", "blocked"],
   "voiceOptions": {
-    "using": "Karen",
-    "speakingRate": 150,
-    "pitch": 50,
-    "volume": 0.5,
-    "modulation": 2,
-    "waitForCompletion": true
+    "using": "Karen",            // Supported voice names by AppleScript
+    "speakingRate": 150,         // Integer value between 50 and 300 words per minute
+    "pitch": 50,                 // Integer value between 0 and 100 (0 = lowest pitch, 100 = highest pitch)
+    "volume": 0.5,               // Float value between 0.0 and 1.0 (0.0 = silent, 1.0 = maximum volume)
+    "modulation": 2,             // Integer value between 0 and 10 (0 = no modulation, 10 = highest modulation)
+    "waitForCompletion": true    // Boolean value (true or false)
   },
   "barkPool": [
     "spotify:track:7jL5aGalMaZRfnJ9jasABT",
@@ -89,14 +89,12 @@ The settings.json file contains various configuration options for Late No More. 
 | calendarsToExclude | Array of objects | A list of calendars to exclude from the meeting alerts. Each object has a `name` and an `id` property. |
 | voiceOptions | Object | Configuration options for the text-to-speech voice alerts. See the nested properties below. |
 | &emsp;using | String | The name of the voice to use (e.g., "Karen"). The available voices depend on your system and installed voices. |
-| &emsp;speakingRate | Integer (suggested range: 100-300) | The speaking rate of the voice, in words per minute. |
-| &emsp;pitch | Float (suggested range: 0.5-2.0) | The pitch multiplier of the voice. |
-| &emsp;volume | Float (range: 0.0-1.0) | The volume of the voice, where 0.0 is mute, and 1.0 is the maximum volume. |
+| &emsp;speakingRate | Integer | The speaking rate of the voice, in words per minute. |
+| &emsp;pitch | Float | The pitch multiplier of the voice. |
+| &emsp;volume | Float | The volume of the voice, where 0.0 is mute, and 1.0 is the maximum volume. |
 | &emsp;waitForCompletion | Boolean | Set to `true` if the application should wait for the voice to finish speaking before continuing, or `false` to allow the application to continue running while the voice speaks. |
-| barkPool | Array of strings | A list of URLs, identifiers, or text strings for media files or text to play/speak as verbal alerts. If a YouTube or Spotify track is provided, it will end any further barking. |
+| barkPool | Array of strings | A list of URLs, spotify:uri entries, or text strings to play/speak as verbal alerts. If a YouTube or Spotify track is provided, it will end any further barking. |
 | dialogWindowTextStages | Array of strings | The list of text messages to display in the alert dialog window, based on the urgency of the event. |
 | intentionPrompts | Array of strings | A list of prompts/questions that the user can answer to help them focus on their intentions for the upcoming meeting. |
-
-### Spotify URIs
 
 [To get a Spotify URI] (https://community.spotify.com/t5/FAQs/What-s-a-Spotify-URI/ta-p/919201) TLDR: hold option/alt when going to share on desktop

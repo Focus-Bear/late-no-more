@@ -1,17 +1,16 @@
 const say = require('../applescript/say.js')
 
-const readSettings = require('../settings.js')
 const isBarkTime = require('./schedule.js')
 const checkForServices = require('./services.js')
+
+const {
+    VERBAL_ALERTS,
+    PAUSE_BETWEEN_BARKS_SECONDS,
+} = require('../../config.js')
 
 let barking = false
 
 async function startBarking(evt) {
-    const {
-        barkPool: VERBAL_ALERTS,
-        pauseAfterBarkSeconds: PAUSE_BETWEEN_BARKS_SECONDS,
-    } = readSettings()
-
     console.log('🐕 Barking requested!')
     const pauseFor = PAUSE_BETWEEN_BARKS_SECONDS * 1000
 

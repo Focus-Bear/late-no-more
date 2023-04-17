@@ -43,8 +43,8 @@ module.exports = async function addTestEvents() {
         'Event',
         uuid(),
         waitFor,
-        'meeting room',
-        'https://google.com',
+        null,
+        'https://meet.google.com/tkt-vjhz-vkj',
         'fbtrigger:heyhey'
     )
     // addDummyEvent("Event", "1", 15.25, "meeting room", "https://google.com");

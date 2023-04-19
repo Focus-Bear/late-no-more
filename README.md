@@ -97,4 +97,4 @@ The settings.json file contains various configuration options for Late No More. 
 | dialogWindowTextStages | Array of strings | The list of text messages to display in the alert dialog window, based on the urgency of the event. |
 | intentionPrompts | Array of strings | A list of prompts/questions that the user can answer to help them focus on their intentions for the upcoming meeting. |
 
-[To get a Spotify URI] (https://community.spotify.com/t5/FAQs/What-s-a-Spotify-URI/ta-p/919201) TLDR: hold option/alt when going to share on desktop
+[To get a Spotify URI](https://community.spotify.com/t5/FAQs/What-s-a-Spotify-URI/ta-p/919201) TLDR: hold option/alt when going to share on desktop

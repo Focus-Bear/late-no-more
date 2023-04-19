@@ -1,4 +1,5 @@
 const say = require('../applescript/say.js')
+const exec = require('../applescript/exec.js')
 
 const isBarkTime = require('./schedule.js')
 const checkForServices = require('./services.js')
@@ -9,6 +10,12 @@ const {
 } = require('../../config.js')
 
 let barking = false
+
+async function awaken() {
+    const coffee = `do shell script "caffeinate -u -t 1"`
+    console.log('☕️ Waking up display if sleeping...')
+    await exec(coffee)
+}
 
 async function startBarking(evt) {
     console.log('🐕 Barking requested!')
@@ -27,6 +34,7 @@ async function startBarking(evt) {
             stopBarking()
             return
         }
+        await awaken()
 
         const randomIndex = Math.floor(Math.random() * VERBAL_ALERTS.length),
             dialog = VERBAL_ALERTS[randomIndex],

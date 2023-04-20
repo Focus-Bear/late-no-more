@@ -7,7 +7,7 @@ module.exports = function (evt, now) {
         { delta, imminent, soon } = calculateProximity(evt, now)
 
     if (events.has('active', evt)) {
-        // if the even has already been imminent,
+        // if the event has already been imminent,
         // we won't handle it again
         return
     }

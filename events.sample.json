@@ -1,0 +1,45 @@
+{
+    "checkUpcomingLookAheadMinutes": 2,
+    "checkCalendarFrequencyMinutes": 1,
+    "checkUpcomingFrequencySeconds": 30,
+    "pauseAfterBarkSeconds": 5,
+    "dialogWindowTimeoutMinutes": 15,
+    "barkStartTime": "07:00",
+    "barkEndTime": "21:00",
+    "calendarsToExclude": [
+        {
+            "name": "Holidays in Australia",
+            "id": "24516AA2-7D42-49FE-803F-76F3DE727A53"
+        }
+    ],
+    "eventKeywordsToIgnore": ["no-notify", "focus", "blocked"],
+    "voiceOptions": {
+        "using": "Karen",
+        "speakingRate": 150,
+        "pitch": 50,
+        "volume": 0.5,
+        "modulation": 2,
+        "waitForCompletion": true
+    },
+    "barkPool": [
+        "yellow alert, meeting imminent",
+        "red alert",
+        "heyyoo... it's time",
+        "beep beep!",
+        "meeting time!",
+        "hey!!",
+        "check your calendar!"
+    ],
+    "dialogWindowTextStages": [
+        "😊 heads up, meeting starting soon!",
+        "😅 fyi your meeting will begin in a moment",
+        "😥 all aboard! meeting about to depart",
+        "😰 final call!",
+        "😱 you are late."
+    ],
+    "intentionPrompts": [
+        "what do you want to contribute to the meeting?",
+        "what will you learn?",
+        "why is it important to pay attention in this meeting?"
+    ]
+}

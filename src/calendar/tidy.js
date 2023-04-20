@@ -1,7 +1,6 @@
 function tidyDate(date) {
     return new Date(date.split(',').slice(1).join(',').replace(' at', ''))
 }
-
 function parseMSFT(str) {
     let start = str.indexOf('<https://')
     if (start === -1) return null
@@ -10,16 +9,18 @@ function parseMSFT(str) {
     if (end === -1) end = str.length
     return str.substring(start, end)
 }
+
 function parseGOOG(str) {
-    const regex = /https\S*[\s\>]/,
-        [url] = str.match(regex)
-    return url
+    const regex = /https:\/\/\S*meet\.google\.com\/\S+/
+    const match = str.match(regex)
+    return match ? match[0] : null
 }
+
 function matchService(evt) {
     const { description } = evt
 
-    const isGoogleMeet = description?.includes('google.com'),
-        isMsftTeams = description?.includes('microsoft.com')
+    const isGoogleMeet = description?.includes('meet.google.com')
+    const isMsftTeams = description?.includes('microsoft.com')
 
     if (isMsftTeams) return { ...evt, url: parseMSFT(description) }
     if (isGoogleMeet) return { ...evt, url: parseGOOG(description) }

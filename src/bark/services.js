@@ -42,12 +42,17 @@ async function openSpotifyTrack(trackUri) {
     }, duration)
 }
 
-//openSpotifyTrack('spotify:track:7jL5aGalMaZRfnJ9jasABT').then(() => {})
-
 module.exports = async function checkForServices(line) {
-    if (line.startsWith('spotify:')) {
-        await openSpotifyTrack(line)
-        return true
+    if (line.includes('spotify')) {
+        let spotifyUri = line
+        if (line.includes("open.spotify.com/track/")) {
+            const trackId = line.split("/track/")[1].split("?")[0];
+            spotifyUri = `spotify:track:${trackId}`;
+        }
+        if (spotifyUri.startsWith('spotify:')) {
+            await openSpotifyTrack(spotifyUri)
+            return true
+        }
     }
     if (line.includes('youtube.com')) {
         openURL(line)

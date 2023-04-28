@@ -1,9 +1,9 @@
 const exec = require('./exec.js')
 const { readSettings } = require('./fs.js')
 
-const { voiceOptions: options } = readSettings()
-
 module.exports = async function say(dialog) {
+    const { voiceOptions: options } = await readSettings()
+
     const optionStrings = {
         using: (value) => ` using "${value}"`,
         speakingRate: (value) => ` speaking rate ${value}`,

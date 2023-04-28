@@ -40,11 +40,11 @@ module.exports = async function addTestEvents() {
 
     const waitFor = LOOK_AHEAD_MINUTES - 0.5
     addDummyEvent(
-        'Event',
+        'Discuss promotion with boss',
         uuid(),
         waitFor,
         null,
-        'https://meet.google.com/tkt-vjhz-vkj',
+        'https://us02web.zoom.us/j/83865145950?pwd=SGpGVURzcTJaTSsvNEtKUHlXWU5Mdz09',
         'fbtrigger:heyhey'
     )
     // addDummyEvent("Event", "1", 15.25, "meeting room", "https://google.com");

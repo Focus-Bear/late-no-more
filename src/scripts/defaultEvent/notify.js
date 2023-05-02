@@ -1,5 +1,7 @@
 const bark = require('../../bark/index.js')
 const handleAnswer = require('./answerHandler.js')
+const { checkForFocusBearInstall } = require('../../applescript/fs.js')
+const open = require('../../applescript/open.js')
 const { showMeetingAlert } = require('./displayAlert.js')
 const {
     DIALOG_STAGES,
@@ -14,6 +16,14 @@ async function notifyUser(evt) {
     const rightNow = new Date(),
         toGo = Math.floor((new Date(evt.startDate) - rightNow) / 1000),
         perStage = Math.floor(toGo / (DIALOG_STAGES.length - 1))
+
+    let fbInstalled = await checkForFocusBearInstall()
+
+    if (fbInstalled) {
+        const focusBearAboutToStartUrl = `open \"focusbear://event-about-to-start?event_title=${evt.summary}&event_description=${evt.description}&event_start_time=${evt.startDate}&event_end_time=${evt.endDate}\"`
+
+        open(focusBearAboutToStartUrl)
+    }
 
     for (let i = 0; i < DIALOG_STAGES.length; i++) {
         const line = DIALOG_STAGES[i],

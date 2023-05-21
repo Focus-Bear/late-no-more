@@ -1,8 +1,0 @@
-2023-05-21T23:28:33.049Z: Late No More Online..
-2023-05-21T23:28:33.211Z: 📙 Allowed to bark 07:00-21:00
-2023-05-21T23:28:33.212Z: setting CALENDARS_TO_EXCLUDE [{"name":"Holidays in Australia","id":"24516AA2-7D42-49FE-803F-76F3DE727A53"},{"name":"US Holidays","id":"0E0A4355-C40A-46FB-8D5F-00D7E795554D"},{"name":"Contacts","id":"FF01E9F1-CC96-450E-B308-7E5CBD6B9520"},{"name":"Birthdays","id":"3EEDD40E-9D61-40BD-973F-D51063311CC3"},{"name":"United Kingdom holidays (1)","id":"E2D50910-1005-4015-A86C-6CB884B3EDDF"},{"name":"United Kingdom holidays","id":"8DF548E7-8061-47C7-AF7B-BF816D3559F2"},{"name":"Birthdays1","id":"2769DE5C-82AE-4211-9BB7-08573B0B2E62"},{"name":"Birthdays","id":"F13B79B0-EA98-4CB9-AA0C-5429C898D004"},{"name":"Birthdays","id":"DBB8EC96-B7A9-4DBB-8F59-FB8DCB87D2A0"},{"name":"WellnessLiving","id":"65786602-78AC-4B0A-8653-0B04DF1616DA"},{"name":"Contacts","id":"CE93F2E4-16B3-4732-A119-97B2604DAEA8"},{"name":"Holidays in Australia","id":"53F680DA-9B73-49C7-A095-0523434E36A7"},{"name":"My proposed times","id":"C0361801-FE27-412A-80D6-E5B992184042"},{"name":"jeremymnagel@gmail.com","id":"D1000F8E-50B7-4A43-914A-C96691337841"},{"name":"Nuanced IT","id":"20AFCE76-102C-4435-A41F-8700B6569870"},{"name":"Focuster","id":"4B53A47C-79BE-4DBE-8078-E5E691ABDA62"}]
-2023-05-21T23:28:33.212Z: setting EVENTS_TO_EXCLUDE ["no-notify","blocked","cancelled","Cancel","GSD","busy","\u0010Customer support","Customer support"]
-2023-05-21T23:28:33.213Z: 🧸 Checking nag state
-2023-05-21T23:28:33.340Z: Focus bear installed? true
-2023-05-21T23:28:33.347Z: 🔄️ Running core loop "2023-05-21T23:28:33.347Z"
-2023-05-21T23:28:33.947Z: 🔎 Events left after filtering: 0

@@ -1,5 +1,6 @@
 const exec = require('../applescript/exec.js')
 const openURL = require('../applescript/event.js')
+const { logToFile } = require('../util/log-message.js')
 
 async function getTrackDuration(trackUri) {
     const command = `
@@ -29,7 +30,7 @@ async function openSpotifyTrack(trackUri) {
     end tell
   `
     await exec(play)
-    console.log('🔊 Playing Track ' + trackUri)
+    logToFile('🔊 Playing Track ' + trackUri)
 
     const pause = `
     tell application "Spotify"
@@ -37,7 +38,7 @@ async function openSpotifyTrack(trackUri) {
     end tell
   `
     timeoutId = setTimeout(async () => {
-        console.log('⏸️ Pausing track!')
+        logToFile('⏸️ Pausing track!')
         await exec(pause)
     }, duration)
 }

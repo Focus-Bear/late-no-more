@@ -3,6 +3,7 @@ const updateState = require('./src/index.js')
 const { setCalsToExclude, setEventsToExclude } = require('./src/calendar')
 const { readSettings } = require('./src/applescript/fs.js')
 const { setNagState } = require('./src/scripts/nag.js')
+const { logToFile } = require('./src/util/log-message.js')
 
 const {
     SLOW_NAP_DURATION_MINUTES,
@@ -23,7 +24,7 @@ async function setSettings() {
 }
 
 async function main() {
-    console.log('Late No More Online..')
+    logToFile('Late No More Online..')
     await setSettings()
 
     if (IS_TESTING) await addTestEvents()
@@ -36,4 +37,4 @@ async function main() {
 
 main()
     .then(() => {})
-    .catch((e) => console.log(e))
+    .catch((e) => logToFile(e))

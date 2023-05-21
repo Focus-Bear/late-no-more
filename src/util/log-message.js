@@ -1,9 +1,16 @@
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
 function logToFile(...messages) {
     // specify the path to your log file
-    const logFilePath = path.join(__dirname, 'late-no-more-log.txt');
+    const logDirectory = path.join(os.homedir(), 'late-no-more-logs');
+    // ensure log directory exists
+    if (!fs.existsSync(logDirectory)) {
+        fs.mkdirSync(logDirectory);
+    }
+
+    const logFilePath = path.join(logDirectory, 'late-no-more-log.txt');
 
     // create a timestamp
     const timestamp = new Date().toISOString();

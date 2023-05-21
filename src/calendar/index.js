@@ -1,6 +1,8 @@
 const exec = require('../applescript/exec.js'),
     { GET_ALL_EVENTS, SCRIPT_HEADER } = require('../applescript/scripts.js')
 
+const { logToFile } = require('../util/log-message.js')
+
 const { tidyEvent } = require('../calendar/tidy.js')
 
 let EVENTS_TO_EXCLUDE, CALENDARS_TO_EXCLUDE
@@ -27,12 +29,12 @@ function ignoreByEvent(summary) {
 }
 
 async function setCalsToExclude(calList) {
-    console.log('setting CALENDARS_TO_EXCLUDE', calList)
+    logToFile('setting CALENDARS_TO_EXCLUDE', calList)
     CALENDARS_TO_EXCLUDE = calList?.map((calendar) => calendar.name) || []
 }
 
 async function setEventsToExclude(eventList) {
-    console.log('setting EVENTS_TO_EXCLUDE', eventList)
+    logToFile('setting EVENTS_TO_EXCLUDE', eventList)
     EVENTS_TO_EXCLUDE = eventList
 }
 
@@ -44,7 +46,7 @@ function filterEvent({ calendarName, summary }) {
         return true
     } catch (e) {
         if (!e.message.includes('Ignoring')) {
-            console.error('Error in filterEvent', e.message)
+            logToFile('Error in filterEvent', e.message)
         }
         return false
     }

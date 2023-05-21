@@ -1,5 +1,6 @@
 const settings = require('../settings.js');
 const exec = require('./exec.js')
+const { logToFile } = require('../util/log-message.js')
 
 let focusBearInstallStatusFromCache = {};
 
@@ -18,9 +19,11 @@ async function checkForFocusBearInstall() {
         const isInstalled = JSON.parse(await exec(SCRIPT));
         focusBearInstallStatusFromCache.isInstalled = isInstalled;
 
+        logToFile(`Focus bear installed? ${JSON.stringify(isInstalled)}`)
+
         return isInstalled;
     } catch (e) {
-        console.error('checkForFocusBear', e);
+        logToFile('Error in checkForFocusBear', e);
         return false;
     }
 }
@@ -42,7 +45,7 @@ async function readSettings() {
 
         return settingsFromFile;
     } catch (e) {
-        console.error('readSettings', e);
+        logToFile('error in readSettings', e);
         return {};
     }
 }

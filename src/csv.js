@@ -2,6 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const { stringify, parse } = require('../lib/csv/sync.cjs')
 const home = require('os').homedir()
+const { logToFile } = require('./util/log-message')
 
 const csvPath = home + '/Documents/LateNoMore-Meetings.csv'
 
@@ -21,7 +22,7 @@ async function ensure() {
         if (!data.length) throw 'Error: no data found'
         return data.slice(1)
     } catch (e) {
-        console.log('Creating empty file..')
+        logToFile('Creating empty file..')
         fs.writeFileSync(csvPath, '', { flag: 'w' })
         await save([])
         return []
@@ -37,9 +38,9 @@ async function save(data) {
         })
 
         fs.writeFileSync(csvPath, asString, { flag: 'w' })
-        console.log('Saved', csvPath)
+        logToFile('Saved', csvPath)
     } catch (e) {
-        console.log(e)
+        logToFile(e)
     }
 }
 async function remove(evt) {
@@ -48,7 +49,7 @@ async function remove(evt) {
             trimmed = records.filter(({ id }) => id !== evt.id)
         await save(trimmed)
     } catch (e) {
-        console.log(e)
+        logToFile(e)
     }
 }
 
@@ -72,7 +73,7 @@ async function update(row) {
         return updated
     })
     if (!edited) {
-        console.log('Adding row to csv..')
+        logToFile('Adding row to csv..')
         await save([...final, row])
         return
     }

@@ -1,10 +1,12 @@
 const { readSettings } = require('../applescript/fs.js')
+const { logToFile } = require('../util/log-message.js')
+
 let barkTime
 
 async function setBarkTime() {
     const { barkStartTime, barkEndTime } = await readSettings()
     barkTime = { startTime: barkStartTime, endTime: barkEndTime }
-    console.log(`📙 Allowed to bark ${barkStartTime}-${barkEndTime}`)
+    logToFile(`📙 Allowed to bark ${barkStartTime}-${barkEndTime}`)
 }
 setBarkTime()
 

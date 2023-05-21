@@ -3,6 +3,7 @@ const exec = require('../applescript/exec.js')
 
 const isBarkTime = require('./schedule.js')
 const checkForServices = require('./services.js')
+const { logToFile } = require('../util/log-message.js')
 
 const {
     VERBAL_ALERTS,
@@ -13,12 +14,13 @@ let barking = false
 
 async function awaken() {
     const coffee = `do shell script "caffeinate -u -t 1"`
-    console.log('☕️ Waking up display if sleeping...')
-    await exec(coffee)
+    logToFile('☕️ Waking up display if sleeping...')
+    const result = await exec(coffee)
+    logToFile(result)
 }
 
 async function startBarking(evt) {
-    console.log('🐕 Barking requested!')
+    logToFile('🐕 Barking requested!')
     const pauseFor = PAUSE_BETWEEN_BARKS_SECONDS * 1000
 
     if (barking) {
@@ -27,7 +29,7 @@ async function startBarking(evt) {
     }
 
     barking = setInterval(async () => {
-        console.log('🐶 Preparing to bark...')
+        logToFile('🐶 Preparing to bark...')
 
         const shouldBark = isBarkTime()
         if (!shouldBark) {
@@ -48,7 +50,7 @@ async function startBarking(evt) {
             return
         }
 
-        console.log(`📢 Barking "${toSay}"`)
+        logToFile(`📢 Barking "${toSay}"`)
         await say(toSay)
     }, pauseFor)
 }
@@ -59,7 +61,7 @@ function stopBarking() {
 
     barking = false
 
-    console.log('🤫 Barking cancelled')
+    logToFile('🤫 Barking cancelled')
 }
 
 function getState() {

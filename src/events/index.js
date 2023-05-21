@@ -1,3 +1,5 @@
+const { logToFile } = require('../util/log-message')
+
 const events = {
     upcoming: [],
     expired: [],
@@ -10,7 +12,7 @@ function set(listName, evts) {
 }
 
 function add(listName, evt) {
-    console.log(`✅ Adding ${evt.type} "${evt.summary}" to "${listName}"`)
+    logToFile(`✅ Adding ${evt.type} "${evt.summary}" to "${listName}"`)
     remove(listName, evt)
     const theList = events[listName]
     events[listName] = [...theList, evt]
@@ -25,12 +27,12 @@ function remove(listName, evt, reason) {
         ({ id, type }) => evt.id !== id && evt.type !== type
     )
 
-    console.log(
+    logToFile(
         `🚮 Removing ${evt.type.toUpperCase()} "${
             evt.summary
         }" from "${listName}"`
     )
-    if (reason) console.log(` ↳ Reason given "${reason}"`)
+    if (reason) logToFile(` ↳ Reason given "${reason}"`)
 }
 
 function has(listName, evt) {

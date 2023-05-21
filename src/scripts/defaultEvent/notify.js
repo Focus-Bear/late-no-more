@@ -2,6 +2,8 @@ const bark = require('../../bark/index.js')
 const handleAnswer = require('./answerHandler.js')
 const { checkForFocusBearInstall } = require('../../applescript/fs.js')
 const open = require('../../applescript/open.js')
+const { logToFile } = require('../../util/log-message.js')
+
 const { showMeetingAlert } = require('./displayAlert.js')
 const {
     DIALOG_STAGES,
@@ -11,7 +13,7 @@ const {
 const giveUpAfter = ALERT_WINDOW_GIVEUP_TIMEOUT_MINUTES * 60
 
 async function notifyUser(evt) {
-    console.log(`🚨 Notifying user about '${evt.summary}' @ ${evt.startDate}`)
+    logToFile(`🚨 Notifying user about '${evt.summary}' @ ${evt.startDate}`)
 
     const rightNow = new Date(),
         toGo = Math.floor((new Date(evt.startDate) - rightNow) / 1000),
@@ -20,6 +22,7 @@ async function notifyUser(evt) {
     let fbInstalled = await checkForFocusBearInstall()
 
     if (fbInstalled) {
+
         const focusBearAboutToStartUrl = `open \"focusbear://event-about-to-start?event_title=${evt.summary}&event_description=${evt.description}&event_start_time=${evt.startDate}&event_end_time=${evt.endDate}\"`
 
         open(focusBearAboutToStartUrl)
@@ -41,7 +44,7 @@ async function notifyUser(evt) {
             const { type } = e
             if (type == 'continue') continue
             if (type == 'break') break
-            console.log('Unhandled error:', e)
+            logToFile('Unhandled error:', e)
         }
         bark.stop() // this might not be necessary
         break

@@ -1,3 +1,5 @@
+const { logToFile } = require('../util/log-message')
+
 function tidyDate(date) {
     return new Date(date.split(',').slice(1).join(',').replace(' at', ''))
 }
@@ -69,5 +71,5 @@ function maintenance() {
         description: `https://teams.microsoft.com///meetup-join/19%3ameeting_ZmYwTY4YjctMzMxMi00MmU5LWFjYTAtNiMwMzE5NZM4Y2F1%40thread.v2/0?context=%7b%22Tid%22%3a%223b518aae-8921-4a7b-8497-619d756c20%22%2%220id%22%33%22b97e1b4b-edb5-48eb-a7830b64a66a55333%22%7d>`,
     }
 
-    console.log(matchService(evts[0]))
+    logToFile(matchService(evts[0]))
 }

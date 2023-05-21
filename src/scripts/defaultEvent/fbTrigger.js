@@ -1,4 +1,5 @@
 const open = require('../../applescript/open.js')
+const { logToFile } = require('../../util/log-message.js')
 
 function extractLine(str) {
     const lines = str.split('\n')
@@ -36,7 +37,7 @@ module.exports = function handleTrigger(evt) {
     const trigger = checkForTrigger(evt)
     if (!trigger) return
 
-    console.log(`📍 Found trigger "${trigger}", opening...`)
+    logToFile(`📍 Found trigger "${trigger}", opening...`)
     const duration = getEventDuration(evt)
     const url = `open \"focusbear://start-activity?activity_id=${trigger}&duration_seconds=${duration}\"`
 

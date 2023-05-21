@@ -3,6 +3,7 @@ const {
     LOOK_AHEAD_MINUTES,
     MEETING_ACTION_BUTTONS,
 } = require('../../../config.js')
+const { logToFile } = require('../../util/log-message.js')
 
 async function warnUser(evt) {
     const title = `Late No More: ${evt.summary} (${evt.calendarName}) is starting in 15 minutes.`,
@@ -13,7 +14,7 @@ async function warnUser(evt) {
 }
 
 async function showMeetingAlert(evt, line, givingUpAfter, showImage = false) {
-    console.log('🔔 Displaying alert')
+    logToFile('🔔 Displaying alert')
     const title = `Late No More: ${evt.summary}`,
         br = '\n',
         text = [evt.startDate, br, line, br, evt.location, evt.url].join(br),

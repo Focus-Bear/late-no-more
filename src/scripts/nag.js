@@ -1,6 +1,8 @@
-const { showDialog } = require('../applescript/dialog.js'),
-    openURL = require('../applescript/event.js'),
-    { checkForFocusBearInstall } = require('../applescript/fs.js')
+const { showDialog } = require('../applescript/dialog.js')
+const openURL = require('../applescript/event.js')
+const { checkForFocusBearInstall } = require('../applescript/fs.js')
+
+const { logToFile } = require('../util/log-message.js')
 
 const visitFocusBear = 'Check out Focus Bear',
     closeDialog = 'Close',
@@ -12,14 +14,14 @@ const focusBearHomePageURL =
 let skipNag = true
 
 async function setNagState() {
-    console.log('🧸 Checking nag state')
+    logToFile('🧸 Checking nag state')
     let fbInstalled = await checkForFocusBearInstall()
 
     const now = new Date(),
         day = now.getDate()
 
     if (day % 7 === 0 && !fbInstalled) {
-        console.log('🧸 Nagging!')
+        logToFile('🧸 Nagging!')
 
         skipNag = false
         return

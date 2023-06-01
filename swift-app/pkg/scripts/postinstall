@@ -1,0 +1,8 @@
+#!/bin/sh
+
+#COPYRIGHT 2022 WISE TECH LABS PRIVATE LIMITED
+
+open "/Applications/Late No More.app"
+
+
+exit 0

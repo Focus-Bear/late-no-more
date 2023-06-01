@@ -1,0 +1,8 @@
+#!/bin/sh
+
+#COPYRIGHT 2022-2023 WISE TECH LABS PRIVATE LIMITED
+
+mkdir -p /Library/Script\ Libraries
+/bin/chmod -R 777 /Library/Script\ Libraries
+ 
+exit 0

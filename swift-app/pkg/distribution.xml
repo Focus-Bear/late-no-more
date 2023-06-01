@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="1">
+<background file="logo.jpg"  mime-type="image/jpg"  alignment="bottomleft" />
+    <welcome file="WELCOME.rtf"/>
+    <title>Late No More</title>
+<pkg-ref id="com.focusbear.latenomore"/>
+    <options customize="never" require-scripts="false"/>
+    <choices-outline>
+        <line choice="default">
+            <line choice="com.focusbear.latenomore"/>
+        </line>
+    </choices-outline>
+    <choice id="default"/>
+    <choice id="com.focusbear.latenomore" visible="false">
+        <pkg-ref id="com.focusbear.latenomore"/>
+    </choice>
+    <pkg-ref id="com.focusbear.latenomore" version="1.0" onConclusion="none">Late%20No%20More-1.0.pkg</pkg-ref>
+</installer-gui-script>

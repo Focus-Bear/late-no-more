@@ -1,0 +1,66 @@
+Notarization Verfication:
+
+xcrun stapler validate [app bundle path]
+
+spctl -a -v ??.app
+
+
+
+
+
+
+Verify whether your Developer ID app is signed correctly and notarized.
+
+    Enable Developer ID-signed apps using Security & Privacy preferences (go to Protect your Mac from malware).
+
+    In Terminal, enter the following command by replacing TrackMix.app with the path to your app.
+    $ spctl -a -v TrackMix.app
+
+    Press Return.
+
+    If the app is correctly signed and notarized, the output of this command is:
+    ./TrackMix.app: accepted
+    source=Notarized Developer ID
+
+    If the app was Developer ID-signed but not notarized, the output is:
+    ./TrackMix.app: accepted
+    source=Developer ID
+
+https://help.apple.com/xcode/mac/current/#/dev1cc22a95c
+
+
+example
+
+spctl -a -v "/Users/prashant/Documents/Apps/Mac Cleaner/builds/pkg/files/Wise Mac Care.app"
+
+
+////check pkg signature 
+
+pkgutil --check-signature pkgpath
+
+
+///check notarised
+codesign -vvv --deep --strict pkgpath
+
+
+xcrun altool --notarization-info 0342280f-17a7-4631-a48d-5166ed4e3dc6 -u "vishnu.wtl@gmail.com"
+
+Password  mmnz-xeky-xmrt-eqgb
+
+xcrun notarytool log --apple-id "vishnu.wtl@gmail.com" --password "mmnz-xeky-xmrt-eqgb" --team-id TCUD568B3U 3ee0e9bc-8c70-4da9-af3d-60162ca838f2
+
+
+
+xcrun stapler staple "/Volumes/Data/Signed/Installer v1.1.0.pkg"
+
+// correct one for pkg is 
+Check pkg Notarized // cla.pkg
+spctl -a -vvv -t install
+
+
+// agr post install executable ni hui to fail Hoga
+
+
+For make post install executable. Chmod 755 file path
+
+

@@ -22,7 +22,7 @@ async function notifyUser(evt) {
     let fbInstalled = await checkForFocusBearInstall()
 
     if (fbInstalled) {
-        const focusBearAboutToStartUrl = `open \"focusbear://event-about-to-start?event_title=${evt.summary}&event_description=${evt.description}&event_start_time=${evt.startDate}&event_end_time=${evt.endDate}\"`
+        const focusBearAboutToStartUrl = `open \"focusbear://event-about-to-start?event_title=${evt.summary}&event_description=${evt.description}&event_start_time=${new Date(evt.startDate).toISOString()}&event_end_time=${new Date(evt.endDate).toISOString()}\"`
         logToFile(`Triggering FB event-about-to-start: ${focusBearAboutToStartUrl}`)
 
         open(focusBearAboutToStartUrl)

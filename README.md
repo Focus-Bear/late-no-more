@@ -2,13 +2,26 @@
 
 Checks local iCal via AppleScript & notifies about upcoming events and meetings. This repo is for a piece of subfunctionality for the Late No More desktop app. To learn more, visit the Focus Bear website.
 
-## Setup
+## Architecture
+
+The calendar alerting is done via a Node JS script that uses applescript + CalendarLib EC. 
+
+The settings UI is a swift app.
+
+## Local development of Node JS app
 
 Clone this repo and run:
 
 `npm install`
 
-Then
+Then you need to install CalendarLib EC (https://latenightsw.com/freeware/)
+
+```
+mkdir -p ~/Library/Script\ Libraries
+cp swift-app/pkg/files/Library/Script\ Libraries/CalendarLib\ EC.scptd ~/Library/Script\ Libraries/CalendarLib\ EC.scptd
+```
+
+Then you can start the node app
 
 `npm run start`
 

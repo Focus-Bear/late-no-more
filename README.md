@@ -2,6 +2,9 @@
 
 Checks local iCal via AppleScript & notifies about upcoming events and meetings. To download a binary, visit https://focusbear.io/en/late-no-more
 
+![Screenshot](https://ph-files.imgix.net/03c7b726-08bc-4ea2-8264-1c4b8cadc48c.png?auto=compress&codec=mozjpeg&cs=strip&auto=format&fit=max&dpr=1)
+
+
 # Motivation from jeznag
 
 I built Late No More because being late for meetings was becoming very problematic for me (I got fired from a job because of it). I have ADHD and it’s way too easy for me to see a notification for a calendar appointment, space out and then forget about the meeting for five minutes. Sometimes I hit Dismiss instead of Snooze and never show up to the meeting at all.

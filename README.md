@@ -1,6 +1,25 @@
 # Late No More
 
-Checks local iCal via AppleScript & notifies about upcoming events and meetings. This repo is for a piece of subfunctionality for the Late No More desktop app. To learn more, visit the Focus Bear website.
+Checks local iCal via AppleScript & notifies about upcoming events and meetings. To download a binary, visit https://focusbear.io/en/late-no-more
+
+# Motivation from jeznag
+
+I built Late No More because being late for meetings was becoming very problematic for me (I got fired from a job because of it). I have ADHD and it’s way too easy for me to see a notification for a calendar appointment, space out and then forget about the meeting for five minutes. Sometimes I hit Dismiss instead of Snooze and never show up to the meeting at all.
+
+My experience is that most calendar apps aren’t built for an ADHD brain like mine. I decided to build a Mac app that would help me and hopefully other people show up on time.
+
+Late-No-More gives you notifications that make sense.
+
+A notification 15 minutes before to remind you to prepare: this one is easy to dismiss
+A notification 2 minutes before to remind you to actually join the dang meeting - this one is not easy to dismiss
+‍
+As the time gets closer to the meeting, the notification gets more and more obnoxious. It changes colour and starts playing annoying motivating sound effects. The goal is to get you to join the meeting 2 minutes early.
+
+Once you’re in the meeting, the app asks you to set an intention - what do you want to learn/share during this meeting?
+
+I’ve gotta admit that not only am I frequently late for meetings, I’m also frequently multitasking/distracting. Reflecting on it, what’s the point of showing up for the meeting if I’m not going to be there mentally as well? I’ve started declining invites to irrelevant meetings with 50 people in them. If the purpose of the meeting is for me to absorb information, I’d rather listen back to the recording at 2x speed.
+
+‍For the meetings that I do choose to attend, I want to give them my full attention: camera on, no other apps, listening intently. That’s really hard for my brain but it’s not impossible. It starts with aligning my motivation: why do I want to show up for the meeting? Hopefully it’s an engaging meeting. If not, that’s ok - I can treat it as an opportunity to train my focus muscle and use the tactics that work for me - clearing distractions from my desk, taking notes and sometimes playing with a fidget toy if I need to (“Busy hands, quiet mind” right?).
 
 ## Architecture
 

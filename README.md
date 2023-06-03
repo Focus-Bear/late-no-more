@@ -2,7 +2,7 @@
 
 Checks local iCal via AppleScript & notifies about upcoming events and meetings. To download a binary, visit https://focusbear.io/en/late-no-more
 
-![Screenshot](https://ph-files.imgix.net/03c7b726-08bc-4ea2-8264-1c4b8cadc48c.png?auto=compress&codec=mozjpeg&cs=strip&auto=format&fit=max&dpr=1)
+![Screenshot](https://uploads-ssl.webflow.com/628f17fc227cdc10d90d9d44/64743b6a76590e82e072cecb_LNM4.jpg)
 
 
 # Motivation from jeznag

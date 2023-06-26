@@ -10,8 +10,9 @@ import EventKit
 //import Speech
 
 class ViewController: NSViewController, NSTokenFieldDelegate {
-
     
+    
+    @IBOutlet weak var checkBoxLaunchAtLogin: NSButton!
     @IBOutlet weak var btnAdvanced: NSButton!
     @IBOutlet weak var pickerEndTime: NSDatePicker!
     @IBOutlet weak var pickerStartTime: NSDatePicker!
@@ -33,7 +34,7 @@ class ViewController: NSViewController, NSTokenFieldDelegate {
         super.viewDidLoad()
         addLog(text: "viewDidLoad")
         
-//        let speechSynth = NSSpeechSynthesizer()
+        //        let speechSynth = NSSpeechSynthesizer()
         let voices = NSSpeechSynthesizer.availableVoices
         
         
@@ -75,7 +76,7 @@ class ViewController: NSViewController, NSTokenFieldDelegate {
         btnApply.title = "Apply"
         lblTitleCalendar.stringValue = "Which calendars do you want to get notifications for?"
         lblTitleEvents.stringValue = "What calendar events do you not want to get notifications for? Choose keywords to ignore:"
-
+        
         let paragraph = NSMutableParagraphStyle()
         paragraph.alignment = btnCheckOut.alignment
         paragraph.lineBreakMode = .byTruncatingTail
@@ -121,10 +122,10 @@ class ViewController: NSViewController, NSTokenFieldDelegate {
                                             arrCalendars[i]["state"] = false
                                             break;
                                         }
-
+                                        
                                     }
                                 }
-
+                                
                             }
                         }
                     }
@@ -169,35 +170,6 @@ class ViewController: NSViewController, NSTokenFieldDelegate {
             addLog(text: "Failed to Read events.json file")
         }
         
-        
-        
-        
-        
-        
-        
-//        let start_time = Date()
-//        let calendar = Calendar.current
-//        let finish_time = calendar.date(byAdding: .year, value: 1, to: start_time) ?? Date()
-//
-//        let predicate = eventStore.predicateForEvents(withStart: Date(), end: finish_time, calendars: [arrCalendars[1]])//nil will include all the calendars
-//
-//        let events = eventStore.events(matching: predicate) as [EKEvent]
-//        print(events)
-        
-        
-        
-        
-//        let eventStore = EventsManager.getEventStore()
-//
-////        NSAppleEventManager
-//
-//        var tempArray:[EKEvent] = []
-//
-//
-//
-//        let predicate = eventStore.predicateForEvents(withStart: startdate, end: endDate, calendars: calendars)//nil will include all the calendars
-//
-//        let events = eventStore.events(matching: predicate) as [EKEvent]
         let char = "l"
         var flags = NSEvent.modifierFlags
         flags.insert(.shift)
@@ -205,6 +177,15 @@ class ViewController: NSViewController, NSTokenFieldDelegate {
         hotKeyRestartApp = HotKey(keyCombo: KeyCombo(stkey: char, modifiers: flags))
         
         tokenField.delegate = self
+        
+        if let loginstatus = UserDefaults.standard.object(forKey: kUserdefaultsLaunchAtLogin) as? Bool{
+            LaunchOnStartup.setLaunchAtStartup(loginstatus)
+            loginstatus ? (checkBoxLaunchAtLogin.state = .on) : (checkBoxLaunchAtLogin.state = .off)
+        }else{
+            UserDefaults.standard.set(true, forKey: kUserdefaultsLaunchAtLogin)
+            LaunchOnStartup.setLaunchAtStartup(true)
+            checkBoxLaunchAtLogin.state = .on
+        }
     }
     var hotKeyRestartApp: HotKey? {
         didSet {
@@ -218,7 +199,7 @@ class ViewController: NSViewController, NSTokenFieldDelegate {
                 DispatchQueue.global().async {
                     sleep(1)
                     DispatchQueue.main.async {
-//                        NSWorkspace.shared.open(URL(fileURLWithPath: "/Applications/LateNoMore"))
+                        //                        NSWorkspace.shared.open(URL(fileURLWithPath: "/Applications/LateNoMore"))
                         self?.launchProcess()
                     }
                 }
@@ -227,7 +208,7 @@ class ViewController: NSViewController, NSTokenFieldDelegate {
     }
     
     var firstTime = true
-
+    
     override func viewDidAppear() {
         addLog(text: "func:- viewDidAppear")
         if firstTime{
@@ -237,10 +218,10 @@ class ViewController: NSViewController, NSTokenFieldDelegate {
                 sleep(1)
                 DispatchQueue.main.async {
                     addLog(text: "open LateNoMore process after file save")
-//                    NSWorkspace.shared.open(URL(fileURLWithPath: "/Applications/LateNoMore"))
-
+                    //                    NSWorkspace.shared.open(URL(fileURLWithPath: "/Applications/LateNoMore"))
+                    
                     self.launchProcess()
-
+                    
                     
                     
                 }
@@ -257,18 +238,18 @@ class ViewController: NSViewController, NSTokenFieldDelegate {
     
     override var representedObject: Any? {
         didSet {
-        // Update the view, if already loaded.
+            // Update the view, if already loaded.
         }
     }
-
+    
     @IBAction func btnCheckOutClicked(_ sender: Any) {
         addLog(text: "btnCheckOutClicked")
         let buynow_path = "https://focusbear.io"
         NSWorkspace.shared.open(URL(string: buynow_path)!)
     }
-//    @IBAction func tokenFieldClicked(_ sender: Any) {
-//
-//    }
+    //    @IBAction func tokenFieldClicked(_ sender: Any) {
+    //
+    //    }
     
     func saveSettings(){
         
@@ -290,7 +271,7 @@ class ViewController: NSViewController, NSTokenFieldDelegate {
         let startTime = getStringFromDate(date: pickerStartTime.dateValue, dateFormat: "HH:mm")
         let endTime = getStringFromDate(date: pickerEndTime.dateValue, dateFormat: "HH:mm")
         
-
+        
         let jsonVoiceOptions:NSDictionary = ["using": usingValue, "speakingRate": speakingRateValue, "pitch": pitchValue, "volume": volumeValue, "modulation": modulationValue]
         
         let json:NSDictionary = ["calendarsToExclude": calendarsToExclude, "eventKeywordsToIgnore": events, "barkStartTime": startTime, "barkEndTime": endTime, "voiceOptions": jsonVoiceOptions, "barkPool": arrBarkPools, "dialogWindowTextStages": arrTextStages, "intentionPrompts": arrIntentionPrompts]
@@ -346,14 +327,14 @@ class ViewController: NSViewController, NSTokenFieldDelegate {
             sleep(1)
             DispatchQueue.main.async {
                 addLog(text: "open LateNoMore process after file save")
-//                NSWorkspace.shared.open(URL(fileURLWithPath: "/Applications/LateNoMore"))
+                //                NSWorkspace.shared.open(URL(fileURLWithPath: "/Applications/LateNoMore"))
                 self.launchProcess()
                 let alert = NSAlert()
                 alert.messageText = "Your settings have been saved."
                 alert.beginSheetModal(for: self.view.window!, completionHandler: {_ in
                     addLog(text: "App terminate")
-//                    NSApp.terminate(self)
-                   // self.view.window?.miniaturize(self)
+                    //                    NSApp.terminate(self)
+                    // self.view.window?.miniaturize(self)
                     DispatchQueue.global().async {
                         DispatchQueue.main.async {
                             self.view.window?.miniaturize(self)
@@ -364,12 +345,17 @@ class ViewController: NSViewController, NSTokenFieldDelegate {
         }
         
     }
+
     
-//    func tokenField(_ tokenField: NSTokenField, shouldAdd tokens: [Any], at index: Int) -> [Any] {
-//        print(tokens)
-//        return tokens
-//    }
-    
+    @IBAction func checkBoxLaunchAtLoginClicked(_ sender: Any) {
+        if checkBoxLaunchAtLogin.state == .on{
+            UserDefaults.standard.set(true, forKey: kUserdefaultsLaunchAtLogin)
+            LaunchOnStartup.setLaunchAtStartup(true)
+        }else{
+            UserDefaults.standard.set(false, forKey: kUserdefaultsLaunchAtLogin)
+            LaunchOnStartup.setLaunchAtStartup(false)
+        }
+    }
     
 }
 
@@ -384,7 +370,7 @@ extension ViewController:NSTableViewDelegate, NSTableViewDataSource {
     
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         if let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "tblCellCalendars"), owner: nil) as? tblCellCalendars {
-
+            
             
             cell.checkBox.title = arrCalendars[row]["name"] as? String ?? ""
             if let state = arrCalendars[row]["state"] as? Bool{

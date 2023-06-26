@@ -8,6 +8,7 @@
 import Cocoa
 
 let kUserdefaultsFirstRun = "firstrun"
+let kUserdefaultsLaunchAtLogin = "kUserdefaultsLaunchAtLogin"
 let appdelegate = NSApplication.shared.delegate as? AppDelegate
 var helperAppUrl:URL!
 let mainStoryboard = NSStoryboard(name: NSStoryboard.Name("Main"), bundle: nil)
@@ -378,3 +379,9 @@ func writeJsonInLog(data: Data?){
         }
     }
 }
+
+
+
+
+
+

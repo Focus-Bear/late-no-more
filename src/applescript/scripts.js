@@ -22,19 +22,21 @@ function createParseStatements(props) {
 
 const GET_ALL_EVENTS = `
         set theCals to fetch calendars {} event store theStore
-		set d1 to (current date)
-		set d2 to d1 + 1 * hours
-		set theEvents to fetch events starting date d1 ending date d2 searching cals theCals event store theStore
+		set start_of_checking_window to (current date)
+		set end_of_checking_window to start_of_checking_window + 1 * hours
+		set theEvents to fetch events starting date start_of_checking_window ending date end_of_checking_window searching cals theCals event store theStore
 
 		set output to {}
 
 		repeat with anEvent in theEvents
 			set startTime to event_start_date of (event info for event anEvent)
 			set current to {}
-			if (startTime ≥ d1) and (startTime ≤ d2) then
+			if (startTime ≥ start_of_checking_window) and (startTime ≤ end_of_checking_window) then
 				try
 					${createParseStatements(properties)}	
 					copy current to end of output
+				on error errMsg
+					display dialog errMsg
 				end try
 			end if
 		end repeat

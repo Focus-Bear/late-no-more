@@ -16,7 +16,15 @@ function logToFile(...messages) {
     const timestamp = new Date().toISOString();
 
     // convert all arguments to string and join them with a space
-    const message = messages.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ');
+    const message = messages.map(arg => {
+        if (arg instanceof Error) {
+            return arg.stack;
+        } else if (typeof arg === 'object') {
+            return JSON.stringify(arg);
+        } else {
+            return arg;
+        }
+    }).join(' ');
 
     // create the log message with the timestamp
     const logMessage = `${timestamp}: ${message}\n`;

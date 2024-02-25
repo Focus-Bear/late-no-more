@@ -40,7 +40,7 @@ module.exports = async function addTestEvents() {
 
     const waitFor = LOOK_AHEAD_MINUTES - 0.5
     addDummyEvent(
-        'Discuss promotion with boss',
+        'Performance Review',
         uuid(),
         waitFor,
         null,

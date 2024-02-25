@@ -1,8 +1,27 @@
+const { DateTime } = require('luxon');
 const { logToFile } = require('../util/log-message')
 
-function tidyDate(date) {
-    return new Date(date.split(',').slice(1).join(',').replace(' at', ''))
+const POSSIBLE_DATE_FORMATS = [
+    'cccc, LLLL dd, yyyy \'at\' h:mm:ss a',
+    'cccc, LLLL dd, yyyy \'at\' hh:mm:ss a',
+];
+
+function tidyDate(dateString) {
+    const processedDateString = dateString.replace(/\s/g, ' ').replace(/[\s\u00A0\u202F\u200B\u2000-\u200A\u2060\uFEFF\u202f]+/g, ' ');
+    try {
+        for (let format of POSSIBLE_DATE_FORMATS) {
+            const parsedDate = DateTime.fromFormat(processedDateString, format);
+            if (parsedDate.isValid) {
+                return parsedDate.toJSDate();
+            }
+        }
+    } catch (e) {
+        logToFile(`Error while parsing date: ${processedDateString}`, e);
+    }
+
+    logToFile(`Could not parse date: '${processedDateString}'`);
 }
+
 function parseMSFT(str) {
     let start = str.indexOf('<https://')
     if (start === -1) return null
@@ -37,21 +56,25 @@ function tidyEvent(evt) {
 
     const [summary, start, end, url, loc, desc, id, calName] = tidy
 
-    const obj = {
+    const startDate = tidyDate(start)
+    const endDate = tidyDate(end)
+
+    const tidiedEvent = {
         summary,
         calendarName: calName,
-        startDate: tidyDate(start),
-        endDate: tidyDate(end),
+        startDate,
+        endDate,
         location: loc,
         description: desc,
         url,
         type: 'default',
         id,
     }
-    return matchService(obj)
+
+    return matchService(tidiedEvent)
 }
 
-module.exports = { tidyEvent, matchService }
+module.exports = { tidyEvent, matchService, tidyDate }
 
 function maintenance() {
     const evts = [

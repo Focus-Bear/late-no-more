@@ -40,7 +40,7 @@ async function save(data) {
         fs.writeFileSync(csvPath, asString, { flag: 'w' })
         logToFile('Saved', csvPath)
     } catch (e) {
-        logToFile(e)
+        logToFile('Error with save', e)
     }
 }
 async function remove(evt) {
@@ -49,7 +49,7 @@ async function remove(evt) {
             trimmed = records.filter(({ id }) => id !== evt.id)
         await save(trimmed)
     } catch (e) {
-        logToFile(e)
+        logToFile('Error with remove', e)
     }
 }
 

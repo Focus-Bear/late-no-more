@@ -1,4 +1,4 @@
-const applescript = require('applescript')
+const applescript = require('applescript');
 
 module.exports = function exec(SCRIPT) {
     return new Promise((resolve, reject) => {

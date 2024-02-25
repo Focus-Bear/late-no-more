@@ -45,6 +45,7 @@ function filterEvent({ calendarName, summary }) {
 
         return true
     } catch (e) {
+        console.error(e);
         if (!e.message.includes('Ignoring')) {
             logToFile('Error in filterEvent', e.message)
         }
@@ -53,10 +54,16 @@ function filterEvent({ calendarName, summary }) {
 }
 
 async function getEvents() {
-    const rawEvents = await exec(SCRIPT_HEADER + GET_ALL_EVENTS),
-        withOutBlanks = rawEvents.filter((e) => e.length),
-        tidied = withOutBlanks.map(tidyEvent)
-    return tidied.filter(filterEvent)
+    try {
+        const rawEvents = await exec(SCRIPT_HEADER + GET_ALL_EVENTS);
+        const withOutBlanks = rawEvents.filter((e) => e.length);
+        const tidied = withOutBlanks.map(tidyEvent);
+
+        return tidied.filter(filterEvent)
+    } catch (e) {
+        logToFile('Error in getEvents', e)
+        return []
+    }
 }
 module.exports = {
     getEvents,

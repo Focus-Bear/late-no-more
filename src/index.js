@@ -31,7 +31,7 @@ module.exports = async function update() {
     const { looming, upcoming, active } = events.get()
     const calendarEvents = await getEvents()
 
-    //    logToFile({ active, looming, upcoming, calendarEvents })
+    logToFile({ active, looming, upcoming, calendarEvents })
 
     const filtered = events.filter(['active'], [...calendarEvents, ...upcoming])
     // We take the events straight out of applescript,

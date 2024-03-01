@@ -4,6 +4,7 @@ const { logToFile } = require('../util/log-message')
 const POSSIBLE_DATE_FORMATS = [
     'cccc, LLLL dd, yyyy \'at\' h:mm:ss a',
     'cccc, LLLL dd, yyyy \'at\' hh:mm:ss a',
+    'cccc, LLLL d, yyyy \'at\' hh:mm:ss a',
 ];
 
 function tidyDate(dateString) {

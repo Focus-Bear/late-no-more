@@ -28,6 +28,15 @@ describe('tidyDate', () => {
     expect(actualDate).toEqual(expectedDate);
   });
 
+  it('should parse a valid date string - 1 digit hour', () => {
+    const dateString = 'Friday, March 1, 2024 at 11:30:00 AM';
+    const expectedDate = new Date('2024-03-01T00:30:00.000Z');
+
+    const actualDate = tidyDate(dateString);
+
+    expect(actualDate).toEqual(expectedDate);
+  });
+
   it('should return undefined for invalid date string', () => {
     const dateString = '2023-01-13T05:30:00.000';
     

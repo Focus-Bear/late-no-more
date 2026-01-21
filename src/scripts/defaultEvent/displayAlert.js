@@ -17,7 +17,7 @@ async function showMeetingAlert(evt, line, givingUpAfter, showImage = false) {
     logToFile('🔔 Displaying alert')
     const title = `Late No More: ${evt.summary}`,
         br = '\n',
-        text = [evt.startDate, br, line, br, evt.location, evt.url].join(br),
+        text = [`Meeting '${evt.summary}' starts in 2 minutes`, br, line, br, evt.location, evt.url].join(br),
         buttons = MEETING_ACTION_BUTTONS
 
     return await showDialog(title, text, buttons, givingUpAfter, showImage)

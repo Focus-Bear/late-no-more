@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1308FC622E0283D700089FCC /* warnUserVc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1308FC612E0283D700089FCC /* warnUserVc.swift */; };
+		1308FC642E0284D100089FCC /* customWc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1308FC632E0284D100089FCC /* customWc.swift */; };
+		1308FC662E029C9800089FCC /* EventWarningManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1308FC652E029C9800089FCC /* EventWarningManager.swift */; };
+		1308FC682E02F3FE00089FCC /* meetingNotesVc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1308FC672E02F3FE00089FCC /* meetingNotesVc.swift */; };
+		135ABF052E01899C007ED73A /* CalendarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135ABF042E01899C007ED73A /* CalendarManager.swift */; };
+		135ABF072E019FF9007ED73A /* customAlertVc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135ABF062E019FF9007ED73A /* customAlertVc.swift */; };
+		137EADCA2E03F761000EB914 /* TextToSpeech.swift in Sources */ = {isa = PBXBuildFile; fileRef = 137EADC92E03F761000EB914 /* TextToSpeech.swift */; };
 		8F26B3EF298E9F87007CD1CA /* NSEventModifierFlags+HotKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F26B3EA298E9F87007CD1CA /* NSEventModifierFlags+HotKey.swift */; };
 		8F26B3F0298E9F87007CD1CA /* KeyCombo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F26B3EB298E9F87007CD1CA /* KeyCombo.swift */; };
 		8F26B3F1298E9F87007CD1CA /* Key.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F26B3EC298E9F87007CD1CA /* Key.swift */; };
@@ -16,7 +23,6 @@
 		8F6B66B52A0233B3002B8137 /* onboardingCardsVc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F6B66B42A0233B3002B8137 /* onboardingCardsVc.swift */; };
 		8F6B66B62A023D66002B8137 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8F6B66B02A022801002B8137 /* Sparkle.framework */; };
 		8F6B66B72A023D66002B8137 /* Sparkle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8F6B66B02A022801002B8137 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		8F6B66C32A028E82002B8137 /* LateNoMore in Resources */ = {isa = PBXBuildFile; fileRef = 8F6B66C22A028E82002B8137 /* LateNoMore */; };
 		8F71395429F64CF80070C44D /* voiceOptionsVc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F71395329F64CF80070C44D /* voiceOptionsVc.swift */; };
 		8F71395629F690770070C44D /* advancedSettingsVc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F71395529F690770070C44D /* advancedSettingsVc.swift */; };
 		8F71395829F6991A0070C44D /* barkPoolVc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F71395729F6991A0070C44D /* barkPoolVc.swift */; };
@@ -59,6 +65,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1308FC612E0283D700089FCC /* warnUserVc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = warnUserVc.swift; sourceTree = "<group>"; };
+		1308FC632E0284D100089FCC /* customWc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = customWc.swift; sourceTree = "<group>"; };
+		1308FC652E029C9800089FCC /* EventWarningManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventWarningManager.swift; sourceTree = "<group>"; };
+		1308FC672E02F3FE00089FCC /* meetingNotesVc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = meetingNotesVc.swift; sourceTree = "<group>"; };
+		135ABF042E01899C007ED73A /* CalendarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarManager.swift; sourceTree = "<group>"; };
+		135ABF062E019FF9007ED73A /* customAlertVc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = customAlertVc.swift; sourceTree = "<group>"; };
+		137EADC92E03F761000EB914 /* TextToSpeech.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextToSpeech.swift; sourceTree = "<group>"; };
 		8F26B3EA298E9F87007CD1CA /* NSEventModifierFlags+HotKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSEventModifierFlags+HotKey.swift"; sourceTree = "<group>"; };
 		8F26B3EB298E9F87007CD1CA /* KeyCombo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyCombo.swift; sourceTree = "<group>"; };
 		8F26B3EC298E9F87007CD1CA /* Key.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Key.swift; sourceTree = "<group>"; };
@@ -68,7 +81,6 @@
 		8F6B66AE2A0225FD002B8137 /* Late-No-More-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Late-No-More-Info.plist"; sourceTree = SOURCE_ROOT; };
 		8F6B66B02A022801002B8137 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		8F6B66B42A0233B3002B8137 /* onboardingCardsVc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = onboardingCardsVc.swift; sourceTree = "<group>"; };
-		8F6B66C22A028E82002B8137 /* LateNoMore */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = LateNoMore; sourceTree = "<group>"; };
 		8F71395329F64CF80070C44D /* voiceOptionsVc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = voiceOptionsVc.swift; sourceTree = "<group>"; };
 		8F71395529F690770070C44D /* advancedSettingsVc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = advancedSettingsVc.swift; sourceTree = "<group>"; };
 		8F71395729F6991A0070C44D /* barkPoolVc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = barkPoolVc.swift; sourceTree = "<group>"; };
@@ -126,7 +138,6 @@
 		8F79699629518A8000188F5D = {
 			isa = PBXGroup;
 			children = (
-				8F6B66C22A028E82002B8137 /* LateNoMore */,
 				8F7969A129518A8000188F5D /* Late No More */,
 				8F7969A029518A8000188F5D /* Products */,
 				8F6B66AF2A022801002B8137 /* Frameworks */,
@@ -148,6 +159,8 @@
 				8F7969A229518A8000188F5D /* AppDelegate.swift */,
 				8F7969B12951EE5100188F5D /* mainWc.swift */,
 				8F7969A429518A8000188F5D /* ViewController.swift */,
+				1308FC652E029C9800089FCC /* EventWarningManager.swift */,
+				135ABF042E01899C007ED73A /* CalendarManager.swift */,
 				8F71395329F64CF80070C44D /* voiceOptionsVc.swift */,
 				8F71395529F690770070C44D /* advancedSettingsVc.swift */,
 				8F71395729F6991A0070C44D /* barkPoolVc.swift */,
@@ -158,6 +171,11 @@
 				8F7969B52951F34E00188F5D /* tblCellCalendars.swift */,
 				8F71395929F69B480070C44D /* tblCell.swift */,
 				8F7969B32951EEF000188F5D /* globalFile.swift */,
+				135ABF062E019FF9007ED73A /* customAlertVc.swift */,
+				1308FC672E02F3FE00089FCC /* meetingNotesVc.swift */,
+				1308FC612E0283D700089FCC /* warnUserVc.swift */,
+				1308FC632E0284D100089FCC /* customWc.swift */,
+				137EADC92E03F761000EB914 /* TextToSpeech.swift */,
 				8FC5CC802A497A95000A0AF7 /* addLoginitem */,
 				8F26B3E9298E9F87007CD1CA /* HotKey */,
 				8F60E7D229CAE40300784F7D /* icon.png */,
@@ -240,7 +258,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8F6B66C32A028E82002B8137 /* LateNoMore in Resources */,
 				8F7969A729518A8500188F5D /* Assets.xcassets in Resources */,
 				8F7969AA29518A8500188F5D /* Main.storyboard in Resources */,
 				8F60E7D329CAE40300784F7D /* icon.png in Resources */,
@@ -257,12 +274,14 @@
 				8F26B3F2298E9F87007CD1CA /* HotKeysController.swift in Sources */,
 				8F71395429F64CF80070C44D /* voiceOptionsVc.swift in Sources */,
 				8F71395E29F6AE410070C44D /* textStagesVc.swift in Sources */,
+				135ABF052E01899C007ED73A /* CalendarManager.swift in Sources */,
 				8F7969B42951EEF000188F5D /* globalFile.swift in Sources */,
 				8F71395629F690770070C44D /* advancedSettingsVc.swift in Sources */,
 				8F71396029F6AE610070C44D /* intentionPromptsVc.swift in Sources */,
 				8F7969A529518A8000188F5D /* ViewController.swift in Sources */,
 				8F26B3F3298E9F87007CD1CA /* HotKey.swift in Sources */,
 				8F26B3F0298E9F87007CD1CA /* KeyCombo.swift in Sources */,
+				1308FC682E02F3FE00089FCC /* meetingNotesVc.swift in Sources */,
 				8F71395829F6991A0070C44D /* barkPoolVc.swift in Sources */,
 				8F26B3EF298E9F87007CD1CA /* NSEventModifierFlags+HotKey.swift in Sources */,
 				8F71395C29F6A0A80070C44D /* addItemVc.swift in Sources */,
@@ -271,9 +290,14 @@
 				8F6B66B52A0233B3002B8137 /* onboardingCardsVc.swift in Sources */,
 				8FC5CC7F2A497A13000A0AF7 /* LaunchOnStartup.swift in Sources */,
 				8F26B3F1298E9F87007CD1CA /* Key.swift in Sources */,
+				135ABF072E019FF9007ED73A /* customAlertVc.swift in Sources */,
 				8F7969B62951F34E00188F5D /* tblCellCalendars.swift in Sources */,
 				8F71395A29F69B480070C44D /* tblCell.swift in Sources */,
 				8F7969A329518A8000188F5D /* AppDelegate.swift in Sources */,
+				1308FC642E0284D100089FCC /* customWc.swift in Sources */,
+				1308FC662E029C9800089FCC /* EventWarningManager.swift in Sources */,
+				137EADCA2E03F761000EB914 /* TextToSpeech.swift in Sources */,
+				1308FC622E0283D700089FCC /* warnUserVc.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -411,10 +435,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "Late No More/Late_No_More.entitlements";
-				CODE_SIGN_IDENTITY = "Developer ID Application: Jeremy Nagel (TCUD568B3U)";
+				CODE_SIGN_IDENTITY = "Developer ID Application: Focus Bear Pty Ltd (TCUD568B3U)";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 18;
+				CURRENT_PROJECT_VERSION = 27;
 				DEVELOPMENT_TEAM = TCUD568B3U;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -432,7 +456,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.focusbear.latenomore;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -450,10 +474,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "Late No More/Late_No_More.entitlements";
-				CODE_SIGN_IDENTITY = "Developer ID Application: Jeremy Nagel (TCUD568B3U)";
+				CODE_SIGN_IDENTITY = "Developer ID Application: Focus Bear Pty Ltd (TCUD568B3U)";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 18;
+				CURRENT_PROJECT_VERSION = 27;
 				DEVELOPMENT_TEAM = TCUD568B3U;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -471,7 +495,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.focusbear.latenomore;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

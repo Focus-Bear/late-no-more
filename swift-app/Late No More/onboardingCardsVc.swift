@@ -9,6 +9,7 @@ import Cocoa
 
 class onboardingCardsVc: NSViewController {
 
+    @IBOutlet weak var heightImageView: NSLayoutConstraint!
     @IBOutlet weak var btnVisitUrl: underLineButton!
     @IBOutlet weak var lblSubTitle: NSTextField!
     @IBOutlet weak var boxFourth: NSBox!
@@ -20,8 +21,8 @@ class onboardingCardsVc: NSViewController {
     @IBOutlet weak var imgView: NSImageView!
     @IBOutlet weak var lblTitle: NSTextField!
     var currentSlideIndex = 0
-    var arrCurrentDic = [["title":"Welcome to Late No More", "subTitle":"You'll now get reminders 2 minutes before your meetings start.", "image":#imageLiteral(resourceName: "reminders_Image")],
-                         ["title":"Set Intentions", "subTitle":"You can now set intention for your meeting after it starts.", "image":#imageLiteral(resourceName: "set_Intention_Image")],
+    var arrCurrentDic = [["title":"Welcome to Late No More", "subTitle":"You'll now get reminders 2 minutes before your meetings start.", "image":#imageLiteral(resourceName: "popup_meeting")],
+                        // ["title":"Set Intentions", "subTitle":"You can now set intention for your meeting after it starts.", "image":#imageLiteral(resourceName: "set_Intention_Image")],
                          ["title":"Connect your calendar accounts", "subTitle":"You need to connect your calendar accounts to MacOS Calendar for Late No More to work.", "image":#imageLiteral(resourceName: "cal")],
                          ["title":"Block distractions", "subTitle":"If you'd like help blocking distractions, check out focusbear.io as well 🙂.", "image":#imageLiteral(resourceName: "img_BlockedPage")]]
     
@@ -47,6 +48,7 @@ class onboardingCardsVc: NSViewController {
 
             btnBack.isHidden = true
             btnNext.title = "Next"
+            heightImageView.constant = 480
         }else if currentSlideIndex == 1{
             boxFirst.fillColor = NSColor.quaternaryLabelColor
             boxSecond.fillColor = NSColor.systemBlue
@@ -55,21 +57,24 @@ class onboardingCardsVc: NSViewController {
             
             btnBack.isHidden = false
             btnNext.title = "Next"
+            heightImageView.constant = 400
         }else if currentSlideIndex == 2{
             boxFirst.fillColor = NSColor.quaternaryLabelColor
             boxSecond.fillColor = NSColor.quaternaryLabelColor
             boxThird.fillColor = NSColor.systemBlue
             boxFourth.fillColor = NSColor.quaternaryLabelColor
-            
+            btnVisitUrl.isHidden = false
             btnBack.isHidden = false
-            btnNext.title = "Next"
-        }else if currentSlideIndex == 3{
+            btnNext.title = "Onwards"
+            heightImageView.constant = 400
+        }
+        else if currentSlideIndex == 3{
             boxFirst.fillColor = NSColor.quaternaryLabelColor
             boxSecond.fillColor = NSColor.quaternaryLabelColor
             boxThird.fillColor = NSColor.quaternaryLabelColor
             boxFourth.fillColor = NSColor.systemBlue
             
-            btnVisitUrl.isHidden = false
+            
             btnBack.isHidden = false
             btnNext.title = "Onwards"
             

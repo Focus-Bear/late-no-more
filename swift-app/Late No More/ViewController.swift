@@ -12,6 +12,7 @@ import EventKit
 class ViewController: NSViewController, NSTokenFieldDelegate {
     
     
+    @IBOutlet weak var lblVersion: NSTextField!
     @IBOutlet weak var checkBoxLaunchAtLogin: NSButton!
     @IBOutlet weak var btnAdvanced: NSButton!
     @IBOutlet weak var pickerEndTime: NSDatePicker!
@@ -35,25 +36,26 @@ class ViewController: NSViewController, NSTokenFieldDelegate {
         addLog(text: "viewDidLoad")
         
         //        let speechSynth = NSSpeechSynthesizer()
-        let voices = NSSpeechSynthesizer.availableVoices
+//        let voices = NSSpeechSynthesizer.availableVoices
+        textToSpeechObject.listVoices()// kust to load objects
         
-        
-        for voice in voices{
-            let attributes = NSSpeechSynthesizer.attributes(forVoice: voice)
-            let name = attributes[.name] as? String ?? "Unknown"
-            let language = attributes[.localeIdentifier] as? String ?? "Unknown"
-            print(name)
-            print(voice.rawValue)
-            print(language)
-            arrVoiceNames.append(name)
-        }
-        if arrVoiceNames.count !=  0{
-            if arrVoiceNames.contains("Karen"){
+//        for voice in voices{
+//            let attributes = NSSpeechSynthesizer.attributes(forVoice: voice)
+//            let name = attributes[.name] as? String ?? "Unknown"
+//            let language = attributes[.localeIdentifier] as? String ?? "Unknown"
+//            print(name)
+//            print(voice.rawValue)
+//            print(language)
+//            arrVoiceNames[name] = voice.rawValue
+//        }
+        if arrVoiceNames.keys.count !=  0{
+            if arrVoiceNames.keys.contains("Karen"){
                 usingValue = "Karen"
             }else{
-                usingValue = arrVoiceNames.first ?? ""
+                usingValue = arrVoiceNames.first?.key ?? ""
             }
         }
+        
         speakingRateValue = 150
         pitchValue = 50
         volumeValue = 0.5
@@ -94,7 +96,7 @@ class ViewController: NSViewController, NSTokenFieldDelegate {
         
         let calendars = eventStore.calendars(for: .event)
         for calendar in calendars {
-            arrCalendars.append(["name":calendar.title, "state": true, "id":calendar.calendarIdentifier])
+            arrCalendars.append(["name":calendar.title, "state": true, "id":calendar.calendarIdentifier, "calendar": calendar])
         }
         print(arrCalendars)
         tokenField.objectValue = ["no-notify"]
@@ -142,10 +144,20 @@ class ViewController: NSViewController, NSTokenFieldDelegate {
                     
                     if let voiceOptions = jsonResult.value(forKey: "voiceOptions") as? NSDictionary{
                         usingValue = voiceOptions.value(forKey: "using") as? String ?? usingValue
-                        speakingRateValue = voiceOptions.value(forKey: "speakingRate") as? Int ?? speakingRateValue
-                        pitchValue = voiceOptions.value(forKey: "pitch") as? Int ?? pitchValue
+                        speakingRateValue = voiceOptions.value(forKey: "speakingRate") as? Float ?? speakingRateValue
+                        pitchValue = voiceOptions.value(forKey: "pitch") as? Float ?? pitchValue
                         volumeValue = voiceOptions.value(forKey: "volume") as? Float ?? volumeValue
                         modulationValue = voiceOptions.value(forKey: "modulation") as? Int ?? modulationValue
+                        
+                        if pitchValue > 2 || pitchValue < 0.5{
+                            pitchValue = 1.2
+                        }
+                        if speakingRateValue > 1{
+                            speakingRateValue = 0.4
+                        }
+                        if volumeValue > 1{
+                            volumeValue = 1
+                        }
                     }
                     
                     if let barkPool = jsonResult.value(forKey: "barkPool") as? [String]{
@@ -186,6 +198,7 @@ class ViewController: NSViewController, NSTokenFieldDelegate {
             LaunchOnStartup.setLaunchAtStartup(true)
             checkBoxLaunchAtLogin.state = .on
         }
+        lblVersion.stringValue = "Version:" + " " + appVersion
     }
     var hotKeyRestartApp: HotKey? {
         didSet {
@@ -195,7 +208,7 @@ class ViewController: NSViewController, NSTokenFieldDelegate {
             hotKey.keyDownHandler = { [weak self] in
                 print("Pressed at \(Date())")
                 addLog(text: "shortcut clicked")
-                terminateProcess()
+//                terminateProcess()
                 DispatchQueue.global().async {
                     sleep(1)
                     DispatchQueue.main.async {
@@ -217,25 +230,29 @@ class ViewController: NSViewController, NSTokenFieldDelegate {
             DispatchQueue.global().async {
                 sleep(1)
                 DispatchQueue.main.async {
-                    addLog(text: "open LateNoMore process after file save")
-                    //                    NSWorkspace.shared.open(URL(fileURLWithPath: "/Applications/LateNoMore"))
-                    
                     self.launchProcess()
-                    
-                    
-                    
                 }
             }
         }
     }
+    var warningManagerObject = EventWarningManager()
     func launchProcess(){
-        let task = Process()
-        task.launchPath = "/bin/bash"
-        task.arguments = ["-c", "launchctl asuser \"$(id -u)\" \"\(helperAppUrl!.path)\""]
-        task.launch()
-        capturePosthog(event: "start-late-no-more-binary", metadata: [:])
+        warningManagerObject.resetData(
+            calendars: arrCalendars,
+            startTimePicker: pickerStartTime,
+            endTimePicker: pickerEndTime
+        )
+        warningManagerObject.startCheck()
+        
+        return;
+//        let task = Process()
+//        task.launchPath = "/bin/bash"
+//        task.arguments = ["-c", "launchctl asuser \"$(id -u)\" \"\(helperAppUrl!.path)\""]
+//        task.launch()
+//        capturePosthog(event: "start-late-no-more-binary", metadata: [:])
     }
     
+
     override var representedObject: Any? {
         didSet {
             // Update the view, if already loaded.
@@ -254,7 +271,7 @@ class ViewController: NSViewController, NSTokenFieldDelegate {
     func saveSettings(){
         
         addLog(text: "func:- saveSettings")
-        terminateProcess()
+//        terminateProcess()
         
         var events = [String]()
         if let objectValue = tokenField.objectValue as? [String] {
@@ -323,6 +340,10 @@ class ViewController: NSViewController, NSTokenFieldDelegate {
         capturePosthog(event: "apply-settings", metadata: [:])
         addLog(text: "btnApplyClicked")
         saveSettings()
+        
+        
+        
+
         DispatchQueue.global().async {
             sleep(1)
             DispatchQueue.main.async {

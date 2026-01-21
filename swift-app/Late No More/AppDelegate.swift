@@ -16,37 +16,38 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var updater: SUUpdater?
     
     func applicationWillFinishLaunching(_ notification: Notification) {
-
+        let settingForScreeenTimeFilePath = "/Users/\(NSUserName())/Library/Application Support/com.App.EarnYourScreentime/fbtt.plist"
+        settingForScreeenTimeFileURL = URL(fileURLWithPath: settingForScreeenTimeFilePath)
         let bundel = Bundle.main.bundleIdentifier ?? ""
         let applicationSupportPath = "/Users/\(NSUserName())/Library/Application Support/\(bundel)"
         CreateDirectoryIfNotExist(path: applicationSupportPath)
         let applicationSupportURL  = URL(fileURLWithPath: applicationSupportPath)
         jsonUrl = applicationSupportURL.appendingPathComponent("events.json")
-        DebugLogsURL = applicationSupportURL.appendingPathComponent("Late No More_Logs.txt")
-        helperAppUrl = applicationSupportURL.appendingPathComponent("LateNoMore")
+        DebugLogsURL = applicationSupportURL.appendingPathComponent("LateNoMore_Logs.txt")
+//        helperAppUrl = applicationSupportURL.appendingPathComponent("LateNoMore")
         if let version = Bundle.main.releaseVersionNumber,let build = Bundle.main.buildVersionNumber{
             addLog(text: "running app version:" + " " + version + "." + build)
             appVersion = version + "." + build
         }
-        if let path = Bundle.main.path(forResource: "LateNoMore", ofType: "") {
-            let url = URL(fileURLWithPath: path)
-            print(url)
-            if FileManager.default.fileExists(atPath: helperAppUrl!.path){
-                do{
-                    try FileManager.default.removeItem(at: helperAppUrl!)
-                }catch{
-                    print(error)
-                }
-            }
-            
-            do{
-                try FileManager.default.copyItem(at: url, to: helperAppUrl!)
-            }catch{
-                print(error)
-            }
-            
-            
-        }
+//        if let path = Bundle.main.path(forResource: "LateNoMore", ofType: "") {
+//            let url = URL(fileURLWithPath: path)
+//            print(url)
+//            if FileManager.default.fileExists(atPath: helperAppUrl!.path){
+//                do{
+//                    try FileManager.default.removeItem(at: helperAppUrl!)
+//                }catch{
+//                    print(error)
+//                }
+//            }
+//            
+//            do{
+//                try FileManager.default.copyItem(at: url, to: helperAppUrl!)
+//            }catch{
+//                print(error)
+//            }
+//            
+//            
+//        }
         
         let systemVersion = ProcessInfo().operatingSystemVersion
         addLog(text: "macOS Version \(systemVersion.majorVersion).\(systemVersion.minorVersion).\(systemVersion.patchVersion)")
@@ -67,13 +68,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         menuItemCheckForUpdates.title = "Check for updates"
         updater = SUUpdater(for: Bundle.main)
         updater?.automaticallyChecksForUpdates = true
-
         if UserDefaults.standard.object(forKey: kUserdefaultsFirstRun) == nil{
             showOnboardingWindow()
         }else{
             self.updater?.checkForUpdatesInBackground()
             loadFullApp()
         }
+        
+        NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(self.macWillPowerOff(_:)), name: NSWorkspace.willPowerOffNotification, object: nil)
     }
     
     func loadFullApp(){
@@ -137,8 +139,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     var isShouldTerminate = false
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
-        
-        
         if isShouldTerminate{
             return .terminateNow
         }else{
@@ -146,17 +146,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 DispatchQueue.global().async {
                     DispatchQueue.main.async {
                         let alert = NSAlert()
-                        alert.messageText = "Do you want to keep Late No More notifications running?"
+                        alert.messageText = "Do you want to Stop Late No More notifications?"
                         alert.addButton(withTitle: "Keep them please")
                         alert.addButton(withTitle: "Stop the notifications!")
                         let result = alert.runModal()
                         if result == .alertFirstButtonReturn{
                             
                         }else{
-                            terminateProcess()
+                            self.isShouldTerminate = true
+                            NSApp.terminate(self)
                         }
-                        self.isShouldTerminate = true
-                        NSApp.terminate(self)
+                        
                     }
                 }
                 return .terminateCancel
@@ -166,11 +166,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
     }
+    
+    @objc private func macWillPowerOff(_ aNotification: Notification) {
+        //respond to the power-off notification
+        addLog(text: "func:- macWillPowerOff")
+        isShouldTerminate = true
+    }
+    
     func applicationWillTerminate(_ aNotification: Notification) {
         // Insert code here to tear down your application
-        
-        
-        
+
     }
 
     func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool {
@@ -178,7 +183,48 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        return false
+    }
+    
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows: Bool) -> Bool {
+        if mainWcObj != nil{
+            mainWcObj?.showWindow(self)
+        }
         return true
     }
+    func applicationDidResignActive(_ notification: Notification) {
+        if arrAlertWcObj.count != 0{
+            setTimerMoveWindowToCenter()
+        }
+    }
+    
+    var timerMoveWindowToCenter:Timer?
+    
+    func setTimerMoveWindowToCenter(){
+        if self.timerMoveWindowToCenter != nil{
+            self.timerMoveWindowToCenter?.invalidate()
+            self.timerMoveWindowToCenter = nil
+        }
+        self.timerMoveWindowToCenter = Timer.scheduledTimer(timeInterval: 60, target: self, selector: #selector(self.moveWindowToCenter), userInfo: nil, repeats: false)
+    }
+    
+    @objc func moveWindowToCenter() {
+        if self.timerMoveWindowToCenter != nil{
+            self.timerMoveWindowToCenter?.invalidate()
+            self.timerMoveWindowToCenter = nil
+        }
+        for i in 0..<arrAlertWcObj.count{
+            let wc = arrAlertWcObj[i]
+            wc.window?.center()
+        }
+    }
+    
+    func applicationDidBecomeActive(_ notification: Notification) {
+        if self.timerMoveWindowToCenter != nil{
+            self.timerMoveWindowToCenter?.invalidate()
+            self.timerMoveWindowToCenter = nil
+        }
+    }
 }
-//todo jab bhi binary updat kro sign krke hi update kro 
+
+//1.0.20

@@ -41,7 +41,10 @@ class voiceOptionsVc: NSViewController {
         btnTestSound.title = "Test Voice"
         //btnOk.title = "OK"
         popUpBtn.removeAllItems()
-        popUpBtn.addItems(withTitles: arrVoiceNames)
+        for key in arrVoiceNames.keys{
+            popUpBtn.addItem(withTitle: key)
+        }
+        
     }
  
     
@@ -51,11 +54,11 @@ class voiceOptionsVc: NSViewController {
         if !usingValue.isEmpty{
             popUpBtn.selectItem(withTitle: usingValue)
         }
-        sliderSpeakingRate.integerValue = speakingRateValue
-        lblValueSpeakingRate.integerValue = speakingRateValue
+        sliderSpeakingRate.floatValue = speakingRateValue
+        lblValueSpeakingRate.floatValue = speakingRateValue
         
-        sliderVolume.integerValue = pitchValue
-        lblValuePitch.integerValue = pitchValue
+        sliderVolume.floatValue = pitchValue
+        lblValuePitch.floatValue = pitchValue
         
         sliderVolume.floatValue = volumeValue
         lblValueVolume.stringValue = "\(Float(round(100 * volumeValue) / 100))"
@@ -65,17 +68,17 @@ class voiceOptionsVc: NSViewController {
     }
     
     @IBAction func popupBtnClicked(_ sender: Any) {
-        usingValue = arrVoiceNames[popUpBtn.indexOfSelectedItem]
+        usingValue = popUpBtn.titleOfSelectedItem ?? ""
     }
     
     @IBAction func sliderSpeakingRateClicked(_ sender: Any) {
-        speakingRateValue = sliderSpeakingRate.integerValue
-        lblValueSpeakingRate.integerValue = speakingRateValue
+        speakingRateValue = sliderSpeakingRate.floatValue
+        lblValueSpeakingRate.floatValue = sliderSpeakingRate.floatValue
     }
     
     @IBAction func sliderPitchClicked(_ sender: Any) {
-        pitchValue = sliderPitch.integerValue
-        lblValuePitch.integerValue = pitchValue
+        pitchValue = sliderPitch.floatValue
+        lblValuePitch.floatValue = sliderPitch.floatValue
     }
     
     @IBAction func sliderVolumeClicked(_ sender: Any) {
@@ -88,18 +91,28 @@ class voiceOptionsVc: NSViewController {
     }
     
     @IBAction func btnTestSoundClicked(_ sender: Any) {
-        let task = Process()
-//        let pipe = Pipe()
-        
-//        task.standardOutput = pipe
-//        task.standardError = pipe
-        task.arguments = ["-c", "say \"I'll make sure you're never late for a meeting\" -v \"\(popUpBtn.titleOfSelectedItem ?? "")\""]
-        task.launchPath = "/bin/zsh"
-        task.standardInput = nil
-        task.launch()
-        
-//        let data = pipe.fileHandleForReading.readDataToEndOfFile()
-//        let output = String(data: data, encoding: .utf8)!
+        testVoice()
+//        let task = Process()
+//        task.arguments = ["-c", "say \"I'll make sure you're never late for a meeting\" -v \"\(popUpBtn.titleOfSelectedItem ?? "")\""]
+//        task.launchPath = "/bin/zsh"
+//        task.standardInput = nil
+//        task.launch()
     }
     
+    func testVoice(){
+        addLog(text: "test Voice")
+        let voice = arrVoiceNames[usingValue]
+        DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.1) {
+            
+            textToSpeechObject.speak("I'll make sure you're never late for a meeting",
+                      voice: voice,
+                           rate: speakingRateValue,//0.4
+                           pitch: pitchValue,//1.2
+                           volume: volumeValue)//0.8
+        }
+    }
+    
+
 }
+
+

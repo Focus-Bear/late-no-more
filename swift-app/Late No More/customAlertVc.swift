@@ -37,6 +37,8 @@ class customAlertVc: NSViewController {
     var parseInfo: MeetingLinkInfo?
     var eventId:String = ""
     var remainingSeconds = 120
+    var verbalAlertsStartTime: Date?
+    private let maxVerbalAlertsDurationSeconds: TimeInterval = 300 // 5 minutes max for verbal alerts
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -168,6 +170,8 @@ class customAlertVc: NSViewController {
         if !joinMeetingClicked{
             timerVerbalAlerts?.invalidate()
             timerVerbalAlerts = nil
+            verbalAlertsStartTime = Date()
+            addLog(text: "Starting verbal alerts, max duration: \(maxVerbalAlertsDurationSeconds) seconds")
             DispatchQueue.global().sync {
                 self.timerVerbalAlerts?.invalidate()
                 self.timerVerbalAlerts = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(self.playVerbalAlert), userInfo: nil, repeats: true)
@@ -177,6 +181,15 @@ class customAlertVc: NSViewController {
     }
     
     @objc func playVerbalAlert(){
+        if let startTime = verbalAlertsStartTime {
+            let elapsedTime = Date().timeIntervalSince(startTime)
+            if elapsedTime >= maxVerbalAlertsDurationSeconds {
+                addLog(text: "Max verbal alerts duration (\(maxVerbalAlertsDurationSeconds) seconds) reached, stopping alerts")
+                stopVerbalAlerts()
+                return
+            }
+        }
+        
         let voice = arrVoiceNames[usingValue]
         DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.1) {
             
@@ -186,6 +199,13 @@ class customAlertVc: NSViewController {
                            pitch: pitchValue,//1.2
                            volume: volumeValue)//0.8
         }
+    }
+    
+    private func stopVerbalAlerts() {
+        timerVerbalAlerts?.invalidate()
+        timerVerbalAlerts = nil
+        verbalAlertsStartTime = nil
+        textToSpeechObject.stopSpeaking()
     }
     
     func meetingDetectedByFocusBear(){
@@ -198,8 +218,7 @@ class customAlertVc: NSViewController {
     override func viewWillDisappear() {
         timerCheckMeeting?.invalidate()
         timerCheckMeeting = nil
-        timerVerbalAlerts?.invalidate()
-        timerVerbalAlerts = nil
+        stopVerbalAlerts()
         btnStartMeeting.isHidden = false
         btnIDontNeedToAttend.isHidden = false
         btnJoinNow.isHidden = false
@@ -210,8 +229,7 @@ class customAlertVc: NSViewController {
             NSWorkspace.shared.open(url)
         }
         joinMeetingClicked = true
-        timerVerbalAlerts?.invalidate()
-        timerVerbalAlerts = nil
+        stopVerbalAlerts()
     }
     
     @IBAction func btnAttendClicked(_ sender: Any) {

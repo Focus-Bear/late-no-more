@@ -23,6 +23,7 @@
 		8F6B66B52A0233B3002B8137 /* onboardingCardsVc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F6B66B42A0233B3002B8137 /* onboardingCardsVc.swift */; };
 		8F6B66B62A023D66002B8137 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8F6B66B02A022801002B8137 /* Sparkle.framework */; };
 		8F6B66B72A023D66002B8137 /* Sparkle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8F6B66B02A022801002B8137 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5E570C0A0000000000000003 /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = 5E570C0A0000000000000002 /* Sentry */; };
 		8F71395429F64CF80070C44D /* voiceOptionsVc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F71395329F64CF80070C44D /* voiceOptionsVc.swift */; };
 		8F71395629F690770070C44D /* advancedSettingsVc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F71395529F690770070C44D /* advancedSettingsVc.swift */; };
 		8F71395829F6991A0070C44D /* barkPoolVc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F71395729F6991A0070C44D /* barkPoolVc.swift */; };
@@ -108,6 +109,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5E570C0A0000000000000003 /* Sentry in Frameworks */,
 				8F6B66B62A023D66002B8137 /* Sparkle.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -215,6 +217,9 @@
 			dependencies = (
 			);
 			name = "Late No More";
+			packageProductDependencies = (
+				5E570C0A0000000000000002 /* Sentry */,
+			);
 			productName = "Late No More";
 			productReference = 8F79699F29518A8000188F5D /* Late No More.app */;
 			productType = "com.apple.product-type.application";
@@ -244,6 +249,9 @@
 				Base,
 			);
 			mainGroup = 8F79699629518A8000188F5D;
+			packageReferences = (
+				5E570C0A0000000000000001 /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
+			);
 			productRefGroup = 8F7969A029518A8000188F5D /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -527,6 +535,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		5E570C0A0000000000000001 /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/getsentry/sentry-cocoa";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		5E570C0A0000000000000002 /* Sentry */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5E570C0A0000000000000001 /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = Sentry;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 8F79699729518A8000188F5D /* Project object */;
 }

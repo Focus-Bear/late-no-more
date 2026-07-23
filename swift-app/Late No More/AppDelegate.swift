@@ -8,14 +8,26 @@
 import Cocoa
 import EventKit
 import Sparkle
+import Sentry
+
+// Client DSN for the Late No More Sentry project. Client DSNs are safe to
+// ship in the app — they only permit sending events, not reading them.
+private let sentryDSN = "https://46bcd71ab3fb9cae3c8bc470bac8c6b2@o4509122919006208.ingest.us.sentry.io/4511782954336256"
 
 @main
 class AppDelegate: NSObject, NSApplicationDelegate {
 
     @IBOutlet weak var menuItemCheckForUpdates: NSMenuItem!
     var updater: SUUpdater?
-    
+
     func applicationWillFinishLaunching(_ notification: Notification) {
+        SentrySDK.start { options in
+            options.dsn = sentryDSN
+            options.releaseName = Bundle.main.releaseVersionNumber.map { version in
+                "com.focusbear.latenomore@\(version)+\(Bundle.main.buildVersionNumber ?? "")"
+            }
+        }
+
         let settingForScreeenTimeFilePath = "/Users/\(NSUserName())/Library/Application Support/com.App.EarnYourScreentime/fbtt.plist"
         settingForScreeenTimeFileURL = URL(fileURLWithPath: settingForScreeenTimeFilePath)
         let bundel = Bundle.main.bundleIdentifier ?? ""

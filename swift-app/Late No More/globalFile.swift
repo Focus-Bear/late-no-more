@@ -169,16 +169,19 @@ var DebugLogsURL:URL!
 class Log: TextOutputStream {
     
     func write(_ string: String) {
-        //        let fm = FileManager.default
-        
-        if let log = DebugLogsURL{//fm.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("Debug_Logs.txt")
-            if let handle = try? FileHandle(forWritingTo: log) {
-                handle.seekToEndOfFile()
-                handle.write(string.data(using: .utf8)!)
-                handle.closeFile()
-            } else {
-                try? string.data(using: .utf8)?.write(to: log)
-            }
+        guard let log = DebugLogsURL, let data = string.data(using: .utf8) else { return }
+
+        // The legacy FileHandle APIs (seekToEndOfFile/write(_:)/closeFile) raise
+        // Objective-C NSExceptions on I/O failure, which Swift cannot catch — a
+        // single bad write from the logging timer would abort the whole app.
+        // The throwing variants surface catchable Swift errors instead.
+        do {
+            let handle = try FileHandle(forWritingTo: log)
+            defer { try? handle.close() }
+            try handle.seekToEnd()
+            try handle.write(contentsOf: data)
+        } catch {
+            try? data.write(to: log)
         }
     }
     static var log: Log = Log()

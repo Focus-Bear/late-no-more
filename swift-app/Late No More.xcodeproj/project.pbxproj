@@ -21,9 +21,8 @@
 		8F26B3F3298E9F87007CD1CA /* HotKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F26B3EE298E9F87007CD1CA /* HotKey.swift */; };
 		8F60E7D329CAE40300784F7D /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F60E7D229CAE40300784F7D /* icon.png */; };
 		8F6B66B52A0233B3002B8137 /* onboardingCardsVc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F6B66B42A0233B3002B8137 /* onboardingCardsVc.swift */; };
-		8F6B66B62A023D66002B8137 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8F6B66B02A022801002B8137 /* Sparkle.framework */; };
-		8F6B66B72A023D66002B8137 /* Sparkle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8F6B66B02A022801002B8137 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5E570C0A0000000000000003 /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = 5E570C0A0000000000000002 /* Sentry */; };
+		5E570C0A0000000000000013 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 5E570C0A0000000000000012 /* Sparkle */; };
 		8F71395429F64CF80070C44D /* voiceOptionsVc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F71395329F64CF80070C44D /* voiceOptionsVc.swift */; };
 		8F71395629F690770070C44D /* advancedSettingsVc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F71395529F690770070C44D /* advancedSettingsVc.swift */; };
 		8F71395829F6991A0070C44D /* barkPoolVc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F71395729F6991A0070C44D /* barkPoolVc.swift */; };
@@ -49,7 +48,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				8F6B66B72A023D66002B8137 /* Sparkle.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -80,7 +78,6 @@
 		8F26B3EE298E9F87007CD1CA /* HotKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HotKey.swift; sourceTree = "<group>"; };
 		8F60E7D229CAE40300784F7D /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon.png; sourceTree = "<group>"; };
 		8F6B66AE2A0225FD002B8137 /* Late-No-More-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Late-No-More-Info.plist"; sourceTree = SOURCE_ROOT; };
-		8F6B66B02A022801002B8137 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		8F6B66B42A0233B3002B8137 /* onboardingCardsVc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = onboardingCardsVc.swift; sourceTree = "<group>"; };
 		8F71395329F64CF80070C44D /* voiceOptionsVc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = voiceOptionsVc.swift; sourceTree = "<group>"; };
 		8F71395529F690770070C44D /* advancedSettingsVc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = advancedSettingsVc.swift; sourceTree = "<group>"; };
@@ -110,7 +107,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5E570C0A0000000000000003 /* Sentry in Frameworks */,
-				8F6B66B62A023D66002B8137 /* Sparkle.framework in Frameworks */,
+				5E570C0A0000000000000013 /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -132,7 +129,6 @@
 		8F6B66AF2A022801002B8137 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				8F6B66B02A022801002B8137 /* Sparkle.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -219,6 +215,7 @@
 			name = "Late No More";
 			packageProductDependencies = (
 				5E570C0A0000000000000002 /* Sentry */,
+				5E570C0A0000000000000012 /* Sparkle */,
 			);
 			productName = "Late No More";
 			productReference = 8F79699F29518A8000188F5D /* Late No More.app */;
@@ -251,6 +248,7 @@
 			mainGroup = 8F79699629518A8000188F5D;
 			packageReferences = (
 				5E570C0A0000000000000001 /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
+				5E570C0A0000000000000011 /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			productRefGroup = 8F7969A029518A8000188F5D /* Products */;
 			projectDirPath = "";
@@ -545,6 +543,14 @@
 				minimumVersion = 8.0.0;
 			};
 		};
+		5E570C0A0000000000000011 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -552,6 +558,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5E570C0A0000000000000001 /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
 			productName = Sentry;
+		};
+		5E570C0A0000000000000012 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5E570C0A0000000000000011 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

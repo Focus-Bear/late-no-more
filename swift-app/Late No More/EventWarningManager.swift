@@ -90,9 +90,19 @@ class EventWarningManager {
         
         let startDateTime = combineCurrentDateWithTime(from: pickerStartTimeDateValue)
         let endDateTime = combineCurrentDateWithTime(from: pickerEndTimeDateValue)
-        
-        let events = calendarManager.fetchEvents(from: startDateTime, to: endDateTime, in: calendarsToCheck)
         let currentDate = Date()
+
+        // The Start/End pickers define the hours the user wants verbal alerts.
+        // Gate on the current wall-clock time here: without this, an event that
+        // merely overlaps the fetch window (e.g. one running 5:55–6:25am against a
+        // 6:00am start) gets fetched and its 15-minute pre-alert fires before the
+        // window opens — waking the user outside their chosen hours.
+        guard isWithinAlertHours(currentDate, start: startDateTime, end: endDateTime) else {
+            addLog(text: "func:- checkEvents skipped, current time outside verbal alert hours")
+            return
+        }
+
+        let events = calendarManager.fetchEvents(from: startDateTime, to: endDateTime, in: calendarsToCheck)
         
         for event in events where !event.isAllDay {
             if let startDateTime = event.startDate{
@@ -134,6 +144,14 @@ class EventWarningManager {
         
     }
     
+    private func isWithinAlertHours(_ now: Date, start: Date, end: Date) -> Bool {
+        if start <= end {
+            return now >= start && now <= end
+        }
+        // Overnight window (e.g. 22:00–06:00): inside if before end or after start.
+        return now >= start || now <= end
+    }
+
     private func combineCurrentDateWithTime(from time: Date) -> Date {
         let calendar = Calendar.current
         let dateComponents = calendar.dateComponents([.year, .month, .day], from: Date())

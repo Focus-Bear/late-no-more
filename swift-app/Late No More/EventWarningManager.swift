@@ -90,7 +90,17 @@ class EventWarningManager {
         
         let startDateTime = combineCurrentDateWithTime(from: pickerStartTimeDateValue)
         let endDateTime = combineCurrentDateWithTime(from: pickerEndTimeDateValue)
-        
+
+        // Never alert outside the user's configured bark hours. The fetch window below is an
+        // overlap query, so an event starting before barkStartTime but ending after it (e.g. a
+        // 5:40am run that ends past a 6:00am start) still gets pulled in — and its warnings fire
+        // relative to the event start, well before the window. Gate on the current clock time so
+        // no popup or verbal alert happens before barkStartTime or after barkEndTime.
+        guard isWithinBarkHours(start: startDateTime, end: endDateTime) else {
+            addLog(text: "func:- checkEvents skipped: outside bark hours")
+            return
+        }
+
         let events = calendarManager.fetchEvents(from: startDateTime, to: endDateTime, in: calendarsToCheck)
         let currentDate = Date()
         
@@ -134,6 +144,11 @@ class EventWarningManager {
         
     }
     
+    private func isWithinBarkHours(start: Date, end: Date) -> Bool {
+        let now = Date()
+        return now >= start && now <= end
+    }
+
     private func combineCurrentDateWithTime(from time: Date) -> Date {
         let calendar = Calendar.current
         let dateComponents = calendar.dateComponents([.year, .month, .day], from: Date())

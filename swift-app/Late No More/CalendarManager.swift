@@ -74,6 +74,11 @@ class CalendarManager {
     }
     
     func fetchEvents(from startDate: Date, to endDate: Date, in calendars: [EKCalendar]) -> [EKEvent] {
+        // predicateForEvents raises NSInvalidArgumentException on an empty (non-nil) calendars
+        // array ("An empty array is not allowed. Pass nil to search all calendars."). No enabled
+        // calendars means there is nothing to check, so return early rather than crash.
+        guard !calendars.isEmpty else { return [] }
+
         let predicate = eventStore.predicateForEvents(withStart: startDate, end: endDate, calendars: calendars)
         let events = eventStore.events(matching: predicate)
         return events.sorted { $0.startDate < $1.startDate }

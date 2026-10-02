@@ -46,7 +46,7 @@ class EventWarningManager {
         guard let eventID = event.eventIdentifier, let calendarID = event.calendar?.calendarIdentifier,
               let start = event.startDate else { return nil }
         return .init(eventID: eventID, calendarID: calendarID,
-                     externalID: event.calendarItemExternalIdentifier, start: start)
+                     externalID: event.calendarItemExternalIdentifier, start: start, end: event.endDate)
     }
 
     @objc private func dismissalSnapshotChanged(_ notification: Notification) {
@@ -327,6 +327,7 @@ struct SharedCalendarDismissals: Codable {
         let calendarID: String
         let externalID: String?
         let start: Date
+        var end: Date? = nil
     }
 
     struct Rule: Codable, Equatable {
@@ -337,6 +338,7 @@ struct SharedCalendarDismissals: Codable {
         let scope: Scope
         let day: String?
         let timeZone: String?
+        var occurrenceDay: String? = nil
 
         func matches(_ event: Identity) -> Bool {
             guard calendarID == event.calendarID else { return false }
@@ -345,7 +347,21 @@ struct SharedCalendarDismissals: Codable {
             guard sameEvent || sameExternal else { return false }
             guard scope == .day else { return true }
             guard let timeZone, let zone = TimeZone(identifier: timeZone) else { return false }
-            return day == SharedCalendarDismissals.dayKey(event.start, zone: zone)
+            guard occurrenceDay == SharedCalendarDismissals.dayKey(event.start, zone: zone),
+                  let day else { return false }
+            let formatter = DateFormatter()
+            formatter.calendar = Calendar(identifier: .gregorian)
+            formatter.locale = Locale(identifier: "en_US_POSIX")
+            formatter.timeZone = zone
+            formatter.dateFormat = "yyyy-MM-dd"
+            guard let dayStart = formatter.date(from: day) else { return false }
+            var calendar = Calendar(identifier: .gregorian)
+            calendar.timeZone = zone
+            guard let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart) else { return false }
+            if let end = event.end, end > event.start {
+                return event.start < dayEnd && end > dayStart
+            }
+            return event.start >= dayStart && event.start < dayEnd
         }
     }
 
@@ -366,7 +382,8 @@ struct SharedCalendarDismissals: Codable {
     static func rule(event: Identity, day: Date?, zone: TimeZone) -> Rule {
         Rule(eventID: event.eventID, calendarID: event.calendarID, externalID: event.externalID,
              scope: day == nil ? .series : .day,
-             day: day.map { dayKey($0, zone: zone) }, timeZone: day == nil ? nil : zone.identifier)
+             day: day.map { dayKey($0, zone: zone) }, timeZone: day == nil ? nil : zone.identifier,
+             occurrenceDay: day == nil ? nil : dayKey(event.start, zone: zone))
     }
 
     var isValid: Bool {
@@ -377,7 +394,7 @@ struct SharedCalendarDismissals: Codable {
             guard validID(rule.eventID), validID(rule.calendarID),
                   rule.externalID.map({ validID($0) }) ?? true else { return false }
             switch rule.scope {
-            case .series: return rule.day == nil && rule.timeZone == nil
+            case .series: return rule.day == nil && rule.timeZone == nil && rule.occurrenceDay == nil
             case .day:
                 guard let day = rule.day, day.count == 10,
                       day.range(of: #"^\d{4}-\d{2}-\d{2}$"#, options: .regularExpression) != nil,
@@ -389,7 +406,9 @@ struct SharedCalendarDismissals: Codable {
                 formatter.dateFormat = "yyyy-MM-dd"
                 formatter.isLenient = false
                 guard let date = formatter.date(from: day) else { return false }
-                return formatter.string(from: date) == day
+                guard formatter.string(from: date) == day, let occurrenceDay = rule.occurrenceDay,
+                      occurrenceDay.count == 10, let occurrence = formatter.date(from: occurrenceDay) else { return false }
+                return formatter.string(from: occurrence) == occurrenceDay
             }
         }
     }
@@ -437,6 +456,7 @@ struct SharedCalendarDismissals: Codable {
         }
         try manager.createDirectory(at: directory, withIntermediateDirectories: true,
                                     attributes: [.posixPermissions: 0o700])
+        try manager.setAttributes([.posixPermissions: 0o700], ofItemAtPath: directory.path)
         try data.write(to: url, options: .atomic)
         try manager.setAttributes([.posixPermissions: 0o600], ofItemAtPath: url.path)
     }

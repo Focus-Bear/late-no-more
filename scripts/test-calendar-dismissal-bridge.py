@@ -44,6 +44,16 @@ assert(!hidden.hides(moved))
 assert(!hidden.hides(otherCalendar))
 assert(!hidden.hides(unknown))
 assert(snapshot([series]).hides(moved))
+let overnight = SharedCalendarDismissals.Identity(eventID: "event", calendarID: "work", externalID: "provider",
+    start: formatter.date(from: "2026-10-01T13:30:00Z")!, end: formatter.date(from: "2026-10-01T14:30:00Z")!)
+let secondDay = SharedCalendarDismissals.rule(event: overnight, day: next, zone: zone)
+assert(snapshot([secondDay]).hides(overnight))
+let endsAtMidnight = SharedCalendarDismissals.Identity(eventID: "event", calendarID: "work", externalID: "provider",
+    start: overnight.start, end: formatter.date(from: "2026-10-01T14:00:00Z")!)
+assert(!snapshot([secondDay]).hides(endsAtMidnight))
+let overnightMovedToSecondDay = SharedCalendarDismissals.Identity(eventID: "event", calendarID: "work", externalID: "provider",
+    start: next, end: next.addingTimeInterval(3600))
+assert(!snapshot([secondDay]).hides(overnightMovedToSecondDay))
 assert(!snapshot([]).hides(event))
 assert(!snapshot([], account: "").hides(event))
 assert(!snapshot([day], account: "").isValid)
@@ -70,7 +80,7 @@ try FileManager.default.removeItem(at: url)
 try FileManager.default.createSymbolicLink(at: url, withDestinationURL: target)
 assert(SharedCalendarDismissals.read(at: url) == nil)
 do { try hidden.write(at: url); assertionFailure("Must refuse symlink") } catch {}
-print("21 shared policy and temporary-file checks passed")
+print("24 shared policy and temporary-file checks passed")
 '''
 with tempfile.TemporaryDirectory(prefix='calendar-dismissal-policy-') as temporary:
     directory = Path(temporary)

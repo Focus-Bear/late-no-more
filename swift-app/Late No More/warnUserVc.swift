@@ -8,6 +8,7 @@
 import Cocoa
 
 class warnUserVc: NSViewController {
+    var calendarDismissalIdentity: SharedCalendarDismissals.Identity?
 
     @IBOutlet weak var btnGotIt: Button!
     @IBOutlet weak var lblSubTitle: NSTextField!

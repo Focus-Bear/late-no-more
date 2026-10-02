@@ -36,6 +36,8 @@ class customAlertVc: NSViewController {
     var timerVerbalAlerts:Timer?
     var parseInfo: MeetingLinkInfo?
     var eventId:String = ""
+    var calendarDismissalIdentity: SharedCalendarDismissals.Identity?
+    private var verbalAlertGeneration = 0
     var remainingSeconds = 120
     var verbalAlertsStartTime: Date?
     private let maxVerbalAlertsDurationSeconds: TimeInterval = 300 // 5 minutes max for verbal alerts
@@ -191,8 +193,13 @@ class customAlertVc: NSViewController {
         }
         
         let voice = arrVoiceNames[usingValue]
-        DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.1) {
-            
+        let generation = verbalAlertGeneration
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            guard let self = self, self.verbalAlertGeneration == generation, self.view.window?.isVisible == true else { return }
+            if let identity = self.calendarDismissalIdentity, SharedCalendarDismissals.read()?.hides(identity) == true {
+                self.silenceForCalendarDismissal()
+                return
+            }
             textToSpeechObject.speak(arrBarkPools.randomElement() ?? "",
                       voice: voice,
                            rate: speakingRateValue,//0.4
@@ -201,7 +208,15 @@ class customAlertVc: NSViewController {
         }
     }
     
+    func silenceForCalendarDismissal() {
+        timerCheckMeeting?.invalidate()
+        timerCheckMeeting = nil
+        stopVerbalAlerts()
+        view.window?.close()
+    }
+
     private func stopVerbalAlerts() {
+        verbalAlertGeneration += 1
         timerVerbalAlerts?.invalidate()
         timerVerbalAlerts = nil
         verbalAlertsStartTime = nil

@@ -21,7 +21,11 @@ class warnUserVc: NSViewController {
         btnGotIt.title = "Got it"
     }
     
-    func resetData(title:String, calendarName:String){
+    /// The meeting this heads-up is for, so a dismissal from another device can close it.
+    private(set) var meeting: MeetingIdentity?
+
+    func resetData(title:String, calendarName:String, startDate:Date){
+        meeting = MeetingIdentity(title: title, startDate: startDate)
         lblTitle.stringValue = "Late No More: \(title) (\(calendarName)) is starting in 15 minutes."
         lblSubTitle.stringValue = "I'll remind you again 2 minutes before."
     }

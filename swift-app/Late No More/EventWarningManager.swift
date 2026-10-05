@@ -159,8 +159,12 @@ class EventWarningManager {
                 warningLock.unlock()
                 
                 let timeUntilEvent = startDateTime.timeIntervalSince(currentDate)
+                // Dealt with already, here or on another device (Focus Bear relays those): no more
+                // warnings, no speech, and no Focus Bear trigger for it.
+                // Not logged: this runs every few seconds per event, and the debug log already grows too fast.
+                let isDismissed = MeetingDismissalRegistry.shared.isDismissed(MeetingIdentity(title: eventTitle, startDate: startDateTime))
                 
-                for warningTime in WarningTime.allCases {
+                for warningTime in WarningTime.allCases where !isDismissed {
                     let warningInterval = warningTime.timeInterval
                     let timeDifference = timeUntilEvent - warningInterval
                     
@@ -212,7 +216,7 @@ class EventWarningManager {
             switch warningTime {
             case .fifteenMinutes:
                 message = "Event '\(event.title ?? "")' starts in 15 minutes"
-                Late_No_More.showWarnWindow(title: event.title, calendarName: event.calendar.title, dismissalIdentity: identity)
+                Late_No_More.showWarnWindow(title: event.title, calendarName: event.calendar.title, startDate: event.startDate, dismissalIdentity: identity)
                 addLog(text: "Event '\(event.title ?? "")' starts in 15 minutes")
             case .twoMinutes:
                 var eventUrl:URL?

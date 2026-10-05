@@ -38,6 +38,10 @@ class customAlertVc: NSViewController {
     var eventId:String = ""
     var calendarDismissalIdentity: SharedCalendarDismissals.Identity?
     private var verbalAlertGeneration = 0
+    /// The meeting this alert is for, as the other devices know it (title + start time).
+    private(set) var meeting: MeetingIdentity?
+    /// One report per alert: joining and "I don't need to attend" can both happen on the same one.
+    private var didReportAcknowledgement = false
     var remainingSeconds = 120
     var verbalAlertsStartTime: Date?
     private let maxVerbalAlertsDurationSeconds: TimeInterval = 300 // 5 minutes max for verbal alerts
@@ -77,6 +81,8 @@ class customAlertVc: NSViewController {
         nagShowTime = Date()
         linkUrl = nil
         self.eventId = eventId
+        meeting = MeetingIdentity(title: title, startDate: time)
+        didReportAcknowledgement = false
         
         
         if let url = url{
@@ -200,6 +206,10 @@ class customAlertVc: NSViewController {
                 self.silenceForCalendarDismissal()
                 return
             }
+            if let meeting = self.meeting, MeetingDismissalRegistry.shared.isDismissed(meeting) {
+                self.closeWithoutReporting()
+                return
+            }
             textToSpeechObject.speak(arrBarkPools.randomElement() ?? "",
                       voice: voice,
                            rate: speakingRateValue,//0.4
@@ -245,6 +255,7 @@ class customAlertVc: NSViewController {
         }
         joinMeetingClicked = true
         stopVerbalAlerts()
+        reportAcknowledgement(reason: .joinedOnMac)
     }
     
     @IBAction func btnAttendClicked(_ sender: Any) {
@@ -257,14 +268,21 @@ class customAlertVc: NSViewController {
 
     
     @IBAction func btnIDontNeedToAttendClicked(_ sender: Any) {
-        for i in 0..<arrAlertWcObj.count{
-            let wc = arrAlertWcObj[i]
-            if wc.window == self.view.window{
-                arrAlertWcObj.remove(at: i)
-                break;
-            }
-        }
-        self.view.window?.close()
+        reportAcknowledgement(reason: .stopReminders)
+        closeWithoutReporting()
+    }
+
+    /// Close this alert without telling Focus Bear: used when the meeting was dismissed on another
+    /// device, which already reported it.
+    func closeWithoutReporting() {
+        arrAlertWcObj.removeAll { $0.window == self.view.window }
+        silenceForCalendarDismissal()
+    }
+
+    private func reportAcknowledgement(reason: MeetingDismissReason) {
+        guard !didReportAcknowledgement, let meeting = meeting else { return }
+        didReportAcknowledgement = true
+        FocusBearDismissalBridgeClient.reportAcknowledgement(of: meeting, reason: reason)
     }
 }
 

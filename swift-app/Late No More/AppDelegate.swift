@@ -134,8 +134,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.terminate(self)
     }
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Insert code here to initialize your application
-        
+        FocusBearDismissalBridgeClient.startObservingDismissalsElsewhere()
     }
     var isShouldTerminate = false
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {

@@ -88,13 +88,13 @@ func showtMeetingNotesWindow(intention: String, eventName: String){
     getMeetingNotesVcObject().resetData(intention: intention, eventName: eventName)
 }
 
-func showWarnWindow(title: String, calendarName: String, dismissalIdentity: SharedCalendarDismissals.Identity? = nil){
+func showWarnWindow(title: String, calendarName: String, startDate: Date, dismissalIdentity: SharedCalendarDismissals.Identity? = nil){
     addLog(text: "showWarnWindow")
     getCustomWcObject().contentViewController = getWarnUserVcObject()
     getCustomWcObject().window?.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(CGWindowLevelKey.modalPanelWindow)))
     getCustomWcObject().showWindow(nil)
     getCustomWcObject().window?.center()
-    getWarnUserVcObject().resetData(title: title, calendarName: calendarName)
+    getWarnUserVcObject().resetData(title: title, calendarName: calendarName, startDate: startDate)
     getWarnUserVcObject().calendarDismissalIdentity = dismissalIdentity
 }
 

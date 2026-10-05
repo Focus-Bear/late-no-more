@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1308FC622E0283D700089FCC /* warnUserVc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1308FC612E0283D700089FCC /* warnUserVc.swift */; };
+		A1D15E5A2F00000100000002 /* MeetingDismissalSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1D15E5A2F00000100000001 /* MeetingDismissalSync.swift */; };
 		1308FC642E0284D100089FCC /* customWc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1308FC632E0284D100089FCC /* customWc.swift */; };
 		1308FC662E029C9800089FCC /* EventWarningManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1308FC652E029C9800089FCC /* EventWarningManager.swift */; };
 		1308FC682E02F3FE00089FCC /* meetingNotesVc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1308FC672E02F3FE00089FCC /* meetingNotesVc.swift */; };
@@ -66,6 +67,7 @@
 
 /* Begin PBXFileReference section */
 		1308FC612E0283D700089FCC /* warnUserVc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = warnUserVc.swift; sourceTree = "<group>"; };
+		A1D15E5A2F00000100000001 /* MeetingDismissalSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingDismissalSync.swift; sourceTree = "<group>"; };
 		1308FC632E0284D100089FCC /* customWc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = customWc.swift; sourceTree = "<group>"; };
 		1308FC652E029C9800089FCC /* EventWarningManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventWarningManager.swift; sourceTree = "<group>"; };
 		1308FC672E02F3FE00089FCC /* meetingNotesVc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = meetingNotesVc.swift; sourceTree = "<group>"; };
@@ -174,6 +176,7 @@
 				135ABF062E019FF9007ED73A /* customAlertVc.swift */,
 				1308FC672E02F3FE00089FCC /* meetingNotesVc.swift */,
 				1308FC612E0283D700089FCC /* warnUserVc.swift */,
+				A1D15E5A2F00000100000001 /* MeetingDismissalSync.swift */,
 				1308FC632E0284D100089FCC /* customWc.swift */,
 				137EADC92E03F761000EB914 /* TextToSpeech.swift */,
 				8FC5CC802A497A95000A0AF7 /* addLoginitem */,
@@ -298,6 +301,7 @@
 				1308FC662E029C9800089FCC /* EventWarningManager.swift in Sources */,
 				137EADCA2E03F761000EB914 /* TextToSpeech.swift in Sources */,
 				1308FC622E0283D700089FCC /* warnUserVc.swift in Sources */,
+				A1D15E5A2F00000100000002 /* MeetingDismissalSync.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

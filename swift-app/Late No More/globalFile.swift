@@ -167,11 +167,14 @@ func getStringFromDate(date:Date, dateFormat:String)->String{
 var DebugLogsURL:URL!
 
 class Log: TextOutputStream {
-    
+    /// The calendar check logs every upcoming event every few seconds; uncapped, the file reached 3.4 GB.
+    static let MAX_LOG_BYTES: UInt64 = 20 * 1024 * 1024
+    /// One older file is kept beside the live one, so a report still has the stretch before a rotation.
+    static let ROTATED_LOG_EXTENSION = "previous"
+
     func write(_ string: String) {
-        //        let fm = FileManager.default
-        
-        if let log = DebugLogsURL{//fm.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("Debug_Logs.txt")
+        if let log = DebugLogsURL {
+            rotateIfOversized(log)
             if let handle = try? FileHandle(forWritingTo: log) {
                 handle.seekToEndOfFile()
                 handle.write(string.data(using: .utf8)!)
@@ -181,6 +184,16 @@ class Log: TextOutputStream {
             }
         }
     }
+
+    private func rotateIfOversized(_ log: URL) {
+        let manager = FileManager.default
+        guard let size = (try? manager.attributesOfItem(atPath: log.path))?[.size] as? UInt64,
+              size >= Self.MAX_LOG_BYTES else { return }
+        let previous = log.appendingPathExtension(Self.ROTATED_LOG_EXTENSION)
+        try? manager.removeItem(at: previous)
+        try? manager.moveItem(at: log, to: previous)
+    }
+
     static var log: Log = Log()
     private init() {} // we are sure, nobody else could create it
 }

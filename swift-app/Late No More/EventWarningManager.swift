@@ -17,6 +17,8 @@ class EventWarningManager {
     private var pickerStartTimeDateValue: Date!
     private var pickerEndTimeDateValue: Date!
     var timeInterval = 10
+    /// When the previous check ran, so a warning whose moment fell between two checks is still shown.
+    private var lastCheckDate: Date?
     // MARK: - Warning Times
     private enum WarningTime: String, CaseIterable {
         case fifteenMinutes = "15 minutes"
@@ -34,6 +36,16 @@ class EventWarningManager {
 //            case .oneMinute: return 60
 //            case .thirtySeconds: return 30
             case .eventTime: return 0
+            }
+        }
+
+        /// How late this warning may still be shown: until the next warning's moment (the start, for
+        /// the two-minute one), and a minute for the start itself, when past events are cleaned up.
+        var maximumLateness: TimeInterval {
+            switch self {
+            case .fifteenMinutes: return WarningTime.fifteenMinutes.timeInterval - WarningTime.twoMinutes.timeInterval
+            case .twoMinutes: return WarningTime.twoMinutes.timeInterval
+            case .eventTime: return WarningTiming.pastEventCleanupSeconds
             }
         }
     }
@@ -93,6 +105,8 @@ class EventWarningManager {
         
         let events = calendarManager.fetchEvents(from: startDateTime, to: endDateTime, in: calendarsToCheck)
         let currentDate = Date()
+        let secondsSinceLastCheck = lastCheckDate.map { currentDate.timeIntervalSince($0) }
+        defer { lastCheckDate = currentDate }
         
         for event in events where !event.isAllDay {
             if let startDateTime = event.startDate{
@@ -112,11 +126,10 @@ class EventWarningManager {
                 let timeUntilEvent = startDateTime.timeIntervalSince(currentDate)
                 
                 for warningTime in WarningTime.allCases {
-                    let warningInterval = warningTime.timeInterval
-                    let timeDifference = timeUntilEvent - warningInterval
-                    
-                    // Check if we're within ±15 seconds of the warning time
-                    if (0...timeInterval).contains(Int(abs(timeDifference))) {
+                    if WarningTiming.isDue(timeUntilEvent: timeUntilEvent, warningInterval: warningTime.timeInterval,
+                                           secondsSinceLastCheck: secondsSinceLastCheck,
+                                           tolerance: TimeInterval(timeInterval),
+                                           maximumLateness: warningTime.maximumLateness) {
                         // Only show if we haven't shown this warning before
                         if !shownTimes.contains(warningTime) {
                             showWarnWindow(for: warningTime, event: event)
@@ -126,7 +139,7 @@ class EventWarningManager {
                     }
                 }
                 // Cleanup past events
-                if timeUntilEvent < -60 {
+                if timeUntilEvent < -WarningTiming.pastEventCleanupSeconds {
                     shownWarnings.removeValue(forKey: eventId)
                 }
             }
@@ -253,3 +266,26 @@ class EventWarningManager {
 //    }
 //    return nil
 //}
+
+// MARK: - WarningTiming
+
+/// When a warning is due. It used to be due only when a check landed within `tolerance` of its exact
+/// moment, so a check that ran late skipped it for good. On 21 Oct 2026 one 10-second check started at
+/// 12:42:47 and stalled until 12:44:37 on a busy Mac; the 12:45 meeting's two-minute window
+/// (12:42:50-12:43:10) fell inside the stall, so neither the alert nor Focus Bear's
+/// event-about-to-start trigger was sent. A warning whose moment passed since the previous check is now
+/// shown late, up to `maximumLateness`. The first check after launch still shows only on-time
+/// warnings, so opening the app doesn't replay a meeting's earlier warnings.
+enum WarningTiming {
+    /// A started event's warnings are forgotten this long after its start.
+    static let pastEventCleanupSeconds: TimeInterval = 60
+
+    static func isDue(timeUntilEvent: TimeInterval, warningInterval: TimeInterval, secondsSinceLastCheck: TimeInterval?,
+                      tolerance: TimeInterval, maximumLateness: TimeInterval) -> Bool {
+        let lateness = warningInterval - timeUntilEvent
+        guard lateness >= -tolerance else { return false }
+        if lateness <= tolerance { return true }
+        guard let secondsSinceLastCheck else { return false }
+        return lateness <= secondsSinceLastCheck + tolerance && lateness <= maximumLateness
+    }
+}

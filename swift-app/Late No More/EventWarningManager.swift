@@ -19,6 +19,8 @@ class EventWarningManager {
     private var pickerStartTimeDateValue: Date!
     private var pickerEndTimeDateValue: Date!
     var timeInterval = 10
+    /// When the previous check ran, so a warning whose moment fell between two checks is still shown.
+    private var lastCheckDate: Date?
     // MARK: - Warning Times
     private enum WarningTime: String, CaseIterable {
         case fifteenMinutes = "15 minutes"
@@ -36,6 +38,16 @@ class EventWarningManager {
 //            case .oneMinute: return 60
 //            case .thirtySeconds: return 30
             case .eventTime: return 0
+            }
+        }
+
+        /// How late this warning may still be shown: until the next warning's moment (the start, for
+        /// the two-minute one), and a minute for the start itself, when past events are cleaned up.
+        var maximumLateness: TimeInterval {
+            switch self {
+            case .fifteenMinutes: return WarningTime.fifteenMinutes.timeInterval - WarningTime.twoMinutes.timeInterval
+            case .twoMinutes: return WarningTime.twoMinutes.timeInterval
+            case .eventTime: return WarningTiming.pastEventCleanupSeconds
             }
         }
     }
@@ -138,6 +150,8 @@ class EventWarningManager {
         let currentDate = Date()
         let dismissals = SharedCalendarDismissals.read()
         DispatchQueue.main.async { self.closeHiddenAlerts() }
+        let secondsSinceLastCheck = lastCheckDate.map { currentDate.timeIntervalSince($0) }
+        defer { lastCheckDate = currentDate }
         
         for event in events where !event.isAllDay {
             if let identity = dismissalIdentity(event), dismissals?.hides(identity) == true { continue }
@@ -161,11 +175,10 @@ class EventWarningManager {
                 let timeUntilEvent = startDateTime.timeIntervalSince(currentDate)
                 
                 for warningTime in WarningTime.allCases {
-                    let warningInterval = warningTime.timeInterval
-                    let timeDifference = timeUntilEvent - warningInterval
-                    
-                    // Check if we're within ±15 seconds of the warning time
-                    if (0...timeInterval).contains(Int(abs(timeDifference))) {
+                    if WarningTiming.isDue(timeUntilEvent: timeUntilEvent, warningInterval: warningTime.timeInterval,
+                                           secondsSinceLastCheck: secondsSinceLastCheck,
+                                           tolerance: TimeInterval(timeInterval),
+                                           maximumLateness: warningTime.maximumLateness) {
                         // Only show if we haven't shown this warning before
                         if !shownTimes.contains(warningTime) {
                             showWarnWindow(for: warningTime, event: event)
@@ -177,7 +190,7 @@ class EventWarningManager {
                     }
                 }
                 // Cleanup past events
-                if timeUntilEvent < -60 {
+                if timeUntilEvent < -WarningTiming.pastEventCleanupSeconds {
                     warningLock.lock()
                     shownWarnings.removeValue(forKey: eventId)
                     warningIdentities.removeValue(forKey: eventId)
@@ -255,20 +268,9 @@ class EventWarningManager {
                 Late_No_More.showtCustomAlertWindow(title: event.title, time: event.startDate, url: eventUrl,notes: event.notes ?? "", eventId:eventId, dismissalIdentity: identity)
                 
                 
-                let formatter = ISO8601DateFormatter()
-                let isoStartDateString = formatter.string(from:event.startDate)
-                let isoEndDateString = formatter.string(from:event.endDate)
-                let eventTitle = event.title ?? ""
-                let allowedCharacters = CharacterSet.urlQueryAllowed
-                let encodedTitle = eventTitle.addingPercentEncoding(withAllowedCharacters: allowedCharacters) ?? ""
-                let encodedStart = isoStartDateString.addingPercentEncoding(withAllowedCharacters: allowedCharacters) ?? ""
-                let encodedEnd = isoEndDateString.addingPercentEncoding(withAllowedCharacters: allowedCharacters) ?? ""
-                
-                let focusBearAboutToStartUrl = "focusbear://event-about-to-start?event_title=\(encodedTitle)&event_start_time=\(encodedStart)&event_end_time=\(encodedEnd)"
-                
-                addLog(text: "Triggering FB event-about-to-start: \(focusBearAboutToStartUrl)")
-                if let url = URL(string: focusBearAboutToStartUrl) {
-                    NSWorkspace.shared.open(url)
+                if let url = FocusBearTrigger.eventAboutToStartURL(title: event.title ?? "", start: event.startDate, end: event.endDate) {
+                    addLog(text: "Triggering FB event-about-to-start: \(url.absoluteString)")
+                    FocusBearTrigger.send(url)
                 }
             case .eventTime:
                 message = "Event '\(event.title ?? "")' is starting now"
@@ -279,6 +281,10 @@ class EventWarningManager {
                         if let customAlertVcObj = wcObj.contentViewController as? customAlertVc{
                             if customAlertVcObj.eventId == eventId{
                                 customAlertVcObj.meetingTimeShowVerbalAlerts()
+                                // Something may have covered the alert since it appeared; the meeting is starting.
+                                if let window = wcObj.window {
+                                    AlertWindowPresentation.bringToFront(window)
+                                }
                                 break;
                             }
                         }
@@ -462,3 +468,86 @@ struct SharedCalendarDismissals: Codable {
     }
 }
 // END SHARED CALENDAR DISMISSAL CONTRACT
+
+// MARK: - WarningTiming
+
+/// When a warning is due. It used to be due only when a check landed within `tolerance` of its exact
+/// moment, so a check that ran late skipped it for good. On 21 Oct 2026 one 10-second check started at
+/// 12:42:47 and stalled until 12:44:37 on a busy Mac; the 12:45 meeting's two-minute window
+/// (12:42:50-12:43:10) fell inside the stall, so neither the alert nor Focus Bear's
+/// event-about-to-start trigger was sent. A warning whose moment passed since the previous check is now
+/// shown late, up to `maximumLateness`. The first check after launch still shows only on-time
+/// warnings, so opening the app doesn't replay a meeting's earlier warnings.
+enum WarningTiming {
+    /// A started event's warnings are forgotten this long after its start.
+    static let pastEventCleanupSeconds: TimeInterval = 60
+
+    static func isDue(timeUntilEvent: TimeInterval, warningInterval: TimeInterval, secondsSinceLastCheck: TimeInterval?,
+                      tolerance: TimeInterval, maximumLateness: TimeInterval) -> Bool {
+        let lateness = warningInterval - timeUntilEvent
+        guard lateness >= -tolerance else { return false }
+        if lateness <= tolerance { return true }
+        guard let secondsSinceLastCheck else { return false }
+        return lateness <= secondsSinceLastCheck + tolerance && lateness <= maximumLateness
+    }
+}
+
+// MARK: - FocusBearTrigger
+
+/// Tells Focus Bear a meeting is about to start, alongside the two-minute alert.
+enum FocusBearTrigger {
+    static let eventAboutToStartBase = "focusbear://event-about-to-start"
+
+    static func eventAboutToStartURL(title: String, start: Date, end: Date) -> URL? {
+        let formatter = ISO8601DateFormatter()
+        let allowedCharacters = CharacterSet.urlQueryAllowed
+        let encode = { (value: String) in value.addingPercentEncoding(withAllowedCharacters: allowedCharacters) ?? "" }
+        let query = "event_title=\(encode(title))&event_start_time=\(encode(formatter.string(from: start)))"
+            + "&event_end_time=\(encode(formatter.string(from: end)))"
+        return URL(string: "\(eventAboutToStartBase)?\(query)")
+    }
+
+    /// Opening the link used to make Focus Bear the active app, the moment the two-minute alert went up.
+    /// Since macOS 14 an inactive app's window only goes in front "conditionally", so the alert could end up
+    /// beneath Focus Bear's and then the user's windows. Focus Bear only needs the link, not the focus.
+    static var openConfiguration: NSWorkspace.OpenConfiguration {
+        let configuration = NSWorkspace.OpenConfiguration()
+        configuration.activates = false
+        return configuration
+    }
+
+    static func send(_ url: URL) {
+        NSWorkspace.shared.open(url, configuration: openConfiguration) { _, error in
+            if let error {
+                addLog(text: "Triggering FB event-about-to-start failed: \(error.localizedDescription)")
+            }
+        }
+    }
+}
+
+// MARK: - AlertWindowPresentation
+
+/// How the meeting alerts go on screen. Late No More is never the active app when an alert fires, and
+/// since macOS 14 `showWindow` from an inactive app only orders the window front "conditionally": it may go
+/// beneath the active app's windows. On 21 Oct 2026 the 4:45 pm meeting's two-minute alert was ordered
+/// front at 16:42:58 (macOS log: "ordered front from a non-active application and may order beneath the
+/// active application's windows") and the user first saw it at 16:45, when the 15-minute alert for the next
+/// meeting was closed on top of it. `orderFrontRegardless` puts the alert in front whichever app is active,
+/// and the collection behaviour keeps it on the Space the user is on, also over a full-screen app.
+enum AlertWindowPresentation {
+    static let level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(CGWindowLevelKey.modalPanelWindow)))
+    static let collectionBehavior: NSWindow.CollectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+
+    static func present(_ windowController: NSWindowController) {
+        guard let window = windowController.window else { return }
+        window.level = level
+        window.collectionBehavior.formUnion(collectionBehavior)
+        windowController.showWindow(nil)
+        window.center()
+        bringToFront(window)
+    }
+
+    static func bringToFront(_ window: NSWindow) {
+        window.orderFrontRegardless()
+    }
+}

@@ -91,9 +91,7 @@ func showtMeetingNotesWindow(intention: String, eventName: String){
 func showWarnWindow(title: String, calendarName: String, dismissalIdentity: SharedCalendarDismissals.Identity? = nil){
     addLog(text: "showWarnWindow")
     getCustomWcObject().contentViewController = getWarnUserVcObject()
-    getCustomWcObject().window?.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(CGWindowLevelKey.modalPanelWindow)))
-    getCustomWcObject().showWindow(nil)
-    getCustomWcObject().window?.center()
+    AlertWindowPresentation.present(getCustomWcObject())
     getWarnUserVcObject().resetData(title: title, calendarName: calendarName)
     getWarnUserVcObject().calendarDismissalIdentity = dismissalIdentity
 }
@@ -104,9 +102,7 @@ func showtCustomAlertWindow(title: String, time: Date, url: URL?, notes:String, 
     let customAlertVcObj = getCustomAlertVcObject()
     
     alertWcObj.contentViewController = customAlertVcObj
-    alertWcObj.window?.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(CGWindowLevelKey.modalPanelWindow)))
-    alertWcObj.showWindow(nil)
-    alertWcObj.window?.center()
+    AlertWindowPresentation.present(alertWcObj)
     customAlertVcObj.resetData(title: title, time: time, url: url, notes:notes, eventId: eventId)
     customAlertVcObj.calendarDismissalIdentity = dismissalIdentity
     arrAlertWcObj.append(alertWcObj)

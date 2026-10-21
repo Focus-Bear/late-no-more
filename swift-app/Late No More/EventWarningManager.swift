@@ -212,20 +212,9 @@ class EventWarningManager {
                 Late_No_More.showtCustomAlertWindow(title: event.title, time: event.startDate, url: eventUrl,notes: event.notes ?? "", eventId:eventId)
                 
                 
-                let formatter = ISO8601DateFormatter()
-                let isoStartDateString = formatter.string(from:event.startDate)
-                let isoEndDateString = formatter.string(from:event.endDate)
-                let eventTitle = event.title ?? ""
-                let allowedCharacters = CharacterSet.urlQueryAllowed
-                let encodedTitle = eventTitle.addingPercentEncoding(withAllowedCharacters: allowedCharacters) ?? ""
-                let encodedStart = isoStartDateString.addingPercentEncoding(withAllowedCharacters: allowedCharacters) ?? ""
-                let encodedEnd = isoEndDateString.addingPercentEncoding(withAllowedCharacters: allowedCharacters) ?? ""
-                
-                let focusBearAboutToStartUrl = "focusbear://event-about-to-start?event_title=\(encodedTitle)&event_start_time=\(encodedStart)&event_end_time=\(encodedEnd)"
-                
-                addLog(text: "Triggering FB event-about-to-start: \(focusBearAboutToStartUrl)")
-                if let url = URL(string: focusBearAboutToStartUrl) {
-                    NSWorkspace.shared.open(url)
+                if let url = FocusBearTrigger.eventAboutToStartURL(title: event.title ?? "", start: event.startDate, end: event.endDate) {
+                    addLog(text: "Triggering FB event-about-to-start: \(url.absoluteString)")
+                    FocusBearTrigger.send(url)
                 }
             case .eventTime:
                 message = "Event '\(event.title ?? "")' is starting now"
@@ -236,6 +225,10 @@ class EventWarningManager {
                         if let customAlertVcObj = wcObj.contentViewController as? customAlertVc{
                             if customAlertVcObj.eventId == eventId{
                                 customAlertVcObj.meetingTimeShowVerbalAlerts()
+                                // Something may have covered the alert since it appeared; the meeting is starting.
+                                if let window = wcObj.window {
+                                    AlertWindowPresentation.bringToFront(window)
+                                }
                                 break;
                             }
                         }
@@ -287,5 +280,65 @@ enum WarningTiming {
         if lateness <= tolerance { return true }
         guard let secondsSinceLastCheck else { return false }
         return lateness <= secondsSinceLastCheck + tolerance && lateness <= maximumLateness
+    }
+}
+
+// MARK: - FocusBearTrigger
+
+/// Tells Focus Bear a meeting is about to start, alongside the two-minute alert.
+enum FocusBearTrigger {
+    static let eventAboutToStartBase = "focusbear://event-about-to-start"
+
+    static func eventAboutToStartURL(title: String, start: Date, end: Date) -> URL? {
+        let formatter = ISO8601DateFormatter()
+        let allowedCharacters = CharacterSet.urlQueryAllowed
+        let encode = { (value: String) in value.addingPercentEncoding(withAllowedCharacters: allowedCharacters) ?? "" }
+        let query = "event_title=\(encode(title))&event_start_time=\(encode(formatter.string(from: start)))"
+            + "&event_end_time=\(encode(formatter.string(from: end)))"
+        return URL(string: "\(eventAboutToStartBase)?\(query)")
+    }
+
+    /// Opening the link used to make Focus Bear the active app, the moment the two-minute alert went up.
+    /// Since macOS 14 an inactive app's window only goes in front "conditionally", so the alert could end up
+    /// beneath Focus Bear's and then the user's windows. Focus Bear only needs the link, not the focus.
+    static var openConfiguration: NSWorkspace.OpenConfiguration {
+        let configuration = NSWorkspace.OpenConfiguration()
+        configuration.activates = false
+        return configuration
+    }
+
+    static func send(_ url: URL) {
+        NSWorkspace.shared.open(url, configuration: openConfiguration) { _, error in
+            if let error {
+                addLog(text: "Triggering FB event-about-to-start failed: \(error.localizedDescription)")
+            }
+        }
+    }
+}
+
+// MARK: - AlertWindowPresentation
+
+/// How the meeting alerts go on screen. Late No More is never the active app when an alert fires, and
+/// since macOS 14 `showWindow` from an inactive app only orders the window front "conditionally": it may go
+/// beneath the active app's windows. On 21 Oct 2026 the 4:45 pm meeting's two-minute alert was ordered
+/// front at 16:42:58 (macOS log: "ordered front from a non-active application and may order beneath the
+/// active application's windows") and the user first saw it at 16:45, when the 15-minute alert for the next
+/// meeting was closed on top of it. `orderFrontRegardless` puts the alert in front whichever app is active,
+/// and the collection behaviour keeps it on the Space the user is on, also over a full-screen app.
+enum AlertWindowPresentation {
+    static let level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(CGWindowLevelKey.modalPanelWindow)))
+    static let collectionBehavior: NSWindow.CollectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+
+    static func present(_ windowController: NSWindowController) {
+        guard let window = windowController.window else { return }
+        window.level = level
+        window.collectionBehavior.formUnion(collectionBehavior)
+        windowController.showWindow(nil)
+        window.center()
+        bringToFront(window)
+    }
+
+    static func bringToFront(_ window: NSWindow) {
+        window.orderFrontRegardless()
     }
 }

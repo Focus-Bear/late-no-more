@@ -226,7 +226,7 @@ class customAlertVc: NSViewController {
     
     @IBAction func btnLinkClicked(_ sender: Any) {
         if let url = linkUrl{
-            NSWorkspace.shared.open(url)
+            MeetingLinkOpener.open(url)
         }
         joinMeetingClicked = true
         stopVerbalAlerts()

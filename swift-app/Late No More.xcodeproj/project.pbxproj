@@ -12,6 +12,8 @@
 		1308FC662E029C9800089FCC /* EventWarningManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1308FC652E029C9800089FCC /* EventWarningManager.swift */; };
 		1308FC682E02F3FE00089FCC /* meetingNotesVc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1308FC672E02F3FE00089FCC /* meetingNotesVc.swift */; };
 		135ABF052E01899C007ED73A /* CalendarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135ABF042E01899C007ED73A /* CalendarManager.swift */; };
+		A1B2C3D4E5F6071829304A03 /* MeetingLinkOpener.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6071829304A04 /* MeetingLinkOpener.swift */; };
+		A1B2C3D4E5F6071829304A01 /* MeetingLinkRouting.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6071829304A02 /* MeetingLinkRouting.swift */; };
 		135ABF072E019FF9007ED73A /* customAlertVc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135ABF062E019FF9007ED73A /* customAlertVc.swift */; };
 		137EADCA2E03F761000EB914 /* TextToSpeech.swift in Sources */ = {isa = PBXBuildFile; fileRef = 137EADC92E03F761000EB914 /* TextToSpeech.swift */; };
 		8F26B3EF298E9F87007CD1CA /* NSEventModifierFlags+HotKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F26B3EA298E9F87007CD1CA /* NSEventModifierFlags+HotKey.swift */; };
@@ -70,6 +72,8 @@
 		1308FC652E029C9800089FCC /* EventWarningManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventWarningManager.swift; sourceTree = "<group>"; };
 		1308FC672E02F3FE00089FCC /* meetingNotesVc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = meetingNotesVc.swift; sourceTree = "<group>"; };
 		135ABF042E01899C007ED73A /* CalendarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarManager.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6071829304A04 /* MeetingLinkOpener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingLinkOpener.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6071829304A02 /* MeetingLinkRouting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingLinkRouting.swift; sourceTree = "<group>"; };
 		135ABF062E019FF9007ED73A /* customAlertVc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = customAlertVc.swift; sourceTree = "<group>"; };
 		137EADC92E03F761000EB914 /* TextToSpeech.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextToSpeech.swift; sourceTree = "<group>"; };
 		8F26B3EA298E9F87007CD1CA /* NSEventModifierFlags+HotKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSEventModifierFlags+HotKey.swift"; sourceTree = "<group>"; };
@@ -161,6 +165,8 @@
 				8F7969A429518A8000188F5D /* ViewController.swift */,
 				1308FC652E029C9800089FCC /* EventWarningManager.swift */,
 				135ABF042E01899C007ED73A /* CalendarManager.swift */,
+				A1B2C3D4E5F6071829304A04 /* MeetingLinkOpener.swift */,
+				A1B2C3D4E5F6071829304A02 /* MeetingLinkRouting.swift */,
 				8F71395329F64CF80070C44D /* voiceOptionsVc.swift */,
 				8F71395529F690770070C44D /* advancedSettingsVc.swift */,
 				8F71395729F6991A0070C44D /* barkPoolVc.swift */,
@@ -275,6 +281,8 @@
 				8F71395429F64CF80070C44D /* voiceOptionsVc.swift in Sources */,
 				8F71395E29F6AE410070C44D /* textStagesVc.swift in Sources */,
 				135ABF052E01899C007ED73A /* CalendarManager.swift in Sources */,
+				A1B2C3D4E5F6071829304A03 /* MeetingLinkOpener.swift in Sources */,
+				A1B2C3D4E5F6071829304A01 /* MeetingLinkRouting.swift in Sources */,
 				8F7969B42951EEF000188F5D /* globalFile.swift in Sources */,
 				8F71395629F690770070C44D /* advancedSettingsVc.swift in Sources */,
 				8F71396029F6AE610070C44D /* intentionPromptsVc.swift in Sources */,

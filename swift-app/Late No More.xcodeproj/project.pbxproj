@@ -10,6 +10,7 @@
 		1308FC622E0283D700089FCC /* warnUserVc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1308FC612E0283D700089FCC /* warnUserVc.swift */; };
 		1308FC642E0284D100089FCC /* customWc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1308FC632E0284D100089FCC /* customWc.swift */; };
 		1308FC662E029C9800089FCC /* EventWarningManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1308FC652E029C9800089FCC /* EventWarningManager.swift */; };
+		5E1A0C2F7B3D4E6A8C9B0D11 /* LogFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1A0C2F7B3D4E6A8C9B0D12 /* LogFile.swift */; };
 		1308FC682E02F3FE00089FCC /* meetingNotesVc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1308FC672E02F3FE00089FCC /* meetingNotesVc.swift */; };
 		135ABF052E01899C007ED73A /* CalendarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135ABF042E01899C007ED73A /* CalendarManager.swift */; };
 		135ABF072E019FF9007ED73A /* customAlertVc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135ABF062E019FF9007ED73A /* customAlertVc.swift */; };
@@ -68,6 +69,7 @@
 		1308FC612E0283D700089FCC /* warnUserVc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = warnUserVc.swift; sourceTree = "<group>"; };
 		1308FC632E0284D100089FCC /* customWc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = customWc.swift; sourceTree = "<group>"; };
 		1308FC652E029C9800089FCC /* EventWarningManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventWarningManager.swift; sourceTree = "<group>"; };
+		5E1A0C2F7B3D4E6A8C9B0D12 /* LogFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogFile.swift; sourceTree = "<group>"; };
 		1308FC672E02F3FE00089FCC /* meetingNotesVc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = meetingNotesVc.swift; sourceTree = "<group>"; };
 		135ABF042E01899C007ED73A /* CalendarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarManager.swift; sourceTree = "<group>"; };
 		135ABF062E019FF9007ED73A /* customAlertVc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = customAlertVc.swift; sourceTree = "<group>"; };
@@ -160,6 +162,7 @@
 				8F7969B12951EE5100188F5D /* mainWc.swift */,
 				8F7969A429518A8000188F5D /* ViewController.swift */,
 				1308FC652E029C9800089FCC /* EventWarningManager.swift */,
+				5E1A0C2F7B3D4E6A8C9B0D12 /* LogFile.swift */,
 				135ABF042E01899C007ED73A /* CalendarManager.swift */,
 				8F71395329F64CF80070C44D /* voiceOptionsVc.swift */,
 				8F71395529F690770070C44D /* advancedSettingsVc.swift */,
@@ -296,6 +299,7 @@
 				8F7969A329518A8000188F5D /* AppDelegate.swift in Sources */,
 				1308FC642E0284D100089FCC /* customWc.swift in Sources */,
 				1308FC662E029C9800089FCC /* EventWarningManager.swift in Sources */,
+				5E1A0C2F7B3D4E6A8C9B0D11 /* LogFile.swift in Sources */,
 				137EADCA2E03F761000EB914 /* TextToSpeech.swift in Sources */,
 				1308FC622E0283D700089FCC /* warnUserVc.swift in Sources */,
 			);

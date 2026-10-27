@@ -162,33 +162,11 @@ func getStringFromDate(date:Date, dateFormat:String)->String{
 
 var DebugLogsURL:URL!
 
-class Log: TextOutputStream {
-    
-    func write(_ string: String) {
-        //        let fm = FileManager.default
-        
-        if let log = DebugLogsURL{//fm.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("Debug_Logs.txt")
-            if let handle = try? FileHandle(forWritingTo: log) {
-                handle.seekToEndOfFile()
-                handle.write(string.data(using: .utf8)!)
-                handle.closeFile()
-            } else {
-                try? string.data(using: .utf8)?.write(to: log)
-            }
-        }
-    }
-    static var log: Log = Log()
-    private init() {} // we are sure, nobody else could create it
-}
+/// Created on first use; it reads `DebugLogsURL` on every write because the app sets it during launch.
+let debugLog = LogFile { DebugLogsURL }
 
-func addLog(text:String){
-    // if isDebugModeEnabled{
-    let df = DateFormatter()
-    df.dateFormat = "yyyy-MM-dd HH:mm:ss"
-    let now = df.string(from: Date())
-    
-    print(now , " - ", text, to: &Log.log)
-    //}
+func addLog(text: String) {
+    debugLog.append(text)
 }
 
 

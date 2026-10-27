@@ -10,51 +10,38 @@ import EventKit
 
 class EventWarningManager {
     // MARK: - Properties
+    private static let CHECK_QUEUE_LABEL = "com.focusbear.latenomore.calendar-check"
+    private static let TIMER_LEEWAY = DispatchTimeInterval.seconds(1)
+    private static let EVENT_DATE_FORMAT = "EEEE, d MMMM yyyy, h:mm a"
+
     private let calendarManager = CalendarManager()
-    private var timer: Timer?
-    private var shownWarnings: [String: Set<WarningTime>] = [:]
+    /// Every check, and all the state below, runs on this queue: EventKit fetches stay off the main
+    /// thread, and two checks never overlap. A user-initiated QoS keeps the check scheduled on a busy Mac.
+    private let checkQueue = DispatchQueue(label: CHECK_QUEUE_LABEL, qos: .userInitiated)
+    private var timer: DispatchSourceTimer?
+    private var shownWarnings: [String: Set<MeetingWarning>] = [:]
     private var arrCalendars: [[String: Any]] = []
     private var pickerStartTimeDateValue: Date!
     private var pickerEndTimeDateValue: Date!
     var timeInterval = 10
     /// When the previous check ran, so a warning whose moment fell between two checks is still shown.
     private var lastCheckDate: Date?
-    // MARK: - Warning Times
-    private enum WarningTime: String, CaseIterable {
-        case fifteenMinutes = "15 minutes"
-        case twoMinutes = "2 minutes"
-//        case oneAndHalfMinutes = "1.5 minutes"
-//        case oneMinute = "1 minute"
-//        case thirtySeconds = "30 seconds"
-        case eventTime = "event time"
-        
-        var timeInterval: TimeInterval {
-            switch self {
-            case .fifteenMinutes: return 900
-            case .twoMinutes: return 120
-//            case .oneAndHalfMinutes: return 90
-//            case .oneMinute: return 60
-//            case .thirtySeconds: return 30
-            case .eventTime: return 0
-            }
-        }
+    private var eventListLog = ChangedListFilter()
+    private let eventDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = EVENT_DATE_FORMAT
+        return formatter
+    }()
 
-        /// How late this warning may still be shown: until the next warning's moment (the start, for
-        /// the two-minute one), and a minute for the start itself, when past events are cleaned up.
-        var maximumLateness: TimeInterval {
-            switch self {
-            case .fifteenMinutes: return WarningTime.fifteenMinutes.timeInterval - WarningTime.twoMinutes.timeInterval
-            case .twoMinutes: return WarningTime.twoMinutes.timeInterval
-            case .eventTime: return WarningTiming.pastEventCleanupSeconds
-            }
-        }
-    }
-    
     // MARK: - Initialization
     func resetData(calendars: [[String: Any]], startTimePicker: NSDatePicker, endTimePicker: NSDatePicker) {
-        self.arrCalendars = calendars
-        self.pickerStartTimeDateValue = startTimePicker.dateValue
-        self.pickerEndTimeDateValue = endTimePicker.dateValue
+        let startTime = startTimePicker.dateValue
+        let endTime = endTimePicker.dateValue
+        checkQueue.async {
+            self.arrCalendars = calendars
+            self.pickerStartTimeDateValue = startTime
+            self.pickerEndTimeDateValue = endTime
+        }
     }
     
     // MARK: - Public Methods
@@ -65,31 +52,25 @@ class EventWarningManager {
     }
     
     func stopCheck() {
-        timer?.invalidate()
+        timer?.cancel()
         timer = nil
     }
     
     // MARK: - Private Methods
+    /// A dispatch timer, unlike the run-loop `Timer` it replaces, can be cancelled from any thread. That one
+    /// was invalidated from the main thread although it ran on a background run loop, so a restart could
+    /// leave the old timer checking alongside the new one.
     private func setupTimer() {
         addLog(text: "func:- setupTimer checkEvents")
-        // Run on background thread but add timer to main run loop
-        DispatchQueue.global().async { [weak self] in
-            guard let self = self else { return }
-            
-            self.timer = Timer.scheduledTimer(
-                timeInterval: TimeInterval(timeInterval),
-                target: self,
-                selector: #selector(self.checkEvents),
-                userInfo: nil,
-                repeats: true
-            )
-            
-            RunLoop.current.add(self.timer!, forMode: .common)
-            RunLoop.current.run()
-        }
+        let interval = DispatchTimeInterval.seconds(timeInterval)
+        let timer = DispatchSource.makeTimerSource(queue: checkQueue)
+        timer.schedule(deadline: .now() + interval, repeating: interval, leeway: Self.TIMER_LEEWAY)
+        timer.setEventHandler { [weak self] in self?.checkEvents() }
+        timer.resume()
+        self.timer = timer
     }
     
-    @objc private func checkEvents() {
+    private func checkEvents() {
         addLog(text: "func:- checkEvents")
         var calendarsToCheck = [EKCalendar]()
         for calendar in arrCalendars {
@@ -103,48 +84,54 @@ class EventWarningManager {
         let startDateTime = combineCurrentDateWithTime(from: pickerStartTimeDateValue)
         let endDateTime = combineCurrentDateWithTime(from: pickerEndTimeDateValue)
         
+        let fetchStart = Date()
         let events = calendarManager.fetchEvents(from: startDateTime, to: endDateTime, in: calendarsToCheck)
+            .filter { !$0.isAllDay && $0.startDate != nil }
         let currentDate = Date()
         let secondsSinceLastCheck = lastCheckDate.map { currentDate.timeIntervalSince($0) }
         defer { lastCheckDate = currentDate }
-        
-        for event in events where !event.isAllDay {
-            if let startDateTime = event.startDate{
-                
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "EEEE, d MMMM yyyy, h:mm a"
+        logIfLate(secondsSinceLastCheck: secondsSinceLastCheck, fetchSeconds: currentDate.timeIntervalSince(fetchStart))
+        logEventListIfChanged(events)
 
-                let date = startDateTime // your date object
-                let dateString = "Today, " + dateFormatter.string(from: date)
-                let eventTitle = event.title ?? ""
-                addLog(text: "event:- name: \(eventTitle), dateTime: \(dateString)")
-                
-                
-                let eventId = event.eventIdentifier ?? UUID().uuidString
-                var shownTimes = shownWarnings[eventId] ?? Set()
-                
-                let timeUntilEvent = startDateTime.timeIntervalSince(currentDate)
-                
-                for warningTime in WarningTime.allCases {
-                    if WarningTiming.isDue(timeUntilEvent: timeUntilEvent, warningInterval: warningTime.timeInterval,
-                                           secondsSinceLastCheck: secondsSinceLastCheck,
-                                           tolerance: TimeInterval(timeInterval),
-                                           maximumLateness: warningTime.maximumLateness) {
-                        // Only show if we haven't shown this warning before
-                        if !shownTimes.contains(warningTime) {
-                            showWarnWindow(for: warningTime, event: event)
-                            shownTimes.insert(warningTime)
-                            shownWarnings[eventId] = shownTimes
-                        }
-                    }
+        for event in events {
+            let startDateTime: Date = event.startDate
+            let eventId = event.eventIdentifier ?? UUID().uuidString
+            var shownTimes = shownWarnings[eventId] ?? Set()
+            let timeUntilEvent = startDateTime.timeIntervalSince(currentDate)
+
+            for warning in WarningTiming.dueWarnings(timeUntilEvent: timeUntilEvent,
+                                                     secondsSinceLastCheck: secondsSinceLastCheck,
+                                                     tolerance: TimeInterval(timeInterval), alreadyShown: shownTimes) {
+                let lateness = warning.secondsBeforeStart - timeUntilEvent
+                if lateness > TimeInterval(timeInterval) {
+                    addLog(text: "Event '\(event.title ?? "")' \(warning.rawValue) warning caught up \(Int(lateness)) s late")
                 }
-                // Cleanup past events
-                if timeUntilEvent < -WarningTiming.pastEventCleanupSeconds {
-                    shownWarnings.removeValue(forKey: eventId)
-                }
+                showWarnWindow(for: warning, event: event)
+                shownTimes.insert(warning)
+                shownWarnings[eventId] = shownTimes
+            }
+            // Cleanup past events
+            if timeUntilEvent < -WarningTiming.pastEventCleanupSeconds {
+                shownWarnings.removeValue(forKey: eventId)
             }
         }
-        
+    }
+
+    private func logIfLate(secondsSinceLastCheck: TimeInterval?, fetchSeconds: TimeInterval) {
+        guard let secondsLate = WarningTiming.secondsLate(secondsSinceLastCheck: secondsSinceLastCheck,
+                                                          checkInterval: TimeInterval(timeInterval)) else { return }
+        addLog(text: "checkEvents ran \(Int(secondsLate)) s late: \(Int(secondsSinceLastCheck ?? 0)) s since the previous check, calendar fetch took \(Int(fetchSeconds)) s")
+    }
+
+    /// The day's events, only when they differ from the last check's. Logging them every 10 seconds is what
+    /// grew the log to 3.6 GB.
+    private func logEventListIfChanged(_ events: [EKEvent]) {
+        let lines = events.map { event in
+            "event:- name: \(event.title ?? ""), dateTime: Today, \(eventDateFormatter.string(from: event.startDate))"
+        }
+        guard let changedLines = eventListLog.changed(lines) else { return }
+        addLog(text: "events:- \(changedLines.count) in the alert hours (changed since the last check)")
+        changedLines.forEach { addLog(text: $0) }
     }
     
     private func combineCurrentDateWithTime(from time: Date) -> Date {
@@ -163,7 +150,7 @@ class EventWarningManager {
         return calendar.date(from: combinedComponents) ?? Date()
     }
     
-    private func showWarnWindow(for warningTime: WarningTime, event: EKEvent) {
+    private func showWarnWindow(for warningTime: MeetingWarning, event: EKEvent) {
         DispatchQueue.main.async {
             let message: String
             switch warningTime {
@@ -262,24 +249,83 @@ class EventWarningManager {
 
 // MARK: - WarningTiming
 
+/// The moments a meeting is announced, earliest first.
+enum MeetingWarning: String, CaseIterable {
+    case fifteenMinutes = "15 minutes"
+    /// The join prompt: the alert with Join Now, plus Focus Bear's event-about-to-start trigger.
+    case twoMinutes = "2 minutes"
+    /// The verbal alerts, played on the join prompt.
+    case eventTime = "event time"
+
+    var secondsBeforeStart: TimeInterval {
+        switch self {
+        case .fifteenMinutes: return 900
+        case .twoMinutes: return 120
+        case .eventTime: return 0
+        }
+    }
+
+    /// The latest a caught-up warning is still shown, in seconds after the meeting's start (negative:
+    /// before it). The 15-minute warning gives way to the join prompt; the join prompt and the verbal
+    /// alerts are still worth having for a while after the start.
+    var latestSecondsAfterStart: TimeInterval {
+        switch self {
+        case .fifteenMinutes: return -MeetingWarning.twoMinutes.secondsBeforeStart
+        case .twoMinutes, .eventTime: return WarningTiming.missedTriggerGraceSeconds
+        }
+    }
+}
+
 /// When a warning is due. It used to be due only when a check landed within `tolerance` of its exact
 /// moment, so a check that ran late skipped it for good. On 21 Oct 2026 one 10-second check started at
 /// 12:42:47 and stalled until 12:44:37 on a busy Mac; the 12:45 meeting's two-minute window
 /// (12:42:50-12:43:10) fell inside the stall, so neither the alert nor Focus Bear's
 /// event-about-to-start trigger was sent. A warning whose moment passed since the previous check is now
-/// shown late, up to `maximumLateness`. The first check after launch still shows only on-time
-/// warnings, so opening the app doesn't replay a meeting's earlier warnings.
+/// shown late. The first check after launch still shows only on-time warnings, so opening the app doesn't
+/// replay a meeting's earlier warnings.
+///
+/// On 27 Oct 2026 that catch-up still missed the 12:45 meeting: the checks stalled from 12:40:29 to 12:44:29
+/// (load average 140-300), and the 12:44:29 check's calendar fetch took until 12:45:08. By then the join
+/// prompt was 8 s past its limit, the meeting's start, so it was skipped, and the start alert had no prompt
+/// to play on. Missed join prompts and start alerts are now caught up until `missedTriggerGraceSeconds`
+/// after the start, and a start alert with no join prompt brings the prompt up first.
 enum WarningTiming {
-    /// A started event's warnings are forgotten this long after its start.
-    static let pastEventCleanupSeconds: TimeInterval = 60
+    static let missedTriggerGraceSeconds: TimeInterval = 5 * 60
+    /// A started event's warnings are forgotten this long after its start: after the grace, so a caught-up
+    /// warning can't be shown a second time.
+    static let pastEventCleanupSeconds: TimeInterval = missedTriggerGraceSeconds + 60
+    /// A check this much later than its interval is logged.
+    static let lateCheckLogSeconds: TimeInterval = 30
 
-    static func isDue(timeUntilEvent: TimeInterval, warningInterval: TimeInterval, secondsSinceLastCheck: TimeInterval?,
-                      tolerance: TimeInterval, maximumLateness: TimeInterval) -> Bool {
-        let lateness = warningInterval - timeUntilEvent
-        guard lateness >= -tolerance else { return false }
+    static func isDue(_ warning: MeetingWarning, timeUntilEvent: TimeInterval, secondsSinceLastCheck: TimeInterval?,
+                      tolerance: TimeInterval) -> Bool {
+        let lateness = warning.secondsBeforeStart - timeUntilEvent
+        guard lateness >= -tolerance, -timeUntilEvent <= warning.latestSecondsAfterStart else { return false }
         if lateness <= tolerance { return true }
         guard let secondsSinceLastCheck else { return false }
-        return lateness <= secondsSinceLastCheck + tolerance && lateness <= maximumLateness
+        return lateness <= secondsSinceLastCheck + tolerance
+    }
+
+    /// The warnings this check shows for one meeting, in order. Each is shown at most once per meeting.
+    static func dueWarnings(timeUntilEvent: TimeInterval, secondsSinceLastCheck: TimeInterval?, tolerance: TimeInterval,
+                            alreadyShown: Set<MeetingWarning>) -> [MeetingWarning] {
+        var due = MeetingWarning.allCases.filter { warning in
+            !alreadyShown.contains(warning) && isDue(warning, timeUntilEvent: timeUntilEvent,
+                                                     secondsSinceLastCheck: secondsSinceLastCheck, tolerance: tolerance)
+        }
+        if due.contains(.twoMinutes) { due.removeAll { $0 == .fifteenMinutes } }
+        if let startIndex = due.firstIndex(of: .eventTime), !due.contains(.twoMinutes),
+           !alreadyShown.contains(.twoMinutes) {
+            due.insert(.twoMinutes, at: startIndex)
+        }
+        return due
+    }
+
+    /// How late a check ran, when that's more than `lateCheckLogSeconds`.
+    static func secondsLate(secondsSinceLastCheck: TimeInterval?, checkInterval: TimeInterval) -> TimeInterval? {
+        guard let secondsSinceLastCheck else { return nil }
+        let secondsLate = secondsSinceLastCheck - checkInterval
+        return secondsLate > lateCheckLogSeconds ? secondsLate : nil
     }
 }
 

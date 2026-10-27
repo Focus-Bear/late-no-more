@@ -1,5 +1,5 @@
 #!/bin/bash
-# Unit tests for the end of swift-app/Late No More/EventWarningManager.swift (WarningTiming, FocusBearTrigger,
+# Unit tests for the end of swift-app/Late No More/EventWarningManager.swift (MeetingWarning, WarningTiming, FocusBearTrigger,
 # AlertWindowPresentation): compiles that part on its own with swiftc and runs the cases below. No Xcode
 # project or test target needed. The window cases open a transparent window for a moment.
 set -euo pipefail
@@ -21,24 +21,89 @@ func check(_ condition: Bool, _ name: String) {
 }
 
 let tolerance: TimeInterval = 10
-let twoMinutes: TimeInterval = 120
-func twoMinuteWarningIsDue(timeUntilEvent: TimeInterval, sinceLastCheck: TimeInterval?) -> Bool {
-    WarningTiming.isDue(timeUntilEvent: timeUntilEvent, warningInterval: twoMinutes, secondsSinceLastCheck: sinceLastCheck,
-                        tolerance: tolerance, maximumLateness: twoMinutes)
+func due(_ timeUntilEvent: TimeInterval, sinceLastCheck: TimeInterval?, shown: Set<MeetingWarning> = []) -> [MeetingWarning] {
+    WarningTiming.dueWarnings(timeUntilEvent: timeUntilEvent, secondsSinceLastCheck: sinceLastCheck, tolerance: tolerance,
+                              alreadyShown: shown)
 }
 
-check(twoMinuteWarningIsDue(timeUntilEvent: 125, sinceLastCheck: 10), "on time, a few seconds early")
-check(twoMinuteWarningIsDue(timeUntilEvent: 112, sinceLastCheck: 10), "on time, a few seconds late")
-check(!twoMinuteWarningIsDue(timeUntilEvent: 133, sinceLastCheck: 10), "not yet: 13 s before the moment")
+check(due(125, sinceLastCheck: 10) == [.twoMinutes], "on time, a few seconds early")
+check(due(112, sinceLastCheck: 10) == [.twoMinutes], "on time, a few seconds late")
+check(due(133, sinceLastCheck: 10).isEmpty, "not yet: 13 s before the moment")
 // 21 Oct 2026: checks at 12:42:47 (133 s to go) and 12:44:47 (13 s to go) around a stall.
-check(twoMinuteWarningIsDue(timeUntilEvent: 13, sinceLastCheck: 120), "a check after a stall still shows the missed warning")
-check(!twoMinuteWarningIsDue(timeUntilEvent: 13, sinceLastCheck: nil), "the first check after launch shows only on-time warnings")
-check(!twoMinuteWarningIsDue(timeUntilEvent: 60, sinceLastCheck: 10), "a moment that passed before the previous check isn't shown again")
-check(!twoMinuteWarningIsDue(timeUntilEvent: -5, sinceLastCheck: 3600), "never after the meeting has started, even after a long sleep")
-check(WarningTiming.isDue(timeUntilEvent: -30, warningInterval: 0, secondsSinceLastCheck: 45, tolerance: tolerance,
-                          maximumLateness: WarningTiming.pastEventCleanupSeconds), "the start alert is shown up to a minute late")
-check(!WarningTiming.isDue(timeUntilEvent: -90, warningInterval: 0, secondsSinceLastCheck: 120, tolerance: tolerance,
-                           maximumLateness: WarningTiming.pastEventCleanupSeconds), "but not once the event is cleaned up")
+check(due(13, sinceLastCheck: 120) == [.twoMinutes], "a check after a stall still shows the missed join prompt")
+// 27 Oct 2026: checks stalled 12:40:29-12:44:29 and that check's fetch ended at 12:45:08, 8 s after the start.
+check(due(-8, sinceLastCheck: 279) == [.twoMinutes, .eventTime],
+      "a stall past the start still shows the join prompt, then the start alert")
+check(due(-180, sinceLastCheck: 3600) == [.twoMinutes, .eventTime], "waking 3 minutes into a meeting still shows its join prompt")
+check(due(-(WarningTiming.missedTriggerGraceSeconds + 10), sinceLastCheck: 3600).isEmpty,
+      "but not once the meeting is more than \(Int(WarningTiming.missedTriggerGraceSeconds / 60)) minutes in")
+check(due(13, sinceLastCheck: nil).isEmpty, "the first check after launch shows only on-time warnings")
+check(due(60, sinceLastCheck: 10).isEmpty, "a moment that passed before the previous check isn't shown again")
+check(due(-8, sinceLastCheck: 279, shown: [.twoMinutes, .eventTime]).isEmpty, "each warning is shown once per meeting")
+check(due(-15, sinceLastCheck: 10, shown: [.twoMinutes]) == [.eventTime], "a start alert that fell between two checks is caught up")
+check(due(5, sinceLastCheck: 10) == [.twoMinutes, .eventTime],
+      "a start with no join prompt yet (app launched after the two-minute moment) brings the prompt up")
+check(due(5, sinceLastCheck: 10, shown: [.twoMinutes]) == [.eventTime], "a start after a closed join prompt doesn't reopen it")
+check(due(100, sinceLastCheck: 900) == [.twoMinutes], "a stall over both moments shows the join prompt, not the 15-minute warning")
+check(due(850, sinceLastCheck: 70) == [.fifteenMinutes], "a 15-minute warning missed in a short stall is caught up")
+check(WarningTiming.pastEventCleanupSeconds > WarningTiming.missedTriggerGraceSeconds + tolerance,
+      "a meeting's shown warnings outlive the catch-up window, so none can show twice")
+check(WarningTiming.secondsLate(secondsSinceLastCheck: 279, checkInterval: tolerance) == 269, "a 269 s late check is logged")
+check(WarningTiming.secondsLate(secondsSinceLastCheck: 35, checkInterval: tolerance) == nil, "a 25 s late check isn't")
+check(WarningTiming.secondsLate(secondsSinceLastCheck: nil, checkInterval: tolerance) == nil, "the first check isn't late")
+
+// Replay of 27 Oct 2026, 12:39-12:58, from LateNoMore_Logs.txt: when each check evaluated the meetings. The rule
+// before this change (21 Oct catch-up: join prompt at most until the start) runs beside the new one.
+func legacyIsDue(_ warning: MeetingWarning, timeUntilEvent: TimeInterval, secondsSinceLastCheck: TimeInterval?) -> Bool {
+    let lateness = warning.secondsBeforeStart - timeUntilEvent
+    let maximumLateness: TimeInterval = [.fifteenMinutes: 780, .twoMinutes: 120, .eventTime: 60][warning]!
+    guard lateness >= -tolerance else { return false }
+    if lateness <= tolerance { return true }
+    guard let secondsSinceLastCheck else { return false }
+    return lateness <= secondsSinceLastCheck + tolerance && lateness <= maximumLateness
+}
+let clock = DateFormatter()
+clock.dateFormat = "HH:mm:ss"
+clock.timeZone = TimeZone(identifier: "Australia/Melbourne")
+func at(_ time: String) -> Date { ISO8601DateFormatter().date(from: "2026-10-27T\(time)+11:00")! }
+let meetings = [("Data/AI standup", at("12:45:00")), ("UX checkin", at("13:00:00"))]
+var checkTimes = ["12:39:28", "12:39:38", "12:39:48", "12:39:58", "12:40:08", "12:40:18", "12:40:29",
+                  /* stalled until 12:44:29; that check's calendar fetch returned at */ "12:45:08"].map(at)
+checkTimes += stride(from: 18.0, through: 918, by: 10).map { at("12:45:00").addingTimeInterval($0) }
+func replay(isNewRule: Bool) -> [String: [MeetingWarning]] {
+    var shown: [String: Set<MeetingWarning>] = [:]
+    var shownAt: [String: [MeetingWarning]] = [:]
+    var previousCheck: Date?
+    print(isNewRule ? "-- new rule --" : "-- before (21 Oct catch-up) --")
+    for checkTime in checkTimes {
+        let since = previousCheck.map { checkTime.timeIntervalSince($0) }
+        if let late = WarningTiming.secondsLate(secondsSinceLastCheck: since, checkInterval: tolerance) {
+            print("\(clock.string(from: checkTime))  checkEvents ran \(Int(late)) s late")
+        }
+        for (title, start) in meetings {
+            let timeUntil = start.timeIntervalSince(checkTime)
+            let fired = isNewRule
+                ? WarningTiming.dueWarnings(timeUntilEvent: timeUntil, secondsSinceLastCheck: since, tolerance: tolerance,
+                                            alreadyShown: shown[title] ?? [])
+                : MeetingWarning.allCases.filter { !(shown[title] ?? []).contains($0)
+                    && legacyIsDue($0, timeUntilEvent: timeUntil, secondsSinceLastCheck: since) }
+            for warning in fired {
+                let late = warning.secondsBeforeStart - timeUntil
+                let what = warning == .twoMinutes ? "join prompt + Focus Bear trigger" : warning == .eventTime ? "start alert" : "15-minute warning"
+                print("\(clock.string(from: checkTime))  \(title): \(what)\(late > tolerance ? " (caught up \(Int(late)) s late)" : "")")
+                shown[title, default: []].insert(warning)
+                shownAt[title, default: []].append(warning)
+            }
+        }
+        previousCheck = checkTime
+    }
+    return shownAt
+}
+let before = replay(isNewRule: false)
+let after = replay(isNewRule: true)
+check(before["Data/AI standup"] == [.eventTime], "replay: before, the 12:45 meeting got only a start alert with no prompt")
+check(after["Data/AI standup"] == [.twoMinutes, .eventTime], "replay: now its join prompt and Focus Bear trigger fire at 12:45:08")
+check(after["UX checkin"] == [.fifteenMinutes, .twoMinutes, .eventTime], "replay: the 1 pm meeting is unchanged")
 
 // Focus Bear trigger: the same link as before, but opening it must not hand Focus Bear the focus.
 let isoFormatter = ISO8601DateFormatter()

@@ -120,6 +120,8 @@ class customAlertVc: NSViewController {
         timerVerbalAlerts?.invalidate()
         timerVerbalAlerts = nil
         lblTitle.stringValue = "Your Meeting Starts in 2 Minutes"
+        // A prompt caught up after a stalled check can come late, even after the start: count from the real start.
+        remainingSeconds = Int(time.timeIntervalSinceNow.rounded())
         updateCountdown()
     }
     

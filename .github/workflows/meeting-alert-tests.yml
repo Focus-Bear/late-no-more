@@ -1,0 +1,24 @@
+name: Meeting alert tests
+
+on:
+  pull_request:
+    paths:
+      - 'swift-app/**'
+      - 'scripts/test-warning-timing.sh'
+      - 'scripts/test-log-file.sh'
+      - '.github/workflows/meeting-alert-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'swift-app/**'
+
+jobs:
+  meeting-alert-tests:
+    runs-on: macos-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Warning timing and alert windows
+        run: ./scripts/test-warning-timing.sh
+      - name: Debug log
+        run: ./scripts/test-log-file.sh

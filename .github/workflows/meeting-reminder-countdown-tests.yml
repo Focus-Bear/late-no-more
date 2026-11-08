@@ -1,0 +1,21 @@
+name: Meeting reminder countdown tests
+
+on:
+  pull_request:
+    paths:
+      - 'swift-app/**'
+      - 'scripts/test-meeting-reminder-countdown.sh'
+      - '.github/workflows/meeting-reminder-countdown-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'swift-app/**'
+
+jobs:
+  meeting-reminder-countdown:
+    runs-on: macos-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Meeting reminder countdown
+        run: ./scripts/test-meeting-reminder-countdown.sh

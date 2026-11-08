@@ -43,11 +43,10 @@ pkgutil --check-signature pkgpath
 codesign -vvv --deep --strict pkgpath
 
 
-xcrun altool --notarization-info 0342280f-17a7-4631-a48d-5166ed4e3dc6 -u "vishnu.wtl@gmail.com"
+xcrun notarytool info 0342280f-17a7-4631-a48d-5166ed4e3dc6 --keychain-profile focusbear-notary
 
-Password  mmnz-xeky-xmrt-eqgb
 
-xcrun notarytool log --apple-id "vishnu.wtl@gmail.com" --password "mmnz-xeky-xmrt-eqgb" --team-id TCUD568B3U 3ee0e9bc-8c70-4da9-af3d-60162ca838f2
+xcrun notarytool log 3ee0e9bc-8c70-4da9-af3d-60162ca838f2 --keychain-profile focusbear-notary
 
 
 

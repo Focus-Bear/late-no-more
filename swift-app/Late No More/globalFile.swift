@@ -97,7 +97,7 @@ func showWarnWindow(title: String, calendarName: String){
     getWarnUserVcObject().resetData(title: title, calendarName: calendarName)
 }
 
-func showtCustomAlertWindow(title: String, time: Date, url: URL?, notes:String, eventId:String){
+func showtCustomAlertWindow(title: String, meeting: MeetingReminderEvent, url: URL?, notes:String, eventId:String){
     addLog(text: "showtCustomAlertWindow")
     let alertWcObj = getCustomAlertWcObject()
     let customAlertVcObj = getCustomAlertVcObject()
@@ -106,8 +106,9 @@ func showtCustomAlertWindow(title: String, time: Date, url: URL?, notes:String, 
     alertWcObj.window?.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(CGWindowLevelKey.modalPanelWindow)))
     alertWcObj.showWindow(nil)
     alertWcObj.window?.center()
-    customAlertVcObj.resetData(title: title, time: time, url: url, notes:notes, eventId: eventId)
+    // Registered before resetData, which closes (and unregisters) a reminder that is already stale.
     arrAlertWcObj.append(alertWcObj)
+    customAlertVcObj.resetData(title: title, meeting: meeting, url: url, notes:notes, eventId: eventId)
 }
 
 var arrAlertWcObj = [customWc]()

@@ -133,3 +133,18 @@ The settings.json file contains various configuration options for Late No More. 
 | intentionPrompts | Array of strings | A list of prompts/questions that the user can answer to help them focus on their intentions for the upcoming meeting. |
 
 [To get a Spotify URI](https://community.spotify.com/t5/FAQs/What-s-a-Spotify-URI/ta-p/919201) TLDR: hold option/alt when going to share on desktop
+
+## Signing and notarizing the Swift app
+
+The scripts in `swift-app/pkg/` (`2build.sh`, `signSwiftApp.sh`) get notarization credentials from
+`swift-app/pkg/notary-auth.sh`, never from the repo. One-time setup on the build Mac — `notarytool`
+prompts for the app-specific password (create one at appleid.apple.com → Sign-In and Security →
+App-Specific Passwords):
+
+```bash
+xcrun notarytool store-credentials focusbear-notary --apple-id <apple-id-email> --team-id TCUD568B3U
+```
+
+Use another profile name with `NOTARY_PROFILE=<name>`, or, where a keychain profile isn't possible, export
+`APPLE_ID` and `APPLE_APP_PASSWORD` (plus `APPLE_TEAM_ID` if it isn't TCUD568B3U). Run the scripts from
+`swift-app/pkg/`.

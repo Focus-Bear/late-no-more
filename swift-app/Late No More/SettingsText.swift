@@ -13,6 +13,7 @@ enum SettingsText {
     static let calendarsTitle = localized("settings.calendars.title", "Calendars")
     static let calendarsFootnote = localized(
         "settings.calendars.footnote", "Late No More reminds you about meetings in the calendars you tick.")
+    static let calendarsOtherAccount = localized("settings.calendars.otherAccount", "Other")
     static let calendarsFilterPlaceholder = localized("settings.calendars.filter", "Filter calendars")
     static let calendarsClearFilter = localized("settings.calendars.clearFilter", "Clear filter")
     static let calendarsNone = localized(

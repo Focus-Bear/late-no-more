@@ -100,16 +100,12 @@ private struct CalendarsSection: View {
                 Text(SettingsText.calendarsNone)
                     .foregroundColor(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
+            } else if model.isCalendarFilterShown {
+                CalendarFilterField(query: $model.calendarQuery)
+                ScrollView { calendarList.padding(.trailing, SettingsLayout.CARD_PADDING) }
+                    .frame(height: SettingsLayout.CALENDAR_LIST_HEIGHT)
             } else {
-                if model.isCalendarFilterShown {
-                    CalendarFilterField(query: $model.calendarQuery)
-                }
-                if model.isCalendarFilterShown {
-                    ScrollView { calendarList.padding(.trailing, SettingsLayout.CARD_PADDING) }
-                        .frame(height: SettingsLayout.CALENDAR_LIST_HEIGHT)
-                } else {
-                    calendarList
-                }
+                calendarList
             }
         }
     }

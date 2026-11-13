@@ -159,10 +159,11 @@ class ViewController: NSViewController {
         let color = calendar.color.usingColorSpace(.sRGB).map {
             CalendarColor(red: Double($0.redComponent), green: Double($0.greenComponent), blue: Double($0.blueComponent))
         }
+        let accountTitle = calendar.source?.title ?? ""
         return CalendarOption(
             id: calendar.calendarIdentifier,
             title: calendar.title,
-            accountTitle: calendar.source?.title ?? "",
+            accountTitle: accountTitle.isEmpty ? SettingsText.calendarsOtherAccount : accountTitle,
             color: color
         )
     }

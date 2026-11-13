@@ -70,9 +70,7 @@ class EventWarningManager {
     deinit { DistributedNotificationCenter.default().removeObserver(self) }
 
     // MARK: - Initialization
-    func resetData(calendars: [[String: Any]], startTimePicker: NSDatePicker, endTimePicker: NSDatePicker) {
-        let startTime = startTimePicker.dateValue
-        let endTime = endTimePicker.dateValue
+    func resetData(calendars: [[String: Any]], startTime: Date, endTime: Date) {
         checkQueue.async {
             self.arrCalendars = calendars
             self.pickerStartTimeDateValue = startTime

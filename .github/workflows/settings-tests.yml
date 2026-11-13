@@ -1,0 +1,21 @@
+name: Settings window tests
+
+on:
+  pull_request:
+    paths:
+      - 'swift-app/**'
+      - 'scripts/test-settings-model.sh'
+      - '.github/workflows/settings-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'swift-app/**'
+
+jobs:
+  settings-model:
+    runs-on: macos-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Settings model
+        run: ./scripts/test-settings-model.sh

@@ -7,421 +7,356 @@
 
 import Cocoa
 import EventKit
-//import Speech
+import SwiftUI
 
-class ViewController: NSViewController, NSTokenFieldDelegate {
-    
-    
-    @IBOutlet weak var lblVersion: NSTextField!
-    @IBOutlet weak var checkBoxLaunchAtLogin: NSButton!
-    @IBOutlet weak var btnAdvanced: NSButton!
-    @IBOutlet weak var pickerEndTime: NSDatePicker!
-    @IBOutlet weak var pickerStartTime: NSDatePicker!
-    @IBOutlet weak var lblEndTime: NSTextField!
-    @IBOutlet weak var lblStartTime: NSTextField!
-    @IBOutlet weak var lblTitleWorkTime: NSTextField!
-    @IBOutlet weak var btnCheckOut: NSButton!
-    @IBOutlet weak var lblBottom: NSTextField!
-    @IBOutlet weak var btnApply: NSButton!
-    @IBOutlet weak var lblTitleEvents: NSTextField!
-    @IBOutlet weak var lblTitleCalendar: NSTextField!
-    @IBOutlet weak var tokenField: NSTokenField!
-    @IBOutlet weak var tblViewCalendar: NSTableView!
-    var arrCalendars = [[String:Any]]()
-    var advancedSettingsVcObj:advancedSettingsVc?
-    var isCalendarListEdited = false
-    
+/// Keys of events.json, shared with the Node engine and every existing user's file.
+private enum SettingsFileKey {
+    static let calendarsToExclude = "calendarsToExclude"
+    static let calendarName = "name"
+    static let calendarID = "id"
+    static let eventKeywordsToIgnore = "eventKeywordsToIgnore"
+    static let barkStartTime = "barkStartTime"
+    static let barkEndTime = "barkEndTime"
+    static let voiceOptions = "voiceOptions"
+    static let voiceUsing = "using"
+    static let voiceSpeakingRate = "speakingRate"
+    static let voicePitch = "pitch"
+    static let voiceVolume = "volume"
+    static let voiceModulation = "modulation"
+    static let barkPool = "barkPool"
+    static let dialogWindowTextStages = "dialogWindowTextStages"
+    static let intentionPrompts = "intentionPrompts"
+}
+
+/// Keys the warning manager reads from each calendar entry.
+private enum CalendarEntryKey {
+    static let name = "name"
+    static let state = "state"
+    static let id = "id"
+    static let calendar = "calendar"
+}
+
+private enum AnalyticsEvent: String {
+    case openAdvancedSettings = "open-advanced-settings"
+    case modifyExcludedCalendarList = "modify-excluded-calendar-list"
+    case applySettings = "apply-settings"
+}
+
+private enum SettingsDefaults {
+    static let preferredVoice = "Karen"
+    static let speakingRate: Float = 150
+    static let pitch: Float = 50
+    static let volume: Float = 0.5
+    static let modulation = 2
+    static let ignoredKeywords = ["no-notify"]
+    static let alertStartTime = TimeOfDay(hour: 7, minute: 0)!
+    static let alertEndTime = TimeOfDay(hour: 21, minute: 0)!
+    static let pitchRange: ClosedRange<Float> = 0.5...2
+    static let fallbackPitch: Float = 1.2
+    static let maxSpeakingRate: Float = 1
+    static let fallbackSpeakingRate: Float = 0.4
+    static let maxVolume: Float = 1
+}
+
+private let FOCUS_BEAR_URL = URL(string: "https://focusbear.io")!
+private let ADVANCED_SETTINGS_SCENE = NSStoryboard.SceneIdentifier("advancedSettingsVc")
+private let RESTART_HOT_KEY = "l"
+/// The settings flow has always waited this long before (re)starting the checker.
+private let CHECKER_START_DELAY_SECONDS: UInt32 = 1
+
+class ViewController: NSViewController {
+    private lazy var eventStore = EKEventStore()
+    private var eventCalendars = [EKCalendar]()
+    private var settingsModel: SettingsViewModel?
+    private var advancedSettingsVcObj: advancedSettingsVc?
+    private var warningManagerObject = EventWarningManager()
+    private var isFirstAppearance = true
+
     override func viewDidLoad() {
         super.viewDidLoad()
         addLog(text: "viewDidLoad")
-        
-        //        let speechSynth = NSSpeechSynthesizer()
-//        let voices = NSSpeechSynthesizer.availableVoices
-        textToSpeechObject.listVoices()// kust to load objects
-        
-//        for voice in voices{
-//            let attributes = NSSpeechSynthesizer.attributes(forVoice: voice)
-//            let name = attributes[.name] as? String ?? "Unknown"
-//            let language = attributes[.localeIdentifier] as? String ?? "Unknown"
-//            print(name)
-//            print(voice.rawValue)
-//            print(language)
-//            arrVoiceNames[name] = voice.rawValue
-//        }
-        if arrVoiceNames.keys.count !=  0{
-            if arrVoiceNames.keys.contains("Karen"){
-                usingValue = "Karen"
-            }else{
-                usingValue = arrVoiceNames.first?.key ?? ""
-            }
-        }
-        
-        speakingRateValue = 150
-        pitchValue = 50
-        volumeValue = 0.5
-        modulationValue = 2
-        
-        btnAdvanced.title = "Advanced"
-        
-        pickerStartTime.dateValue = getDateFromString(date: "7:00", dateFormat: "HH:mm") ?? Date()
-        pickerEndTime.dateValue = getDateFromString(date: "21:00", dateFormat: "HH:mm") ?? Date()
-        
-        
-        
-        lblStartTime.stringValue = "Start Time:"
-        lblEndTime.stringValue = "End Time:"
-        
-        
-        lblTitleWorkTime.stringValue = "What hours do you want to get verbal alerts?"
-        
-        lblBottom.stringValue = "Late No More is brought to you by Focus Bear, a holistic productivity and habit formation app."
-        btnApply.title = "Apply"
-        lblTitleCalendar.stringValue = "Which calendars do you want to get notifications for?"
-        lblTitleEvents.stringValue = "What calendar events do you not want to get notifications for? Choose keywords to ignore:"
-        
-        let paragraph = NSMutableParagraphStyle()
-        paragraph.alignment = btnCheckOut.alignment
-        paragraph.lineBreakMode = .byTruncatingTail
-        let attrs = [NSAttributedString.Key.foregroundColor: NSColor.labelColor, NSAttributedString.Key.paragraphStyle: paragraph, NSAttributedString.Key.underlineStyle: NSUnderlineStyle.single.rawValue] as [NSAttributedString.Key : Any]
-        let attrString: NSAttributedString = NSAttributedString(string: "Check it out at focusbear.io", attributes: attrs)
-        btnCheckOut.attributedTitle = attrString
-        
-        
-        //        let calendars = EventStore.calendars(for entityType:.Events)
-        let eventStore = EKEventStore()
-        
-        
-        
-        
-        
-        let calendars = eventStore.calendars(for: .event)
-        for calendar in calendars {
-            arrCalendars.append(["name":calendar.title, "state": true, "id":calendar.calendarIdentifier, "calendar": calendar])
-        }
-        print(arrCalendars)
-        tokenField.objectValue = ["no-notify"]
-        
+
+        textToSpeechObject.listVoices() // fills arrVoiceNames
+        applyDefaultVoiceOptions()
+
+        eventCalendars = eventStore.calendars(for: .event)
         addLog(text: "got Calenders from eventStore")
-        
-        do {
-            let data = try Data(contentsOf: jsonUrl!, options: .mappedIfSafe)
-            //  if data != nil{
-            addLog(text: "Got Data from events.json")
-            
-            do {
-                if let jsonResult: NSDictionary = try JSONSerialization.jsonObject(with: data, options:JSONSerialization.ReadingOptions.mutableContainers) as? NSDictionary{
-                    print(jsonResult)
-                    
-                    addLog(text: "Got Json from events.json data")
-                    if let calendarsToExclude = jsonResult.value(forKey: "calendarsToExclude") as? [NSDictionary]{
-                        for i in 0..<arrCalendars.count {
-                            let calendar = arrCalendars[i]
-                            if let id = calendar["id"] as? String{
-                                
-                                for excludeCalendar in calendarsToExclude {
-                                    if let savedId = excludeCalendar["id"] as? String{
-                                        if id == savedId{
-                                            arrCalendars[i]["state"] = false
-                                            break;
-                                        }
-                                        
-                                    }
-                                }
-                                
-                            }
-                        }
-                    }
-                    if let eventKeywordsToIgnore = jsonResult.value(forKey: "eventKeywordsToIgnore") as? [String]{
-                        tokenField.objectValue = eventKeywordsToIgnore
-                    }
-                    
-                    if let barkStartTime = jsonResult.value(forKey: "barkStartTime") as? String{
-                        pickerStartTime.dateValue = getDateFromString(date: barkStartTime, dateFormat: "HH:mm") ?? Date()
-                    }
-                    if let barkEndTime = jsonResult.value(forKey: "barkEndTime") as? String{
-                        pickerEndTime.dateValue = getDateFromString(date: barkEndTime, dateFormat: "HH:mm") ?? Date()
-                    }
-                    
-                    if let voiceOptions = jsonResult.value(forKey: "voiceOptions") as? NSDictionary{
-                        usingValue = voiceOptions.value(forKey: "using") as? String ?? usingValue
-                        speakingRateValue = voiceOptions.value(forKey: "speakingRate") as? Float ?? speakingRateValue
-                        pitchValue = voiceOptions.value(forKey: "pitch") as? Float ?? pitchValue
-                        volumeValue = voiceOptions.value(forKey: "volume") as? Float ?? volumeValue
-                        modulationValue = voiceOptions.value(forKey: "modulation") as? Int ?? modulationValue
-                        
-                        if pitchValue > 2 || pitchValue < 0.5{
-                            pitchValue = 1.2
-                        }
-                        if speakingRateValue > 1{
-                            speakingRateValue = 0.4
-                        }
-                        if volumeValue > 1{
-                            volumeValue = 1
-                        }
-                    }
-                    
-                    if let barkPool = jsonResult.value(forKey: "barkPool") as? [String]{
-                        arrBarkPools  = barkPool
-                    }
-                    
-                    if let dialogWindowTextStages = jsonResult.value(forKey: "dialogWindowTextStages") as? [String]{
-                        arrTextStages  = dialogWindowTextStages
-                    }
-                    
-                    if let intentionPrompts = jsonResult.value(forKey: "intentionPrompts") as? [String]{
-                        arrIntentionPrompts  = intentionPrompts
-                    }
-                }
-            }catch{
-                addLog(text: "Failed to Read Json file form data")
-                print(error)
-            }
-            //  }
-        } catch {
-            // handle error
-            addLog(text: "Failed to Read events.json file")
-        }
-        
-        let char = "l"
-        var flags = NSEvent.modifierFlags
-        flags.insert(.shift)
-        flags.insert(.command)
-        hotKeyRestartApp = HotKey(keyCombo: KeyCombo(stkey: char, modifiers: flags))
-        
-        tokenField.delegate = self
-        
-        if let loginstatus = UserDefaults.standard.object(forKey: kUserdefaultsLaunchAtLogin) as? Bool{
-            LaunchOnStartup.setLaunchAtStartup(loginstatus)
-            loginstatus ? (checkBoxLaunchAtLogin.state = .on) : (checkBoxLaunchAtLogin.state = .off)
-        }else{
-            UserDefaults.standard.set(true, forKey: kUserdefaultsLaunchAtLogin)
-            LaunchOnStartup.setLaunchAtStartup(true)
-            checkBoxLaunchAtLogin.state = .on
-        }
-        lblVersion.stringValue = "Version:" + " " + appVersion
+
+        let storedSettings = readSettingsFile()
+        applyAdvancedSettings(from: storedSettings)
+
+        hotKeyRestartApp = HotKey(keyCombo: KeyCombo(stkey: RESTART_HOT_KEY, modifiers: [.shift, .command]))
+        embedSettingsView(settings: alertSettings(from: storedSettings), launchesAtLogin: restoreLaunchAtLogin())
+        observeSheetsAndTermination()
     }
-    var hotKeyRestartApp: HotKey? {
-        didSet {
-            guard let hotKey = hotKeyRestartApp else {
-                return
-            }
-            hotKey.keyDownHandler = { [weak self] in
-                print("Pressed at \(Date())")
-                addLog(text: "shortcut clicked")
-//                terminateProcess()
-                DispatchQueue.global().async {
-                    sleep(1)
-                    DispatchQueue.main.async {
-                        //                        NSWorkspace.shared.open(URL(fileURLWithPath: "/Applications/LateNoMore"))
-                        self?.launchProcess()
-                    }
-                }
-            }
-        }
-    }
-    
-    var firstTime = true
-    
+
     override func viewDidAppear() {
         addLog(text: "func:- viewDidAppear")
-        if firstTime{
-            firstTime = false
-            saveSettings()
-            DispatchQueue.global().async {
-                sleep(1)
-                DispatchQueue.main.async {
-                    self.launchProcess()
-                }
-            }
-        }
-    }
-    var warningManagerObject = EventWarningManager()
-    func launchProcess(){
-        warningManagerObject.resetData(
-            calendars: arrCalendars,
-            startTimePicker: pickerStartTime,
-            endTimePicker: pickerEndTime
-        )
-        warningManagerObject.startCheck()
-        
-        return;
-//        let task = Process()
-//        task.launchPath = "/bin/bash"
-//        task.arguments = ["-c", "launchctl asuser \"$(id -u)\" \"\(helperAppUrl!.path)\""]
-//        task.launch()
-//        capturePosthog(event: "start-late-no-more-binary", metadata: [:])
-    }
-    
-
-    override var representedObject: Any? {
-        didSet {
-            // Update the view, if already loaded.
-        }
-    }
-    
-    @IBAction func btnCheckOutClicked(_ sender: Any) {
-        addLog(text: "btnCheckOutClicked")
-        let buynow_path = "https://focusbear.io"
-        NSWorkspace.shared.open(URL(string: buynow_path)!)
-    }
-    //    @IBAction func tokenFieldClicked(_ sender: Any) {
-    //
-    //    }
-    
-    func saveSettings(){
-        
-        addLog(text: "func:- saveSettings")
-//        terminateProcess()
-        
-        var events = [String]()
-        if let objectValue = tokenField.objectValue as? [String] {
-            events = objectValue
-        }
-        var calendarsToExclude = [NSDictionary]()
-        for calendar in arrCalendars {
-            if let state = calendar["state"] as? Bool{
-                if !state{
-                    calendarsToExclude.append(["name":calendar["name"] as? String ?? "", "id":calendar["id"] as? String ?? ""])
-                }
-            }
-        }
-        let startTime = getStringFromDate(date: pickerStartTime.dateValue, dateFormat: "HH:mm")
-        let endTime = getStringFromDate(date: pickerEndTime.dateValue, dateFormat: "HH:mm")
-        
-        
-        let jsonVoiceOptions:NSDictionary = ["using": usingValue, "speakingRate": speakingRateValue, "pitch": pitchValue, "volume": volumeValue, "modulation": modulationValue]
-        
-        let json:NSDictionary = ["calendarsToExclude": calendarsToExclude, "eventKeywordsToIgnore": events, "barkStartTime": startTime, "barkEndTime": endTime, "voiceOptions": jsonVoiceOptions, "barkPool": arrBarkPools, "dialogWindowTextStages": arrTextStages, "intentionPrompts": arrIntentionPrompts]
-        
-        addLog(text: "Save events.json start")
-        do {
-            let jsonData = try JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) as Data
-            var jsonString = String(data: jsonData, encoding: String.Encoding.utf8)!
-            jsonString = jsonString.replacingOccurrences(of: "\\/", with: "/")
-            print("json string = \(jsonString)")
-            addLog(text: "Success: converted to string from json")
-            do {
-                try jsonString.write(to: jsonUrl!,
-                                     atomically: true,
-                                     encoding: .utf8)
-                //                try jsonData.write(to: URL(fileURLWithPath: "/Users/prashant/Desktop/fmynew.json"))
-                
-                addLog(text: "Success: write json file:- \(jsonString)")
-            } catch {
-                // Handle error
-                addLog(text: "Failure: write json file")
-            }
-            
-            
-        } catch _ {
-            print ("JSON Failure")
-            addLog(text: "Failure: convert data from json")
-        }
-        
-        
-        
-    }
-    
-    @IBAction func btnAdvancedClicked(_ sender: Any) {
-        addLog(text:"button advanced clicked")
-        capturePosthog(event: "open-advanced-settings", metadata: [:])
-        if advancedSettingsVcObj == nil{
-            advancedSettingsVcObj = mainStoryboard.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("advancedSettingsVc")) as? advancedSettingsVc
-        }
-        
-        self.presentAsSheet(advancedSettingsVcObj!)
-    }
-    
-    @IBAction func btnApplyClicked(_ sender: Any) {
-        if isCalendarListEdited{
-            isCalendarListEdited = false
-            capturePosthog(event: "modify-excluded-calendar-list", metadata: [:])
-        }
-        capturePosthog(event: "apply-settings", metadata: [:])
-        addLog(text: "btnApplyClicked")
-        saveSettings()
-        
-        
-        
-
+        guard isFirstAppearance, let settings = settingsModel?.settings else { return }
+        isFirstAppearance = false
+        writeSettingsFile(settings)
         DispatchQueue.global().async {
-            sleep(1)
-            DispatchQueue.main.async {
-                addLog(text: "open LateNoMore process after file save")
-                //                NSWorkspace.shared.open(URL(fileURLWithPath: "/Applications/LateNoMore"))
-                self.launchProcess()
-                let alert = NSAlert()
-                alert.messageText = "Your settings have been saved."
-                alert.beginSheetModal(for: self.view.window!, completionHandler: {_ in
-                    addLog(text: "App terminate")
-                    //                    NSApp.terminate(self)
-                    // self.view.window?.miniaturize(self)
-                    DispatchQueue.global().async {
-                        DispatchQueue.main.async {
-                            self.view.window?.miniaturize(self)
-                        }
-                    }
-                })
-            }
-        }
-        
-    }
-
-    
-    @IBAction func checkBoxLaunchAtLoginClicked(_ sender: Any) {
-        if checkBoxLaunchAtLogin.state == .on{
-            UserDefaults.standard.set(true, forKey: kUserdefaultsLaunchAtLogin)
-            LaunchOnStartup.setLaunchAtStartup(true)
-        }else{
-            UserDefaults.standard.set(false, forKey: kUserdefaultsLaunchAtLogin)
-            LaunchOnStartup.setLaunchAtStartup(false)
+            sleep(CHECKER_START_DELAY_SECONDS)
+            DispatchQueue.main.async { self.launchProcess() }
         }
     }
-    
-}
 
-
-extension ViewController:NSTableViewDelegate, NSTableViewDataSource {
-    func numberOfRows(in tableView: NSTableView) -> Int {
-        
-        return arrCalendars.count
+    override func viewWillDisappear() {
+        super.viewWillDisappear()
+        settingsModel?.saveNowIfChanged()
     }
-    
-    
-    
-    func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
-        if let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "tblCellCalendars"), owner: nil) as? tblCellCalendars {
-            
-            
-            cell.checkBox.title = arrCalendars[row]["name"] as? String ?? ""
-            if let state = arrCalendars[row]["state"] as? Bool{
-                if state{
-                    cell.checkBox.state = .on
-                }else{
-                    cell.checkBox.state = .off
+
+    var hotKeyRestartApp: HotKey? {
+        didSet {
+            hotKeyRestartApp?.keyDownHandler = { [weak self] in
+                addLog(text: "shortcut clicked")
+                DispatchQueue.global().async {
+                    sleep(CHECKER_START_DELAY_SECONDS)
+                    DispatchQueue.main.async { self?.launchProcess() }
                 }
             }
-            
-            cell.checkBox.target = self
-            cell.checkBox.tag = row
-            cell.checkBox.action = #selector(btncheckBoxClicked(sender:))
-            return cell
         }
-        
-        return NSTableCellView()
     }
-    
-    @objc func btncheckBoxClicked(sender:NSButton){
-        if arrCalendars[sender.tag]["state"] as? Bool == true{
-            arrCalendars[sender.tag]["state"] = false
-        }else{
-            arrCalendars[sender.tag]["state"] = true
+
+    func launchProcess() {
+        guard let settings = settingsModel?.settings else { return }
+        updateWarningManager(with: settings)
+        warningManagerObject.startCheck()
+    }
+
+    // MARK: - Settings view
+
+    private func embedSettingsView(settings: AlertSettings, launchesAtLogin: Bool) {
+        let model = SettingsViewModel(
+            calendars: eventCalendars.map(calendarOption),
+            settings: settings,
+            launchesAtLogin: launchesAtLogin,
+            versionDescription: appVersion,
+            persist: { [weak self] settings, previous in self?.apply(settings, replacing: previous) },
+            onLaunchAtLoginChange: { isOn in
+                UserDefaults.standard.set(isOn, forKey: kUserdefaultsLaunchAtLogin)
+                LaunchOnStartup.setLaunchAtStartup(isOn)
+            }
+        )
+        settingsModel = model
+
+        let hostingView = NSHostingView(rootView: SettingsView(
+            model: model,
+            onOpenAdvanced: { [weak self] in self?.openAdvancedSettings() },
+            onOpenWebsite: { [weak self] in self?.openFocusBearWebsite() }
+        ))
+        hostingView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(hostingView)
+        NSLayoutConstraint.activate([
+            hostingView.topAnchor.constraint(equalTo: view.topAnchor),
+            hostingView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            hostingView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            hostingView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+        ])
+    }
+
+    private func calendarOption(for calendar: EKCalendar) -> CalendarOption {
+        let color = calendar.color.usingColorSpace(.sRGB).map {
+            CalendarColor(red: Double($0.redComponent), green: Double($0.greenComponent), blue: Double($0.blueComponent))
         }
-        isCalendarListEdited = true
-        tblViewCalendar.reloadData()
+        return CalendarOption(
+            id: calendar.calendarIdentifier,
+            title: calendar.title,
+            accountTitle: calendar.source?.title ?? "",
+            color: color
+        )
     }
-    func tableViewSelectionDidChange(_ notification: Notification) {
-        
+
+    private func apply(_ settings: AlertSettings, replacing previous: AlertSettings) {
+        addLog(text: "settings changed, saving")
+        if settings.enabledCalendarIDs != previous.enabledCalendarIDs {
+            capturePosthog(event: AnalyticsEvent.modifyExcludedCalendarList.rawValue, metadata: [:])
+        }
+        capturePosthog(event: AnalyticsEvent.applySettings.rawValue, metadata: [:])
+        writeSettingsFile(settings)
+        // The checker reads its calendars and hours on every tick, so new values need no restart.
+        updateWarningManager(with: settings)
+    }
+
+    private func updateWarningManager(with settings: AlertSettings) {
+        warningManagerObject.resetData(
+            calendars: calendarEntries(enabledIDs: settings.enabledCalendarIDs),
+            startTime: settings.alertStartTime.date(),
+            endTime: settings.alertEndTime.date()
+        )
+    }
+
+    private func calendarEntries(enabledIDs: Set<String>) -> [[String: Any]] {
+        eventCalendars.map { calendar in
+            [
+                CalendarEntryKey.name: calendar.title,
+                CalendarEntryKey.state: enabledIDs.contains(calendar.calendarIdentifier),
+                CalendarEntryKey.id: calendar.calendarIdentifier,
+                CalendarEntryKey.calendar: calendar,
+            ]
+        }
+    }
+
+    // MARK: - Actions
+
+    private func openFocusBearWebsite() {
+        addLog(text: "btnCheckOutClicked")
+        NSWorkspace.shared.open(FOCUS_BEAR_URL)
+    }
+
+    private func openAdvancedSettings() {
+        addLog(text: "button advanced clicked")
+        capturePosthog(event: AnalyticsEvent.openAdvancedSettings.rawValue, metadata: [:])
+        if advancedSettingsVcObj == nil {
+            advancedSettingsVcObj = mainStoryboard.instantiateController(withIdentifier: ADVANCED_SETTINGS_SCENE) as? advancedSettingsVc
+        }
+        guard let advancedSettings = advancedSettingsVcObj else { return }
+        presentAsSheet(advancedSettings)
+    }
+
+    private func observeSheetsAndTermination() {
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(sheetDidEnd(_:)), name: NSWindow.didEndSheetNotification, object: nil)
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(applicationWillTerminate(_:)),
+            name: NSApplication.willTerminateNotification, object: nil)
+    }
+
+    /// The Advanced sheet edits globals this window doesn't track, so they are saved when it closes.
+    @objc private func sheetDidEnd(_ notification: Notification) {
+        guard let window = notification.object as? NSWindow, window == view.window,
+              let settings = settingsModel?.settings else { return }
+        addLog(text: "advanced settings closed, saving")
+        capturePosthog(event: AnalyticsEvent.applySettings.rawValue, metadata: [:])
+        writeSettingsFile(settings)
+    }
+
+    @objc private func applicationWillTerminate(_ notification: Notification) {
+        settingsModel?.saveNowIfChanged()
+    }
+
+    // MARK: - Launch at login
+
+    private func restoreLaunchAtLogin() -> Bool {
+        let isOn = UserDefaults.standard.object(forKey: kUserdefaultsLaunchAtLogin) as? Bool ?? true
+        UserDefaults.standard.set(isOn, forKey: kUserdefaultsLaunchAtLogin)
+        LaunchOnStartup.setLaunchAtStartup(isOn)
+        return isOn
+    }
+
+    // MARK: - Settings file
+
+    private func readSettingsFile() -> NSDictionary? {
+        guard let url = jsonUrl, let data = try? Data(contentsOf: url, options: .mappedIfSafe) else {
+            addLog(text: "Failed to Read events.json file")
+            return nil
+        }
+        addLog(text: "Got Data from events.json")
+        guard let json = (try? JSONSerialization.jsonObject(with: data)) as? NSDictionary else {
+            addLog(text: "Failed to Read Json file form data")
+            return nil
+        }
+        addLog(text: "Got Json from events.json data")
+        return json
+    }
+
+    private func alertSettings(from json: NSDictionary?) -> AlertSettings {
+        let excludedIDs = (json?[SettingsFileKey.calendarsToExclude] as? [NSDictionary] ?? [])
+            .compactMap { $0[SettingsFileKey.calendarID] as? String }
+        return AlertSettings(
+            enabledCalendarIDs: CalendarExclusions.enabledIDs(
+                of: eventCalendars.map(calendarOption), excludedIDs: Set(excludedIDs)),
+            ignoredKeywords: json?[SettingsFileKey.eventKeywordsToIgnore] as? [String] ?? SettingsDefaults.ignoredKeywords,
+            alertStartTime: storedTime(json?[SettingsFileKey.barkStartTime]) ?? SettingsDefaults.alertStartTime,
+            alertEndTime: storedTime(json?[SettingsFileKey.barkEndTime]) ?? SettingsDefaults.alertEndTime
+        )
+    }
+
+    private func storedTime(_ value: Any?) -> TimeOfDay? {
+        (value as? String).flatMap(TimeOfDay.init(storageString:))
+    }
+
+    private func applyDefaultVoiceOptions() {
+        if !arrVoiceNames.isEmpty {
+            usingValue = arrVoiceNames.keys.contains(SettingsDefaults.preferredVoice)
+                ? SettingsDefaults.preferredVoice
+                : arrVoiceNames.first?.key ?? ""
+        }
+        speakingRateValue = SettingsDefaults.speakingRate
+        pitchValue = SettingsDefaults.pitch
+        volumeValue = SettingsDefaults.volume
+        modulationValue = SettingsDefaults.modulation
+    }
+
+    private func applyAdvancedSettings(from json: NSDictionary?) {
+        if let voiceOptions = json?[SettingsFileKey.voiceOptions] as? NSDictionary {
+            applyVoiceOptions(voiceOptions)
+        }
+        if let barkPool = json?[SettingsFileKey.barkPool] as? [String] {
+            arrBarkPools = barkPool
+        }
+        if let textStages = json?[SettingsFileKey.dialogWindowTextStages] as? [String] {
+            arrTextStages = textStages
+        }
+        if let intentionPrompts = json?[SettingsFileKey.intentionPrompts] as? [String] {
+            arrIntentionPrompts = intentionPrompts
+        }
+    }
+
+    private func applyVoiceOptions(_ voiceOptions: NSDictionary) {
+        usingValue = voiceOptions[SettingsFileKey.voiceUsing] as? String ?? usingValue
+        speakingRateValue = voiceOptions[SettingsFileKey.voiceSpeakingRate] as? Float ?? speakingRateValue
+        pitchValue = voiceOptions[SettingsFileKey.voicePitch] as? Float ?? pitchValue
+        volumeValue = voiceOptions[SettingsFileKey.voiceVolume] as? Float ?? volumeValue
+        modulationValue = voiceOptions[SettingsFileKey.voiceModulation] as? Int ?? modulationValue
+
+        // Values on the Node engine's scales (README: pitch 0–100, rate in words per minute) are out of
+        // range for the speech synthesiser.
+        if !SettingsDefaults.pitchRange.contains(pitchValue) {
+            pitchValue = SettingsDefaults.fallbackPitch
+        }
+        if speakingRateValue > SettingsDefaults.maxSpeakingRate {
+            speakingRateValue = SettingsDefaults.fallbackSpeakingRate
+        }
+        volumeValue = min(volumeValue, SettingsDefaults.maxVolume)
+    }
+
+    private func writeSettingsFile(_ settings: AlertSettings) {
+        addLog(text: "func:- saveSettings")
+        let excluded = CalendarExclusions
+            .excluded(from: eventCalendars.map(calendarOption), enabledIDs: settings.enabledCalendarIDs)
+            .map { [SettingsFileKey.calendarName: $0.name, SettingsFileKey.calendarID: $0.id] }
+        let voiceOptions: NSDictionary = [
+            SettingsFileKey.voiceUsing: usingValue,
+            SettingsFileKey.voiceSpeakingRate: speakingRateValue,
+            SettingsFileKey.voicePitch: pitchValue,
+            SettingsFileKey.voiceVolume: volumeValue,
+            SettingsFileKey.voiceModulation: modulationValue,
+        ]
+        let json: NSDictionary = [
+            SettingsFileKey.calendarsToExclude: excluded,
+            SettingsFileKey.eventKeywordsToIgnore: settings.ignoredKeywords,
+            SettingsFileKey.barkStartTime: settings.alertStartTime.storageString,
+            SettingsFileKey.barkEndTime: settings.alertEndTime.storageString,
+            SettingsFileKey.voiceOptions: voiceOptions,
+            SettingsFileKey.barkPool: arrBarkPools,
+            SettingsFileKey.dialogWindowTextStages: arrTextStages,
+            SettingsFileKey.intentionPrompts: arrIntentionPrompts,
+        ]
+
+        addLog(text: "Save events.json start")
+        guard let url = jsonUrl,
+              let jsonData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted),
+              let jsonString = String(data: jsonData, encoding: .utf8)?.replacingOccurrences(of: "\\/", with: "/")
+        else {
+            addLog(text: "Failure: convert data from json")
+            return
+        }
+        do {
+            try jsonString.write(to: url, atomically: true, encoding: .utf8)
+            addLog(text: "Success: write json file:- \(jsonString)")
+        } catch {
+            addLog(text: "Failure: write json file")
+        }
     }
 }
-

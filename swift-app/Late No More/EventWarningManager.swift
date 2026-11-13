@@ -39,10 +39,10 @@ class EventWarningManager {
     }
     
     // MARK: - Initialization
-    func resetData(calendars: [[String: Any]], startTimePicker: NSDatePicker, endTimePicker: NSDatePicker) {
+    func resetData(calendars: [[String: Any]], startTime: Date, endTime: Date) {
         self.arrCalendars = calendars
-        self.pickerStartTimeDateValue = startTimePicker.dateValue
-        self.pickerEndTimeDateValue = endTimePicker.dateValue
+        self.pickerStartTimeDateValue = startTime
+        self.pickerEndTimeDateValue = endTime
     }
     
     // MARK: - Public Methods

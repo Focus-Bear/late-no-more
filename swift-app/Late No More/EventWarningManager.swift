@@ -14,6 +14,7 @@ class EventWarningManager {
     private var timer: Timer?
     private var shownWarnings: [String: Set<WarningTime>] = [:]
     private var arrCalendars: [[String: Any]] = []
+    private var ignoredKeywords: [String] = []
     private var pickerStartTimeDateValue: Date!
     private var pickerEndTimeDateValue: Date!
     var timeInterval = 10
@@ -39,8 +40,9 @@ class EventWarningManager {
     }
     
     // MARK: - Initialization
-    func resetData(calendars: [[String: Any]], startTime: Date, endTime: Date) {
+    func resetData(calendars: [[String: Any]], startTime: Date, endTime: Date, ignoredKeywords: [String]) {
         self.arrCalendars = calendars
+        self.ignoredKeywords = ignoredKeywords
         self.pickerStartTimeDateValue = startTime
         self.pickerEndTimeDateValue = endTime
     }
@@ -94,7 +96,7 @@ class EventWarningManager {
         let events = calendarManager.fetchEvents(from: startDateTime, to: endDateTime, in: calendarsToCheck)
         let currentDate = Date()
         
-        for event in events where !event.isAllDay {
+        for event in events where !event.isAllDay && !KeywordList.isIgnored(eventTitle: event.title, keywords: ignoredKeywords) {
             if let startDateTime = event.startDate{
                 
                 let dateFormatter = DateFormatter()

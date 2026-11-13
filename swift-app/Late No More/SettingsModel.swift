@@ -124,6 +124,16 @@ enum KeywordList {
         keywords.filter { $0 != keyword }
     }
 
+    /// Whether an event with this title should be skipped: its title contains a keyword, ignoring case,
+    /// as the Node engine matched them.
+    static func isIgnored(eventTitle: String?, keywords: [String]) -> Bool {
+        guard let title = eventTitle else { return false }
+        return keywords.contains { keyword in
+            let trimmed = keyword.trimmingCharacters(in: .whitespaces)
+            return !trimmed.isEmpty && title.localizedCaseInsensitiveContains(trimmed)
+        }
+    }
+
     private static func contains(_ keyword: String, in keywords: [String]) -> Bool {
         keywords.contains { $0.caseInsensitiveCompare(keyword) == .orderedSame }
     }

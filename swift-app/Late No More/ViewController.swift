@@ -182,7 +182,8 @@ class ViewController: NSViewController {
         warningManagerObject.resetData(
             calendars: calendarEntries(enabledIDs: settings.enabledCalendarIDs),
             startTime: settings.alertStartTime.date(),
-            endTime: settings.alertEndTime.date()
+            endTime: settings.alertEndTime.date(),
+            ignoredKeywords: settings.ignoredKeywords
         )
     }
 

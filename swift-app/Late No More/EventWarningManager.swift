@@ -23,6 +23,7 @@ class EventWarningManager {
     private var warningIdentities: [String: SharedCalendarDismissals.Identity] = [:]
     private let warningLock = NSLock()
     private var arrCalendars: [[String: Any]] = []
+    private var ignoredKeywords: [String] = []
     private var pickerStartTimeDateValue: Date!
     private var pickerEndTimeDateValue: Date!
     var timeInterval = 10
@@ -70,9 +71,10 @@ class EventWarningManager {
     deinit { DistributedNotificationCenter.default().removeObserver(self) }
 
     // MARK: - Initialization
-    func resetData(calendars: [[String: Any]], startTime: Date, endTime: Date) {
+    func resetData(calendars: [[String: Any]], startTime: Date, endTime: Date, ignoredKeywords: [String]) {
         checkQueue.async {
             self.arrCalendars = calendars
+            self.ignoredKeywords = ignoredKeywords
             self.pickerStartTimeDateValue = startTime
             self.pickerEndTimeDateValue = endTime
         }
@@ -129,7 +131,8 @@ class EventWarningManager {
         let dismissals = SharedCalendarDismissals.read()
         let events = calendarManager.fetchEvents(from: startDateTime, to: endDateTime, in: calendarsToCheck)
             .filter { event in
-                guard !event.isAllDay, event.startDate != nil else { return false }
+                guard !event.isAllDay, event.startDate != nil,
+                      !KeywordList.isIgnored(eventTitle: event.title, keywords: self.ignoredKeywords) else { return false }
                 guard let identity = dismissalIdentity(event) else { return true }
                 return dismissals?.hides(identity) != true
             }

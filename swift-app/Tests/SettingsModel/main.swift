@@ -72,6 +72,11 @@ check(KeywordList.adding("a, b,,c", to: []) == ["a", "b", "c"], "adds comma-sepa
 check(KeywordList.adding("No-Notify", to: ["no-notify"]) == ["no-notify"], "skips a duplicate in another case")
 check(KeywordList.adding("   ", to: ["x"]) == ["x"], "skips blanks")
 check(KeywordList.removing("b", from: ["a", "b", "c"]) == ["a", "c"], "removes a keyword")
+check(KeywordList.isIgnored(eventTitle: "Standup [SKIPLNM]", keywords: ["no-notify", "[skiplnm]"]),
+      "an event whose title contains a keyword, in any case, is ignored")
+check(!KeywordList.isIgnored(eventTitle: "Standup", keywords: ["no-notify"]), "other events are not ignored")
+check(!KeywordList.isIgnored(eventTitle: "Standup", keywords: ["", "  "]), "blank keywords match nothing")
+check(!KeywordList.isIgnored(eventTitle: nil, keywords: ["no-notify"]), "an untitled event is not ignored")
 
 // MARK: Calendar exclusions
 

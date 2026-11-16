@@ -5,3 +5,6 @@ node_modules
 .history
 dist
 **/late-no-more-log.txt
+
+# App Store Connect API private keys
+*.p8

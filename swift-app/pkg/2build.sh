@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail   # stop at the first failed step
 
 # Name of the package.
 NAME="Late No More"
@@ -9,16 +10,18 @@ IDENTIFIER="com.focusbear.latenomore"
 # Package version number.
 VERSION="1.0"
 
-productbuild --distribution Distribution.xml --package-path "$NAME-$VERSION.pkg"  --resources resources "Late No More.pkg" --sign "Developer ID Installer: Jeremy Nagel (TCUD568B3U)"
- 
-# Sign the final pkg
-codesign -f -s "Developer ID Application: Jeremy Nagel (TCUD568B3U)" -v "Late No More.pkg"
+# Notarization credentials live in the keychain, never in this file.
+# One-time setup per machine (App Store Connect API key):
+#   xcrun notarytool store-credentials "LNM_NOTARY" --key ~/.private_keys/AuthKey_<KeyID>.p8 --key-id <KeyID> --issuer <IssuerID>
+NOTARY_PROFILE="${NOTARY_PROFILE:-LNM_NOTARY}"
 
-#Verify Sign
-codesign -vvv --deep --strict "Late No More.pkg"
+productbuild --distribution Distribution.xml --package-path "$NAME-$VERSION.pkg" --resources resources "$NAME.pkg" --sign "Developer ID Installer: Focus Bear Pty Ltd (TCUD568B3U)"
 
-xcrun notarytool submit "Late No More.pkg" --wait --apple-id "vishnu.wtl@gmail.com" --password "mmnz-xeky-xmrt-eqgb" --team-id TCUD568B3U
+# Verify the installer signature
+pkgutil --check-signature "$NAME.pkg"
 
-xcrun stapler staple "Late No More.pkg"
+xcrun notarytool submit "$NAME.pkg" --wait --keychain-profile "$NOTARY_PROFILE"
 
-spctl --assess -vv --type install "Late No More.pkg"
+xcrun stapler staple "$NAME.pkg"
+
+spctl --assess -vv --type install "$NAME.pkg"

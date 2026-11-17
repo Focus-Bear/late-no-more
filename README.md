@@ -1,6 +1,6 @@
 # Late No More
 
-Checks local iCal via AppleScript & notifies about upcoming events and meetings. To download a binary, visit https://focusbear.io/en/late-no-more
+Checks your macOS calendars & notifies about upcoming events and meetings. To download a binary, visit https://focusbear.io/en/late-no-more
 
 ![Screenshot](https://uploads-ssl.webflow.com/628f17fc227cdc10d90d9d44/64743b6a76590e82e072cecb_LNM4.jpg)
 
@@ -26,30 +26,21 @@ I’ve gotta admit that not only am I frequently late for meetings, I’m also f
 
 ## Architecture
 
-The calendar alerting is done via a Node JS script that uses applescript + CalendarLib EC. 
+Late No More is a native macOS app in `swift-app/`. It reads your calendars through EventKit
+(`CalendarManager.swift`), schedules the alerts in `EventWarningManager.swift`, and has the settings UI.
+There is no Node.js part any more: the original Node/AppleScript alerting script was replaced by the
+Swift implementation and removed from this repo.
 
-The settings UI is a swift app.
+## Local development
 
-## Local development of Node JS app
+Open `swift-app/Late No More.xcodeproj` in Xcode and run the `Late No More` scheme, or build from the
+command line:
 
-Clone this repo and run:
-
-`npm install`
-
-Then you need to install CalendarLib EC (https://latenightsw.com/freeware/)
-
-```
-mkdir -p ~/Library/Script\ Libraries
-cp swift-app/pkg/files/Library/Script\ Libraries/CalendarLib\ EC.scptd ~/Library/Script\ Libraries/CalendarLib\ EC.scptd
+```bash
+xcodebuild -project "swift-app/Late No More.xcodeproj" -scheme "Late No More" -configuration Debug build
 ```
 
-Then you can start the node app
-
-`npm run start`
-
-or for testing
-
-`npm run test`
+The installer package is built with the scripts in `swift-app/pkg/` (`1build.sh`, then `2build.sh`).
 
 ## How it works
 
@@ -57,7 +48,7 @@ There are two core cycles in play:
 
 1. First is to check iCal and save all meetings occurring in the next specified minutes to a local, in-memory list. This is governed by checkCalendarFrequencyMinutes.
 2. Second is to check the upcomingEvents, in-memory list for any imminent meetings and notify. This is governed by checkUpcomingFrequencySeconds.
-3. Upon meetings, optionally set an intention & write notes, which are saved to ~/Documents/LateNoMore-Meetings.csv.
+3. Upon meetings, optionally set an intention & write notes.
 
 ## Configuration Options
 
@@ -111,7 +102,7 @@ Please see the Configuration Options section below for details on each setting.
 
 ### Configuration Options
 
-The settings.json file contains various configuration options for Late No More. Refer to the Example Configuration section above for a full example.
+The app saves its settings to `~/Library/Application Support/com.focusbear.latenomore/events.json`; edit them in the app's settings window. Refer to the Example Configuration section above for a full example.
 | Setting | Type | Description |
 | ------------------------------ | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | checkUpcomingLookAheadMinutes | Integer | The number of minutes to look ahead in the calendar for upcoming meetings. |

@@ -51,7 +51,50 @@ class advancedSettingsVc: NSViewController {
             tabViewItemIntentionPrompts.view?.addSubview(intentionPromptsVcObj!.view)
             tabViewItemIntentionPrompts.view?.addConstraints(subView: intentionPromptsVcObj!.view)
         }
+        addFocusBearTabIfInstalled()
     }
+
+    /// The Focus Bear tab, only once a Focus Bear that can open meeting links is installed.
+    private func addFocusBearTabIfInstalled() {
+        guard FocusBearInstallation.canOpenBrowserLinks, let tabView = tabViewItemVoiceOptions.tabView else { return }
+        let item = NSTabViewItem(identifier: Self.focusBearTabIdentifier)
+        item.label = Self.focusBearTabLabel
+        item.view = makeFocusBearSettingsView()
+        tabView.addTabViewItem(item)
+    }
+
+    private func makeFocusBearSettingsView() -> NSView {
+        let checkBox = NSButton(checkboxWithTitle: OpenMeetingsInFocusBearSetting.title, target: self,
+                                action: #selector(openMeetingsInFocusBearClicked(_:)))
+        checkBox.state = OpenMeetingsInFocusBearSetting.isOn ? .on : .off
+        let explanation = NSTextField(wrappingLabelWithString: OpenMeetingsInFocusBearSetting.explanation)
+        explanation.textColor = .secondaryLabelColor
+        let stack = NSStackView(views: [checkBox, explanation])
+        stack.orientation = .vertical
+        stack.alignment = .leading
+        stack.spacing = Self.focusBearTabSpacing
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        let container = NSView()
+        container.addSubview(stack)
+        NSLayoutConstraint.activate([
+            stack.topAnchor.constraint(equalTo: container.topAnchor, constant: Self.focusBearTabMargin),
+            stack.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: Self.focusBearTabMargin),
+            stack.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -Self.focusBearTabMargin),
+            // The explanation wraps at the tab's width instead of running off it on one line.
+            explanation.widthAnchor.constraint(equalTo: stack.widthAnchor),
+        ])
+        return container
+    }
+
+    @objc private func openMeetingsInFocusBearClicked(_ sender: NSButton) {
+        OpenMeetingsInFocusBearSetting.isOn = sender.state == .on
+        addLog(text: "advance settings:- open meetings in Focus Bear's browser \(OpenMeetingsInFocusBearSetting.isOn)")
+    }
+
+    private static let focusBearTabIdentifier = "focusBear"
+    private static let focusBearTabLabel = "Focus Bear"
+    private static let focusBearTabMargin: CGFloat = 20
+    private static let focusBearTabSpacing: CGFloat = 8
     override func viewWillAppear() {
         btnOk.keyEquivalent = "\r"
     }

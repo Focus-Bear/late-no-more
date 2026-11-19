@@ -7,10 +7,10 @@ NAME="Late No More"
 IDENTIFIER="com.focusbear.latenomore"
 
 # Package version number.
-VERSION="1.0"
+VERSION="2.0"
 
 # The location to copy the contents of files.
-INSTALL_LOCATION="/"
+INSTALL_LOCATION="/Applications"
 
 
 # Remove any unwanted .DS_Store files.

@@ -73,6 +73,15 @@ class CalendarManager {
                     .sorted { $0.startDate < $1.startDate }
     }
     
+    /// Looks up by time as well as identifier: every occurrence of a recurring event shares one
+    /// `eventIdentifier`, so `event(withIdentifier:)` can return a different day's occurrence.
+    func fetchOccurrence(withIdentifier identifier: String, overlapping start: Date, end: Date) -> EKEvent? {
+        let predicate = eventStore.predicateForEvents(withStart: start, end: max(end, start.addingTimeInterval(1)), calendars: nil)
+        return eventStore.events(matching: predicate)
+            .filter { $0.eventIdentifier == identifier }
+            .min { abs($0.startDate.timeIntervalSince(start)) < abs($1.startDate.timeIntervalSince(start)) }
+    }
+
     func fetchEvents(from startDate: Date, to endDate: Date, in calendars: [EKCalendar]) -> [EKEvent] {
         let predicate = eventStore.predicateForEvents(withStart: startDate, end: endDate, calendars: calendars)
         let events = eventStore.events(matching: predicate)
@@ -169,4 +178,11 @@ class CalendarManager {
     
 }
 
-
+extension MeetingReminderEvent {
+    init(_ event: EKEvent) {
+        self.init(start: event.startDate,
+                  end: event.endDate,
+                  isCancelled: event.status == .canceled,
+                  isDeclined: event.attendees?.first { $0.isCurrentUser }?.participantStatus == .declined)
+    }
+}

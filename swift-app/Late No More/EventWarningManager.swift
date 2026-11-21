@@ -94,7 +94,7 @@ class EventWarningManager {
         let events = calendarManager.fetchEvents(from: startDateTime, to: endDateTime, in: calendarsToCheck)
         let currentDate = Date()
         
-        for event in events where !event.isAllDay {
+        for event in events where !event.isAllDay && !MeetingReminderEvent(event).isCancelledOrDeclined {
             if let startDateTime = event.startDate{
                 
                 let dateFormatter = DateFormatter()
@@ -196,7 +196,7 @@ class EventWarningManager {
                 message = "Event '\(event.title ?? "")' starts in 2 minutes and Event url is '\(eventUrlString)'"
                 addLog(text: "Event '\(event.title ?? "")' starts in 2 minutes and Event url is '\(eventUrlString)'")
                 let eventId = event.eventIdentifier ?? ""
-                Late_No_More.showtCustomAlertWindow(title: event.title, time: event.startDate, url: eventUrl,notes: event.notes ?? "", eventId:eventId)
+                Late_No_More.showtCustomAlertWindow(title: event.title, meeting: MeetingReminderEvent(event), url: eventUrl,notes: event.notes ?? "", eventId:eventId)
                 
                 
                 let formatter = ISO8601DateFormatter()

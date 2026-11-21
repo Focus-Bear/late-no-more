@@ -36,7 +36,10 @@ class customAlertVc: NSViewController {
     var timerVerbalAlerts:Timer?
     var parseInfo: MeetingLinkInfo?
     var eventId:String = ""
-    var remainingSeconds = 120
+    private var meeting: MeetingReminderEvent?
+    private var lastCalendarRecheck: Date?
+    /// EventKit lookups are too heavy for the one-second countdown tick.
+    private let calendarRecheckIntervalSeconds: TimeInterval = 30
     var verbalAlertsStartTime: Date?
     private let maxVerbalAlertsDurationSeconds: TimeInterval = 300 // 5 minutes max for verbal alerts
     
@@ -60,7 +63,7 @@ class customAlertVc: NSViewController {
         lblTitle.font = NSFont.monospacedSystemFont(ofSize: 16, weight: .semibold)
     }
     
-    func resetData(title:String,time:Date, url:URL?, notes:String, eventId:String){
+    func resetData(title:String, meeting:MeetingReminderEvent, url:URL?, notes:String, eventId:String){
         parseInfo = nil
         lbCloseThisPopup.isHidden = true
         joinMeetingClicked = false
@@ -75,6 +78,8 @@ class customAlertVc: NSViewController {
         nagShowTime = Date()
         linkUrl = nil
         self.eventId = eventId
+        self.meeting = meeting
+        lastCalendarRecheck = Date()
         
         
         if let url = url{
@@ -105,8 +110,7 @@ class customAlertVc: NSViewController {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "EEEE, d MMMM yyyy, h:mm a"
 
-        let date = time // your date object
-        let dateString = "Today, " + dateFormatter.string(from: date)
+        let dateString = "Today, " + dateFormatter.string(from: meeting.start)
         lblDateTime.stringValue = dateString
         
         timerCheckMeeting?.invalidate()
@@ -119,7 +123,6 @@ class customAlertVc: NSViewController {
         
         timerVerbalAlerts?.invalidate()
         timerVerbalAlerts = nil
-        lblTitle.stringValue = "Your Meeting Starts in 2 Minutes"
         updateCountdown()
     }
     
@@ -136,34 +139,34 @@ class customAlertVc: NSViewController {
                 }
             }
         }
-        remainingSeconds -= 1
+        recheckCalendarIfDue()
         updateCountdown()
     }
     
+    /// Picks up a cancellation, a decline, a deletion or a new time made in the calendar after the reminder appeared.
+    private func recheckCalendarIfDue() {
+        guard !eventId.isEmpty, let meeting = meeting else { return }
+        let now = Date()
+        if let lastCheck = lastCalendarRecheck, now.timeIntervalSince(lastCheck) < calendarRecheckIntervalSeconds { return }
+        lastCalendarRecheck = now
+        let occurrence = calendarManager.fetchOccurrence(withIdentifier: eventId, overlapping: meeting.start, end: meeting.end)
+        self.meeting = occurrence.map(MeetingReminderEvent.init)
+    }
+    
     func updateCountdown() {
-        let absSeconds = abs(remainingSeconds)
-        let minutes = absSeconds / 60
-        let seconds = absSeconds % 60
-        var minutesText = "Minutes"
-        
-        if minutes == 0{
-            if seconds == 1{
-                minutesText = "Second"
-            }else{
-                minutesText = "Seconds"
-            }
-        }else if minutes == 1{
-            minutesText = "Minutes"
+        let phase = MeetingReminderCountdown.phase(for: meeting, now: Date())
+        if case .dismiss(let reason) = phase {
+            addLog(text: "Dismissing meeting reminder for \(lblEventName.stringValue): \(reason.rawValue)")
+            closeReminderWindow()
+            return
         }
-        
-        
-        if remainingSeconds >= 0 {
-            lblTitle.textColor = .labelColor
-            lblTitle.stringValue = String(format: "Your Meeting Starts in %d:%02d \(minutesText)", minutes, seconds)
-        } else {
-            lblTitle.stringValue = String(format: "Your Meeting Starts in -%d:%02d \(minutesText)", minutes, seconds)
+        guard let title = MeetingReminderCountdown.title(for: phase) else { return }
+        if case .startedAgo = phase {
             lblTitle.textColor = .systemRed
+        } else {
+            lblTitle.textColor = .labelColor
         }
+        lblTitle.stringValue = title
     }
     
     func meetingTimeShowVerbalAlerts(){
@@ -242,6 +245,13 @@ class customAlertVc: NSViewController {
 
     
     @IBAction func btnIDontNeedToAttendClicked(_ sender: Any) {
+        closeReminderWindow()
+    }
+    
+    private func closeReminderWindow() {
+        timerCheckMeeting?.invalidate()
+        timerCheckMeeting = nil
+        stopVerbalAlerts()
         for i in 0..<arrAlertWcObj.count{
             let wc = arrAlertWcObj[i]
             if wc.window == self.view.window{

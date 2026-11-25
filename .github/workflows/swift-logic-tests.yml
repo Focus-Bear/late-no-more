@@ -1,0 +1,21 @@
+name: Swift logic tests
+
+on:
+  pull_request:
+    paths:
+      - 'swift-app/**'
+      - 'scripts/test-meeting-link-routing.sh'
+      - '.github/workflows/swift-logic-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'swift-app/**'
+
+jobs:
+  meeting-link-routing:
+    runs-on: macos-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Meeting link routing
+        run: ./scripts/test-meeting-link-routing.sh

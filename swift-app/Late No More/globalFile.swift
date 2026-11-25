@@ -25,12 +25,12 @@ func getonboardingCardsVcObject()-> onboardingCardsVc{
 }
 
 
-var customWcObj:customWc?
-func getCustomWcObject()-> customWc{
-    if customWcObj == nil{
-        customWcObj = mainStoryboard.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("customWc")) as? customWc
+var warnWcObj:NSWindowController?
+func getWarnWcObject()-> NSWindowController{
+    if warnWcObj == nil{
+        warnWcObj = NSWindowController(window: ReminderPanel.make())
     }
-    return customWcObj!
+    return warnWcObj!
 }
 
 func getCustomAlertWcObject()-> customWc{
@@ -90,8 +90,12 @@ func showtMeetingNotesWindow(intention: String, eventName: String){
 
 func showWarnWindow(title: String, calendarName: String, dismissalIdentity: SharedCalendarDismissals.Identity? = nil){
     addLog(text: "showWarnWindow")
-    getCustomWcObject().contentViewController = getWarnUserVcObject()
-    AlertWindowPresentation.present(getCustomWcObject())
+    let warnWc = getWarnWcObject()
+    warnWc.contentViewController = getWarnUserVcObject()
+    // Keeps the install tree's alert behaviour: the reminder shows on the user's Space, also over a full-screen app.
+    warnWc.window?.collectionBehavior.formUnion(AlertWindowPresentation.collectionBehavior)
+    warnWc.window?.center()
+    ReminderPanel.show(warnWc.window)
     getWarnUserVcObject().resetData(title: title, calendarName: calendarName)
     getWarnUserVcObject().calendarDismissalIdentity = dismissalIdentity
 }

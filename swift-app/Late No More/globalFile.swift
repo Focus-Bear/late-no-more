@@ -25,12 +25,12 @@ func getonboardingCardsVcObject()-> onboardingCardsVc{
 }
 
 
-var customWcObj:customWc?
-func getCustomWcObject()-> customWc{
-    if customWcObj == nil{
-        customWcObj = mainStoryboard.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier("customWc")) as? customWc
+var warnWcObj:NSWindowController?
+func getWarnWcObject()-> NSWindowController{
+    if warnWcObj == nil{
+        warnWcObj = NSWindowController(window: ReminderPanel.make())
     }
-    return customWcObj!
+    return warnWcObj!
 }
 
 func getCustomAlertWcObject()-> customWc{
@@ -90,10 +90,10 @@ func showtMeetingNotesWindow(intention: String, eventName: String){
 
 func showWarnWindow(title: String, calendarName: String){
     addLog(text: "showWarnWindow")
-    getCustomWcObject().contentViewController = getWarnUserVcObject()
-    getCustomWcObject().window?.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(CGWindowLevelKey.modalPanelWindow)))
-    getCustomWcObject().showWindow(nil)
-    getCustomWcObject().window?.center()
+    let warnWc = getWarnWcObject()
+    warnWc.contentViewController = getWarnUserVcObject()
+    warnWc.window?.center()
+    ReminderPanel.show(warnWc.window)
     getWarnUserVcObject().resetData(title: title, calendarName: calendarName)
 }
 

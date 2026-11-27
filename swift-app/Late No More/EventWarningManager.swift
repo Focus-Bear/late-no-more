@@ -88,14 +88,12 @@ class EventWarningManager {
         }
         
         
-        let startDateTime = combineCurrentDateWithTime(from: pickerStartTimeDateValue)
-        let endDateTime = combineCurrentDateWithTime(from: pickerEndTimeDateValue)
-        
-        let events = calendarManager.fetchEvents(from: startDateTime, to: endDateTime, in: calendarsToCheck)
         let currentDate = Date()
+        let hours = AlertHours(on: currentDate, startTime: pickerStartTimeDateValue, endTime: pickerEndTimeDateValue)
+        let events = calendarManager.fetchEvents(from: hours.start, to: hours.end, in: calendarsToCheck)
         
         for event in events where !event.isAllDay {
-            if let startDateTime = event.startDate{
+            if let startDateTime = event.startDate, hours.allowsAlerts(forMeetingStartingAt: startDateTime) {
                 
                 let dateFormatter = DateFormatter()
                 dateFormatter.dateFormat = "EEEE, d MMMM yyyy, h:mm a"
@@ -132,22 +130,6 @@ class EventWarningManager {
             }
         }
         
-    }
-    
-    private func combineCurrentDateWithTime(from time: Date) -> Date {
-        let calendar = Calendar.current
-        let dateComponents = calendar.dateComponents([.year, .month, .day], from: Date())
-        let timeComponents = calendar.dateComponents([.hour, .minute, .second], from: time)
-        
-        var combinedComponents = DateComponents()
-        combinedComponents.year = dateComponents.year
-        combinedComponents.month = dateComponents.month
-        combinedComponents.day = dateComponents.day
-        combinedComponents.hour = timeComponents.hour
-        combinedComponents.minute = timeComponents.minute
-        combinedComponents.second = timeComponents.second
-        
-        return calendar.date(from: combinedComponents) ?? Date()
     }
     
     private func showWarnWindow(for warningTime: WarningTime, event: EKEvent) {
@@ -253,3 +235,34 @@ class EventWarningManager {
 //    }
 //    return nil
 //}
+
+// MARK: - AlertHours
+
+/// The alert hours on one day. Only meetings that start inside them get popups or spoken alerts, as the
+/// settings window promises. The calendar fetch returns every event that overlaps the hours, so a block
+/// running from midnight to 6:45 am overlapped a 6:30 am start: each night at 00:00 it was fetched for the
+/// new day, its two-minute alert was caught up, and its verbal alerts played for five minutes.
+struct AlertHours {
+    let start: Date
+    let end: Date
+
+    /// The hours on `day`, from the settings' start and end times (only their time of day counts). An end
+    /// at or before the start leaves no hours at all.
+    init(on day: Date, startTime: Date, endTime: Date, calendar: Calendar = .current) {
+        start = Self.combine(day: day, timeOfDay: startTime, calendar: calendar)
+        end = Self.combine(day: day, timeOfDay: endTime, calendar: calendar)
+    }
+
+    func allowsAlerts(forMeetingStartingAt meetingStart: Date) -> Bool {
+        meetingStart >= start && meetingStart < end
+    }
+
+    private static func combine(day: Date, timeOfDay: Date, calendar: Calendar) -> Date {
+        var components = calendar.dateComponents([.year, .month, .day], from: day)
+        let time = calendar.dateComponents([.hour, .minute, .second], from: timeOfDay)
+        components.hour = time.hour
+        components.minute = time.minute
+        components.second = time.second
+        return calendar.date(from: components) ?? day
+    }
+}

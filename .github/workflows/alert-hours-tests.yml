@@ -1,0 +1,21 @@
+name: Alert hours tests
+
+on:
+  pull_request:
+    paths:
+      - 'swift-app/**'
+      - 'scripts/test-alert-hours.sh'
+      - '.github/workflows/alert-hours-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'swift-app/**'
+
+jobs:
+  alert-hours:
+    runs-on: macos-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Alert hours
+        run: ./scripts/test-alert-hours.sh
